@@ -4,6 +4,10 @@ Scorea est une application pour modéliser le règlement d'un diplôme.
 Elle permet de créer des blocs de compétences et d'y définir les compétences associées,
 afin de représenter formellement l'organisation des savoirs et les règles d'obtention du diplôme.
 
+## Coding Style
+Les conventions de code du projet sont décrites dans le fichier  
+[CodingStyle.md](./docs/CodingStyle.md).
+
 ## Diagrammes
 
 ### Base de données
