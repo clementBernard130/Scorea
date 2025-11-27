@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@source not "../../public";
+
+
+body {
+    background-color: lightgray;
+}
