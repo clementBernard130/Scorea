@@ -22,5 +22,3 @@ Les conventions de code du projet sont décrites dans le fichier
 - [Philippe OU](https://github.com/OuPhilippeCci)
 - [Aymeric CLEMENT](https://github.com/aclement0)
 - [Enzo SORIA BONET](https://github.com/esoriabonet)
-
-projetFinCCI
