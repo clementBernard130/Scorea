@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\SkillRepository;
+use App\Repository\SubjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SkillRepository::class)]
-class Skill
+#[ORM\Entity(repositoryClass: SubjectRepository::class)]
+class Subject
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,19 +22,18 @@ class Skill
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'skills')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?SkillUnit $skillUnit = null;
+    #[ORM\Column]
+    private ?float $coefficient = null;
 
     /**
-     * @var Collection<int, Subject>
+     * @var Collection<int, Skill>
      */
-    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'skills')]
-    private Collection $subjects;
+    #[ORM\ManyToMany(targetEntity: Skill::class, inversedBy: 'subjects')]
+    private Collection $skills;
 
     public function __construct()
     {
-        $this->subjects = new ArrayCollection();
+        $this->skills = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -66,41 +65,38 @@ class Skill
         return $this;
     }
 
-    public function getSkillUnit(): ?SkillUnit
+    public function getCoefficient(): ?float
     {
-        return $this->skillUnit;
+        return $this->coefficient;
     }
 
-    public function setSkillUnit(?SkillUnit $skillUnit): static
+    public function setCoefficient(float $coefficient): static
     {
-        $this->skillUnit = $skillUnit;
+        $this->coefficient = $coefficient;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Subject>
+     * @return Collection<int, Skill>
      */
-    public function getSubjects(): Collection
+    public function getSkills(): Collection
     {
-        return $this->subjects;
+        return $this->skills;
     }
 
-    public function addSubject(Subject $subject): static
+    public function addSkill(Skill $skill): static
     {
-        if (!$this->subjects->contains($subject)) {
-            $this->subjects->add($subject);
-            $subject->addSkill($this);
+        if (!$this->skills->contains($skill)) {
+            $this->skills->add($skill);
         }
 
         return $this;
     }
 
-    public function removeSubject(Subject $subject): static
+    public function removeSkill(Skill $skill): static
     {
-        if ($this->subjects->removeElement($subject)) {
-            $subject->removeSkill($this);
-        }
+        $this->skills->removeElement($skill);
 
         return $this;
     }
