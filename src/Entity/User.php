@@ -49,6 +49,9 @@ class User
     #[ORM\OneToMany(targetEntity: Grade::class, mappedBy: 'teacher', orphanRemoval: true)]
     private Collection $givenGrades;
 
+    #[ORM\Column(length: 255)]
+    private ?string $password = null;
+
     public function __construct()
     {
         $this->grades = new ArrayCollection();
@@ -200,6 +203,18 @@ class User
                 $givenGrade->setTeacher(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
         return $this;
     }
