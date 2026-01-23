@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\TrainingRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TrainingRepository::class)]
@@ -19,14 +20,17 @@ class Training
     private ?string $name = null;
 
     /**
-     * @var Collection<int, Classe>
+     * @var Collection<int, Sections>
      */
-    #[ORM\OneToMany(targetEntity: Classe::class, mappedBy: 'training', orphanRemoval: true)]
-    private Collection $classes;
+    #[ORM\OneToMany(targetEntity: Sections::class, mappedBy: 'training_id', orphanRemoval: true)]
+    private Collection $sections;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     public function __construct()
     {
-        $this->classes = new ArrayCollection();
+        $this->sections = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -47,32 +51,45 @@ class Training
     }
 
     /**
-     * @return Collection<int, Classe>
+     * @return Collection<int, Sections>
      */
-    public function getClasses(): Collection
+    public function getSections(): Collection
     {
-        return $this->classes;
+        return $this->sections;
     }
 
-    public function addClass(Classe $class): static
+    public function addSection(Sections $section): static
     {
-        if (!$this->classes->contains($class)) {
-            $this->classes->add($class);
-            $class->setTraining($this);
+        if (!$this->sections->contains($section)) {
+            $this->sections->add($section);
+            $section->setTrainingId($this);
         }
 
         return $this;
     }
 
-    public function removeClass(Classe $class): static
+    public function removeSection(Sections $section): static
     {
-        if ($this->classes->removeElement($class)) {
+        if ($this->sections->removeElement($section)) {
             // set the owning side to null (unless already changed)
-            if ($class->getTraining() === $this) {
-                $class->setTraining(null);
+            if ($section->getTrainingId() === $this) {
+                $section->setTrainingId(null);
             }
         }
 
         return $this;
     }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
 }
