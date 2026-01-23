@@ -6,7 +6,7 @@ use App\Repository\GradeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GradeRepository::class)]
-class Grade
+class Grades
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -9,7 +9,7 @@ use App\Entity\Training;
 use App\Entity\Subject;
 use App\Entity\SkillUnit;
 use App\Entity\Skill;
-use App\Entity\Grade;
+use App\Entity\Grades;
 use App\Entity\Sections;
 use DateTime;
 use DateTimeImmutable;
@@ -422,7 +422,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($grades as $gradeData) {
-            $grade = new Grade();
+            $grade = new Grades();
             $grade->setStudent($gradeData['student']);
             $grade->setSubject($gradeData['subject']);
             $grade->setTeacher($gradeData['teacher']);

@@ -32,9 +32,9 @@ class Subject
     private Collection $skills;
 
     /**
-     * @var Collection<int, Grade>
+     * @var Collection<int, Grades>
      */
-    #[ORM\OneToMany(targetEntity: Grade::class, mappedBy: 'subject', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'subject', orphanRemoval: true)]
     private Collection $grades;
 
     public function __construct()
@@ -109,14 +109,14 @@ class Subject
     }
 
     /**
-     * @return Collection<int, Grade>
+     * @return Collection<int, Grades>
      */
     public function getGrades(): Collection
     {
         return $this->grades;
     }
 
-    public function addGrade(Grade $grade): static
+    public function addGrade(Grades $grade): static
     {
         if (!$this->grades->contains($grade)) {
             $this->grades->add($grade);
@@ -126,7 +126,7 @@ class Subject
         return $this;
     }
 
-    public function removeGrade(Grade $grade): static
+    public function removeGrade(Grades $grade): static
     {
         if ($this->grades->removeElement($grade)) {
             // set the owning side to null (unless already changed)

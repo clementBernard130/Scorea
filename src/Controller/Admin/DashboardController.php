@@ -4,7 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Entity\Sections;
-use App\Entity\Grade;
+use App\Entity\Grades;
 use App\Entity\Skill;
 use App\Entity\SkillUnit;
 use App\Entity\Subject;
@@ -36,7 +36,7 @@ class DashboardController extends AbstractDashboardController
         // Menu CRUD
         yield MenuItem::linkToCrud('Users', 'fa fa-user', User::class);
         yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
-        yield MenuItem::linkToCrud('Grades', 'fa fa-graduation-cap', Grade::class);
+        yield MenuItem::linkToCrud('Grades', 'fa fa-graduation-cap', Grades::class);
         yield MenuItem::linkToCrud('Skills', 'fa fa-lightbulb', Skill::class);
         yield MenuItem::linkToCrud('Skill Units', 'fa fa-cubes', SkillUnit::class);
         yield MenuItem::linkToCrud('Subjects', 'fa fa-book', Subject::class);

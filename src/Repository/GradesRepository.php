@@ -2,18 +2,18 @@
 
 namespace App\Repository;
 
-use App\Entity\Grade;
+use App\Entity\Grades;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Grade>
+ * @extends ServiceEntityRepository<Grades>
  */
 class GradeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Grade::class);
+        parent::__construct($registry, Grades::class);
     }
 
     //    /**
