@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -53,7 +54,10 @@ class UserCrudController extends AbstractCrudController
             ->renderExpanded();
 
     
-        yield IntegerField::new('class_id', 'ID Classe');
+        yield AssociationField::new('sections', 'Sections')
+        ->setFormTypeOptions([
+            'by_reference' => false, // Souvent nécessaire pour que les ManyToMany s'enregistrent bien
+        ]);
 
     
         yield DateTimeField::new('created_at', 'Créé le')->hideOnForm();

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -47,8 +49,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $deleted_at = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $class_id = null;
+    /**
+     * @var Collection<int, Sections>
+     */
+    #[ORM\ManyToMany(targetEntity: Sections::class, inversedBy: 'users')]
+    private Collection $sections;
+
+    public function __construct()
+    {
+        $this->sections = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -191,15 +201,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getClassId(): ?int
+    /**
+     * @return Collection<int, Sections>
+     */
+    public function getSections(): Collection
     {
-        return $this->class_id;
+        return $this->sections;
     }
 
-    public function setClassId(?int $class_id): static
+    public function addSection(Sections $section): static
     {
-        $this->class_id = $class_id;
+        if (!$this->sections->contains($section)) {
+            $this->sections->add($section);
+        }
 
         return $this;
     }
+
+    public function removeSection(Sections $section): static
+    {
+        $this->sections->removeElement($section);
+
+        return $this;
+    }
+
 }
