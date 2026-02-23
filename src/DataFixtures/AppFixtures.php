@@ -8,7 +8,7 @@ use App\Entity\User;
 use App\Entity\Training;
 use App\Entity\Subject;
 use App\Entity\SkillUnit;
-use App\Entity\Skill;
+use App\Entity\Skills;
 use App\Entity\Grades;
 use App\Entity\Sections;
 use DateTime;
@@ -297,7 +297,7 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
-        // === Skill Unit ===
+        // === Skills Unit ===
         $skillUnits = [
             'DSNS-BLOC-1 : Analyser, conceptualiser, maquetter et sécuriser une solution',
             'DSNS-BLOC-2 : Concevoir, développer, mettre en production et maintenir une solution',
@@ -358,7 +358,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($skills as $skillData) {
-            $skill = new Skill();
+            $skill = new Skills();
             $skill->setName($skillData['name']);
             $skill->setDescription($skillData['description']);
             $skill->setSkillUnit($manager->getRepository(SkillUnit::class)->findOneBy(['name' => $skillData['skillUnit']]));
@@ -373,11 +373,11 @@ class AppFixtures extends Fixture
         $bddSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Base de données']);
         $projetSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Projet']);
         
-        $analyserSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Analyser les besoins métiers']);
-        $concevoirSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Concevoir une architecture applicative']);
-        $securiserSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Sécuriser une application']);
-        $developerSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Développer des composants métier']);
-        $productionSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Mettre en production une application']);
+        $analyserSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Analyser les besoins métiers']);
+        $concevoirSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Concevoir une architecture applicative']);
+        $securiserSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Sécuriser une application']);
+        $developerSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Développer des composants métier']);
+        $productionSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Mettre en production une application']);
         
         $pythonSubject->addSkill($developerSkill);
         $frameworkSubject->addSkill($developerSkill);

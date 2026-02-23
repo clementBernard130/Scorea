@@ -26,9 +26,9 @@ class Subject
     private ?float $coefficient = null;
 
     /**
-     * @var Collection<int, Skill>
+     * @var Collection<int, Skills>
      */
-    #[ORM\ManyToMany(targetEntity: Skill::class, inversedBy: 'subjects')]
+    #[ORM\ManyToMany(targetEntity: Skills::class, inversedBy: 'subjects')]
     private Collection $skills;
 
     /**
@@ -85,14 +85,14 @@ class Subject
     }
 
     /**
-     * @return Collection<int, Skill>
+     * @return Collection<int, Skills>
      */
     public function getSkills(): Collection
     {
         return $this->skills;
     }
 
-    public function addSkill(Skill $skill): static
+    public function addSkill(Skills $skill): static
     {
         if (!$this->skills->contains($skill)) {
             $this->skills->add($skill);
@@ -101,7 +101,7 @@ class Subject
         return $this;
     }
 
-    public function removeSkill(Skill $skill): static
+    public function removeSkill(Skills $skill): static
     {
         $this->skills->removeElement($skill);
 
