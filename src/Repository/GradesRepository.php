@@ -17,7 +17,7 @@ class GradesRepository extends ServiceEntityRepository
     }
 
     //    /**
-    //     * @return Grade[] Returns an array of Grade objects
+    //     * @return Grades[] Returns an array of Grades objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class GradesRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Grade
+    //    public function findOneBySomeField($value): ?Grades
     //    {
     //        return $this->createQueryBuilder('g')
     //            ->andWhere('g.exampleField = :val')
