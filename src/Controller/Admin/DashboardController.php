@@ -9,37 +9,96 @@ use App\Entity\Skill;
 use App\Entity\SkillUnit;
 use App\Entity\Subject;
 use App\Entity\Training;
+use App\Repository\UserRepository;
+use App\Repository\SectionsRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
+use DateTime;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
-    public function index(): Response
+    public function __construct(
+        private UserRepository $userRepository,
+        private SectionsRepository $sectionsRepository
+    ) {}
+
+    public function index(): Response 
     {
-        return $this->render('admin/dashboard.html.twig');
+        $allUsers = $this->userRepository->findAll();
+
+        $studentCount = count(array_filter($allUsers, function($user) {
+            $roles = $user->getRoles();
+            return !in_array('ROLE_TEACHER', $roles) && !in_array('ROLE_ADMIN', $roles);
+        }));
+
+        $teacherCount = count(array_filter($allUsers, function($user) {
+            return in_array('ROLE_TEACHER', $user->getRoles());
+        }));
+
+        $classes = $this->sectionsRepository->findAll();
+        $classCount = count($classes);
+
+        $trainings = $this->sectionsRepository->findAll();
+        $trainingCount = count($trainings);
+
+        $alerts = $this->generateAlerts($studentCount, $teacherCount, $classCount, $allUsers, $classes);
+
+        $formatter = new \IntlDateFormatter('fr_FR', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE);
+        $formattedDate = $formatter->format(new \DateTime());
+
+        $currentUser = $this->getUser();
+        
+        return $this->render('admin/dashboard.html.twig', [
+            'currentUser' => $currentUser,
+            'studentCount' => $studentCount,
+            'teacherCount' => $teacherCount,
+            'classCount' => $classCount,
+            'trainingCount' => $trainingCount,
+            'formattedDate' => $formattedDate,
+            'recentAlerts' => $alerts,
+        ]);
+    }
+
+    private function generateAlerts(int $studentCount, int $teacherCount, int $classCount, array $allUsers, array $classes): array
+    {
+        $alerts = [];
+
+        // A récupérer de la BDD
+
+        return $alerts;
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('ProjetFinCCI');
+            ->setTitle('Scorea - Administration');
     }
 
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
 
-        // Menu CRUD
-        yield MenuItem::linkToCrud('Users', 'fa fa-user', User::class);
+        // Section Gestion des Utilisateurs
+        yield MenuItem::section('Gestion des Utilisateurs', 'fa fa-users');
+        yield MenuItem::linkToCrud('Utilisateurs', 'fa fa-user', User::class);
         yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
-        yield MenuItem::linkToCrud('Grades', 'fa fa-graduation-cap', Grade::class);
-        yield MenuItem::linkToCrud('Skills', 'fa fa-lightbulb', Skill::class);
-        yield MenuItem::linkToCrud('Skill Units', 'fa fa-cubes', SkillUnit::class);
-        yield MenuItem::linkToCrud('Subjects', 'fa fa-book', Subject::class);
-        yield MenuItem::linkToCrud('Trainings', 'fa fa-school', Training::class);
+
+        // Section Formations
+        yield MenuItem::section('Formations & Matières', 'fa fa-graduation-cap');
+        yield MenuItem::linkToCrud('Formations', 'fa fa-school', Training::class);
+        yield MenuItem::linkToCrud('Matières', 'fa fa-book', Subject::class);
+
+        // Section Compétences
+        yield MenuItem::section('Compétences', 'fa fa-star');
+        yield MenuItem::linkToCrud('Compétences', 'fa fa-lightbulb', Skill::class);
+        yield MenuItem::linkToCrud('Blocs de Compétences', 'fa fa-cubes', SkillUnit::class);
+
+        // Section Évaluations
+        yield MenuItem::section('Évaluations', 'fa fa-chart-bar');
+        yield MenuItem::linkToCrud('Notes', 'fa fa-graduation-cap', Grade::class);
     }
 }

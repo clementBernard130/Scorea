@@ -1,0 +1,11 @@
+{# templates/bundles/EasyAdminBundle/layout.html.twig #}
+
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content_header %}
+    {{ parent() }}
+
+    <div class="ea-header-date">
+        {{ "now"|date("l d F Y") }}
+    </div>
+{% endblock %}
