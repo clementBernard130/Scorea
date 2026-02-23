@@ -6,7 +6,7 @@ use App\Entity\Users;
 use App\Entity\Sections;
 use App\Entity\Grades;
 use App\Entity\Skills;
-use App\Entity\SkillUnit;
+use App\Entity\SkillsUnit;
 use App\Entity\Subject;
 use App\Entity\Training;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -38,7 +38,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
         yield MenuItem::linkToCrud('Grades', 'fa fa-graduation-cap', Grades::class);
         yield MenuItem::linkToCrud('Skills', 'fa fa-lightbulb', Skills::class);
-        yield MenuItem::linkToCrud('Skill Units', 'fa fa-cubes', SkillUnit::class);
+        yield MenuItem::linkToCrud('Skills Unit', 'fa fa-cubes', SkillsUnit::class);
         yield MenuItem::linkToCrud('Subjects', 'fa fa-book', Subject::class);
         yield MenuItem::linkToCrud('Trainings', 'fa fa-school', Training::class);
     }

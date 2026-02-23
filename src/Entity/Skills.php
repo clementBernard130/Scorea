@@ -25,7 +25,7 @@ class Skills
 
     #[ORM\ManyToOne(inversedBy: 'skills')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?SkillUnit $skillUnit = null;
+    private ?SkillsUnit $skillUnit = null;
 
     /**
      * @var Collection<int, Subject>
@@ -67,12 +67,12 @@ class Skills
         return $this;
     }
 
-    public function getSkillUnit(): ?SkillUnit
+    public function getSkillUnit(): ?SkillsUnit
     {
         return $this->skillUnit;
     }
 
-    public function setSkillUnit(?SkillUnit $skillUnit): static
+    public function setSkillUnit(?SkillsUnit $skillUnit): static
     {
         $this->skillUnit = $skillUnit;
 

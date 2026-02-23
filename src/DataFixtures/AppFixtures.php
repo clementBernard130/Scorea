@@ -7,7 +7,7 @@ use Doctrine\Persistence\ObjectManager;
 use App\Entity\Users;
 use App\Entity\Training;
 use App\Entity\Subject;
-use App\Entity\SkillUnit;
+use App\Entity\SkillsUnit;
 use App\Entity\Skills;
 use App\Entity\Grades;
 use App\Entity\Sections;
@@ -305,7 +305,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($skillUnits as $skillUnitName) {
-            $skillUnit = new SkillUnit();
+            $skillUnit = new SkillsUnit();
             $skillUnit->setName($skillUnitName);
             $skillUnit->setDescription('Description pour ' . $skillUnitName);
             $manager->persist($skillUnit);
@@ -361,7 +361,7 @@ class AppFixtures extends Fixture
             $skill = new Skills();
             $skill->setName($skillData['name']);
             $skill->setDescription($skillData['description']);
-            $skill->setSkillUnit($manager->getRepository(SkillUnit::class)->findOneBy(['name' => $skillData['skillUnit']]));
+            $skill->setSkillUnit($manager->getRepository(SkillsUnit::class)->findOneBy(['name' => $skillData['skillUnit']]));
             $manager->persist($skill);
         }
 

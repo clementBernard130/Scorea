@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\SkillUnitRepository;
+use App\Repository\SkillsUnitRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SkillUnitRepository::class)]
-class SkillUnit
+#[ORM\Entity(repositoryClass: SkillsUnitRepository::class)]
+#[ORM\Table(name: 'skill_units')]
+class SkillsUnit
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
