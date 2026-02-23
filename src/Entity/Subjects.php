@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\SubjectRepository;
+use App\Repository\SubjectsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SubjectRepository::class)]
-class Subject
+#[ORM\Entity(repositoryClass: SubjectsRepository::class)]
+#[ORM\Table(name: 'subjects')]
+class Subjects
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,15 +27,18 @@ class Subject
     private ?float $coefficient = null;
 
     /**
-     * @var Collection<int, Skill>
+     * @var Collection<int, Skills>
      */
-    #[ORM\ManyToMany(targetEntity: Skill::class, inversedBy: 'subjects')]
+    #[ORM\ManyToMany(targetEntity: Skills::class, inversedBy: 'subjects')]
+    #[ORM\JoinTable(name: 'subject_skills')]
+    #[ORM\JoinColumn(name: 'subject_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'skills_id', referencedColumnName: 'id')]
     private Collection $skills;
 
     /**
-     * @var Collection<int, Grade>
+     * @var Collection<int, Grades>
      */
-    #[ORM\OneToMany(targetEntity: Grade::class, mappedBy: 'subject', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'subject', orphanRemoval: true)]
     private Collection $grades;
 
     public function __construct()
@@ -85,14 +89,14 @@ class Subject
     }
 
     /**
-     * @return Collection<int, Skill>
+     * @return Collection<int, Skills>
      */
     public function getSkills(): Collection
     {
         return $this->skills;
     }
 
-    public function addSkill(Skill $skill): static
+    public function addSkill(Skills $skill): static
     {
         if (!$this->skills->contains($skill)) {
             $this->skills->add($skill);
@@ -101,7 +105,7 @@ class Subject
         return $this;
     }
 
-    public function removeSkill(Skill $skill): static
+    public function removeSkill(Skills $skill): static
     {
         $this->skills->removeElement($skill);
 
@@ -109,14 +113,14 @@ class Subject
     }
 
     /**
-     * @return Collection<int, Grade>
+     * @return Collection<int, Grades>
      */
     public function getGrades(): Collection
     {
         return $this->grades;
     }
 
-    public function addGrade(Grade $grade): static
+    public function addGrade(Grades $grade): static
     {
         if (!$this->grades->contains($grade)) {
             $this->grades->add($grade);
@@ -126,7 +130,7 @@ class Subject
         return $this;
     }
 
-    public function removeGrade(Grade $grade): static
+    public function removeGrade(Grades $grade): static
     {
         if ($this->grades->removeElement($grade)) {
             // set the owning side to null (unless already changed)

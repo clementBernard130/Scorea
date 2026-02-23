@@ -2,39 +2,39 @@
 
 namespace App\Repository;
 
-use App\Entity\SkillUnit;
+use App\Entity\Grades;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<SkillUnit>
+ * @extends ServiceEntityRepository<Grades>
  */
-class SkillUnitRepository extends ServiceEntityRepository
+class GradesRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, SkillUnit::class);
+        parent::__construct($registry, Grades::class);
     }
 
     //    /**
-    //     * @return SkillUnit[] Returns an array of SkillUnit objects
+    //     * @return Grades[] Returns an array of Grades objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
+    //        return $this->createQueryBuilder('g')
+    //            ->andWhere('g.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
+    //            ->orderBy('g.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?SkillUnit
+    //    public function findOneBySomeField($value): ?Grades
     //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
+    //        return $this->createQueryBuilder('g')
+    //            ->andWhere('g.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

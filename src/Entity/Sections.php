@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\ClasseRepository;
+use App\Repository\SectionsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ClasseRepository::class)]
-class Classe
+#[ORM\Entity(repositoryClass: SectionsRepository::class)]
+class Sections
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,23 +19,20 @@ class Classe
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column]
-    private ?int $duration = null;
-
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $start_date = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $end_date = null;
 
-    #[ORM\ManyToOne(inversedBy: 'classes')]
+    #[ORM\ManyToOne(inversedBy: 'sections')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Training $training = null;
+    private ?Trainings $training = null;
 
     /**
-     * @var Collection<int, User>
+     * @var Collection<int, Users>
      */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'classe')]
+    #[ORM\ManyToMany(targetEntity: Users::class, mappedBy: 'sections')]
     private Collection $users;
 
     public function __construct()
@@ -55,18 +53,6 @@ class Classe
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getDuration(): ?int
-    {
-        return $this->duration;
-    }
-
-    public function setDuration(int $duration): static
-    {
-        $this->duration = $duration;
 
         return $this;
     }
@@ -95,12 +81,12 @@ class Classe
         return $this;
     }
 
-    public function getTraining(): ?Training
+    public function getTrainingId(): ?Trainings
     {
         return $this->training;
     }
 
-    public function setTraining(?Training $training): static
+    public function setTrainingId(?Trainings $training): static
     {
         $this->training = $training;
 
@@ -108,32 +94,34 @@ class Classe
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Users>
      */
     public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(User $user): static
+    public function addUser(Users $user): static
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->setClasse($this);
+            $user->addSection($this);
         }
 
         return $this;
     }
 
-    public function removeUser(User $user): static
+    public function removeUser(Users $user): static
     {
         if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getClasse() === $this) {
-                $user->setClasse(null);
-            }
+            $user->removeSection($this);
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->name;
     }
 }
