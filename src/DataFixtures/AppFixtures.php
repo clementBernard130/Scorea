@@ -4,12 +4,12 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use App\Entity\User;
-use App\Entity\Training;
-use App\Entity\Subject;
-use App\Entity\SkillUnit;
-use App\Entity\Skill;
-use App\Entity\Grade;
+use App\Entity\Users;
+use App\Entity\Trainings;
+use App\Entity\Subjects;
+use App\Entity\SkillsUnit;
+use App\Entity\Skills;
+use App\Entity\Grades;
 use App\Entity\Sections;
 use DateTime;
 use DateTimeImmutable;
@@ -38,7 +38,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($trainings as $trainingName) {
-            $training = new Training();
+            $training = new Trainings();
             $training->setName($trainingName);
             $manager->persist($training);
         }
@@ -92,7 +92,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($subjects as $subjectData) {
-            $subject = new Subject();
+            $subject = new Subjects();
             $subject->setName($subjectData['name']);
             $subject->setDescription('Description pour ' . $subjectData['name']);
             $subject->setCoefficient($subjectData['coefficient']);
@@ -116,7 +116,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($admin as $adminData) {
-            $user = new User();
+            $user = new Users();
             $user->setUsername($adminData['username']);
             $user->setFirstName($adminData['first_name']);
             $user->setLastName($adminData['last_name']);
@@ -173,7 +173,7 @@ class AppFixtures extends Fixture
         foreach ($sections as $sectionData) {
             $section = new Sections();
             $section->setName($sectionData['name']);
-            $section->setTrainingId($manager->getRepository(Training::class)->findOneBy(['name' => $sectionData['training']]));
+            $section->setTrainingId($manager->getRepository(Trainings::class)->findOneBy(['name' => $sectionData['training']]));
             $section->setStartDate(new DateTime('2025-09-01'));
             $section->setEndDate(new DateTime('2026-07-30'));
             $manager->persist($section);
@@ -234,7 +234,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($teachers as $teacherData) {
-            $user = new User();
+            $user = new Users();
             $user->setUsername($teacherData['username']);
             $user->setFirstName($teacherData['first_name']);
             $user->setLastName($teacherData['last_name']);
@@ -282,7 +282,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($students as $studentData) {
-            $user = new User();
+            $user = new Users();
             $user->setUsername($studentData['username']);
             $user->setFirstName($studentData['first_name']);
             $user->setLastName($studentData['last_name']);
@@ -297,7 +297,7 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
-        // === Skill Unit ===
+        // === Skills Unit ===
         $skillUnits = [
             'DSNS-BLOC-1 : Analyser, conceptualiser, maquetter et sécuriser une solution',
             'DSNS-BLOC-2 : Concevoir, développer, mettre en production et maintenir une solution',
@@ -305,7 +305,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($skillUnits as $skillUnitName) {
-            $skillUnit = new SkillUnit();
+            $skillUnit = new SkillsUnit();
             $skillUnit->setName($skillUnitName);
             $skillUnit->setDescription('Description pour ' . $skillUnitName);
             $manager->persist($skillUnit);
@@ -358,26 +358,26 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($skills as $skillData) {
-            $skill = new Skill();
+            $skill = new Skills();
             $skill->setName($skillData['name']);
             $skill->setDescription($skillData['description']);
-            $skill->setSkillUnit($manager->getRepository(SkillUnit::class)->findOneBy(['name' => $skillData['skillUnit']]));
+            $skill->setSkillUnit($manager->getRepository(SkillsUnit::class)->findOneBy(['name' => $skillData['skillUnit']]));
             $manager->persist($skill);
         }
 
         $manager->flush();
 
         // === Lier Skills aux Subjects ===
-        $pythonSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Python']);
-        $frameworkSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Framework PHP']);
-        $bddSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Base de données']);
-        $projetSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Projet']);
+        $pythonSubject = $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Python']);
+        $frameworkSubject = $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Framework PHP']);
+        $bddSubject = $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Base de données']);
+        $projetSubject = $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Projet']);
         
-        $analyserSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Analyser les besoins métiers']);
-        $concevoirSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Concevoir une architecture applicative']);
-        $securiserSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Sécuriser une application']);
-        $developerSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Développer des composants métier']);
-        $productionSkill = $manager->getRepository(Skill::class)->findOneBy(['name' => 'Mettre en production une application']);
+        $analyserSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Analyser les besoins métiers']);
+        $concevoirSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Concevoir une architecture applicative']);
+        $securiserSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Sécuriser une application']);
+        $developerSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Développer des composants métier']);
+        $productionSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Mettre en production une application']);
         
         $pythonSubject->addSkill($developerSkill);
         $frameworkSubject->addSkill($developerSkill);
@@ -391,13 +391,13 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         // === Grades ===     
-        $student1 = $manager->getRepository(User::class)->findOneBy(['username' => 'student1']);
-        $student2 = $manager->getRepository(User::class)->findOneBy(['username' => 'student2']);
-        $student3 = $manager->getRepository(User::class)->findOneBy(['username' => 'student3']);
-        $student4 = $manager->getRepository(User::class)->findOneBy(['username' => 'student4']);
+        $student1 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student1']);
+        $student2 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student2']);
+        $student3 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student3']);
+        $student4 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student4']);
         
-        $teacher1 = $manager->getRepository(User::class)->findOneBy(['username' => 'teacher1']);
-        $teacher2 = $manager->getRepository(User::class)->findOneBy(['username' => 'teacher2']);
+        $teacher1 = $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher1']);
+        $teacher2 = $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher2']);
 
         $grades = [
             // Notes pour student1
@@ -422,7 +422,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($grades as $gradeData) {
-            $grade = new Grade();
+            $grade = new Grades();
             $grade->setStudent($gradeData['student']);
             $grade->setSubject($gradeData['subject']);
             $grade->setTeacher($gradeData['teacher']);

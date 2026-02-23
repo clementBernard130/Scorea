@@ -2,13 +2,13 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\User;
+use App\Entity\Users;
 use App\Entity\Sections;
-use App\Entity\Grade;
-use App\Entity\Skill;
-use App\Entity\SkillUnit;
-use App\Entity\Subject;
-use App\Entity\Training;
+use App\Entity\Grades;
+use App\Entity\Skills;
+use App\Entity\SkillsUnit;
+use App\Entity\Subjects;
+use App\Entity\Trainings;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -34,12 +34,12 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
 
         // Menu CRUD
-        yield MenuItem::linkToCrud('Users', 'fa fa-user', User::class);
+        yield MenuItem::linkToCrud('Users', 'fa fa-user', Users::class);
         yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
-        yield MenuItem::linkToCrud('Grades', 'fa fa-graduation-cap', Grade::class);
-        yield MenuItem::linkToCrud('Skills', 'fa fa-lightbulb', Skill::class);
-        yield MenuItem::linkToCrud('Skill Units', 'fa fa-cubes', SkillUnit::class);
-        yield MenuItem::linkToCrud('Subjects', 'fa fa-book', Subject::class);
-        yield MenuItem::linkToCrud('Trainings', 'fa fa-school', Training::class);
+        yield MenuItem::linkToCrud('Grades', 'fa fa-graduation-cap', Grades::class);
+        yield MenuItem::linkToCrud('Skills', 'fa fa-lightbulb', Skills::class);
+        yield MenuItem::linkToCrud('Skills Unit', 'fa fa-cubes', SkillsUnit::class);
+        yield MenuItem::linkToCrud('Subjects', 'fa fa-book', Subjects::class);
+        yield MenuItem::linkToCrud('Trainings', 'fa fa-school', Trainings::class);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Skill;
+use App\Entity\Skills;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -12,7 +12,7 @@ class SkillCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Skill::class;
+        return Skills::class;
     }
 
     /*

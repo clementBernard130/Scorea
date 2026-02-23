@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\User;
+use App\Entity\Users;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -23,7 +23,7 @@ class UserCrudController extends AbstractCrudController
 
     public static function getEntityFqcn(): string
     {
-        return User::class;
+        return Users::class;
     }
 
     public function configureFields(string $pageName): iterable
@@ -68,7 +68,7 @@ class UserCrudController extends AbstractCrudController
         $this->hashPassword($entityInstance);
         
     
-        if ($entityInstance instanceof User && !$entityInstance->getCreatedAt()) {
+        if ($entityInstance instanceof Users && !$entityInstance->getCreatedAt()) {
             $entityInstance->setCreatedAt(new \DateTimeImmutable());
             $entityInstance->setUpdatedAt(new \DateTimeImmutable());
         }
@@ -84,7 +84,7 @@ class UserCrudController extends AbstractCrudController
         $this->hashPassword($entityInstance);
         
     
-        if ($entityInstance instanceof User) {
+        if ($entityInstance instanceof Users) {
             $entityInstance->setUpdatedAt(new \DateTimeImmutable());
         }
 
@@ -96,12 +96,12 @@ class UserCrudController extends AbstractCrudController
      */
     private function hashPassword($user): void
     {
-        if (!$user instanceof User) {
+        if (!$user instanceof Users) {
             return;
         } 
         
         $context = $this->getContext();
-        $plainPassword = $context->getRequest()->request->all('User')['password'] ?? null;
+        $plainPassword = $context->getRequest()->request->all('Users')['password'] ?? null;
 
         if (!empty($plainPassword)) {
             $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);

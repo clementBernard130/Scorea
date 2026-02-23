@@ -27,12 +27,12 @@ class Sections
 
     #[ORM\ManyToOne(inversedBy: 'sections')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Training $training = null;
+    private ?Trainings $training = null;
 
     /**
-     * @var Collection<int, User>
+     * @var Collection<int, Users>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'sections')]
+    #[ORM\ManyToMany(targetEntity: Users::class, mappedBy: 'sections')]
     private Collection $users;
 
     public function __construct()
@@ -81,12 +81,12 @@ class Sections
         return $this;
     }
 
-    public function getTrainingId(): ?Training
+    public function getTrainingId(): ?Trainings
     {
         return $this->training;
     }
 
-    public function setTrainingId(?Training $training): static
+    public function setTrainingId(?Trainings $training): static
     {
         $this->training = $training;
 
@@ -94,14 +94,14 @@ class Sections
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Users>
      */
     public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(User $user): static
+    public function addUser(Users $user): static
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
@@ -111,7 +111,7 @@ class Sections
         return $this;
     }
 
-    public function removeUser(User $user): static
+    public function removeUser(Users $user): static
     {
         if ($this->users->removeElement($user)) {
             $user->removeSection($this);
