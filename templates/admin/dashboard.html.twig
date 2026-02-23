@@ -3,39 +3,335 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block main %}
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <h1>Bienvenue sur votre page administrateur Scorea</h1>
-                <p>Utilisez le menu de navigation pour accéder aux différentes sections.</p>
-            </div>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div class="welcome-message">
+            <h1 class="welcome-title">Bienvenue <span class="user-name">{% if currentUser and currentUser.firstName and currentUser.lastName %}{{ currentUser.firstName }} {{ currentUser.lastName }}{% else %}ADMIN{% endif %}</span></h1>
+            <p class="welcome-subtitle">sur votre page d'administration <span class="name-highlight">Scorea</span></p>
         </div>
-        
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fa fa-user"></i> Utilisateurs</h5>
-                        <p class="card-text">Gérer les utilisateurs de la plateforme.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fa fa-chalkboard"></i> Classes</h5>
-                        <p class="card-text">Gérer les classes et leurs attributions.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fa fa-school"></i> Formations</h5>
-                        <p class="card-text">Gérer les formations disponibles.</p>
-                    </div>
-                </div>
-            </div>
+        <div class="header-date">
+            <p>{{ formattedDate }}</p>
         </div>
     </div>
+
+    <div class="statistics-section">
+        <h2 class="section-title">Statistiques Globales</h2>
+        <div class="stats-grid">
+            <a href="{{ ea_url({ crudAction: 'index', crudControllerFqcn: 'App\\Controller\\Admin\\UserCrudController' }) }}" class="stat-card stat-card-link">
+                <div class="stat-icon students">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Élèves</h3>
+                    <p class="stat-number">{{ studentCount }}</p>
+                </div>
+            </a>
+
+            <a href="{{ ea_url({ crudAction: 'index', crudControllerFqcn: 'App\\Controller\\Admin\\UserCrudController' }) }}" class="stat-card stat-card-link">
+                <div class="stat-icon teachers">
+                    <i class="fas fa-chalkboard-user"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Professeurs</h3>
+                    <p class="stat-number">{{ teacherCount }}</p>
+                </div>
+            </a>
+
+            <a href="{{ ea_url({ crudAction: 'index', crudControllerFqcn: 'App\\Controller\\Admin\\SectionsCrudController' }) }}" class="stat-card stat-card-link">
+                <div class="stat-icon classes">
+                    <i class="fas fa-school"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Classes</h3>
+                    <p class="stat-number">{{ classCount }}</p>
+                </div>
+            </a>
+
+            {# Trainings #}
+            <a href="{{ ea_url({ crudAction: 'index', crudControllerFqcn: 'App\\Controller\\Admin\\TrainingCrudController' }) }}" class="stat-card stat-card-link">
+                <div class="stat-icon trainings">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Formations</h3>
+                    <p class="stat-number">{{ trainingCount }}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="alerts">
+        <h2 class="section-title">Alertes Récentes</h2>
+        {% if recentAlerts is not empty %}
+            <ul class="alerts-list">
+                {% for alert in recentAlerts %}
+                    <li class="alert-item">
+                        <div class="alert-icon">
+                            {% if alert.type == 'warning' %}
+                                <i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i>
+                            {% elseif alert.type == 'error' %}
+                                <i class="fas fa-times-circle" style="color: #e74c3c;"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle" style="color: #3498db;"></i>
+                            {% endif %}
+                        </div>
+                        <div class="alert-content">
+                            <p class="alert-message">{{ alert.message }}</p>
+                            <p class="alert-date">{{ alert.createdAt|date('d M Y H:i') }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-alerts">Aucune alerte récente.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e8e8e8;
+        position: relative;
+    }
+
+    .welcome-message {
+        flex: 1;
+    }
+
+    .welcome-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 8px 0;
+    }
+
+    .user-name {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .name-highlight {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-weight: 700;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .welcome-subtitle {
+        font-size: 16px;
+        color: #666;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    .page-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+    }
+
+    .header-date {
+        color: #666;
+        font-weight: 500;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    .header-date p {
+        margin: 0;
+        font-size: 25px;
+    }
+
+    .statistics-section {
+        margin-top: 30px;
+        padding-bottom: 60px;
+        border-bottom: 2px solid #e8e8e8;
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-left: 5px solid #667eea;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card-link {
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.students {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .stat-icon.teachers {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .stat-icon.classes {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+
+    .stat-content h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+        margin: 0 0 8px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-number {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+    }
+
+        .alerts {
+        margin-top: 30px;
+    }
+
+    .alerts-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .alert-item {
+        display: flex;
+        gap: 15px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        border-left: 4px solid #3498db;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .alert-item:has(.fa-exclamation-triangle) {
+        border-left-color: #f39c12;
+        background: #fffbf0;
+    }
+
+    .alert-item:has(.fa-times-circle) {
+        border-left-color: #e74c3c;
+        background: #fef5f5;
+    }
+
+    .alert-item:has(.fa-info-circle) {
+        border-left-color: #3498db;
+        background: #f0f8ff;
+    }
+
+    .alert-icon {
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .alert-content {
+        flex: 1;
+    }
+
+    .alert-message {
+        margin: 0 0 4px 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .alert-date {
+        margin: 0;
+        font-size: 12px;
+        color: #999;
+    }
+
+    .no-alerts {
+        text-align: center;
+        color: #999;
+        padding: 20px;
+        font-style: italic;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 {% endblock %}
