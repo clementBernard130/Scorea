@@ -2,15 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\SkillsUnitRepository;
+use App\Repository\SkillUnitRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SkillsUnitRepository::class)]
-#[ORM\Table(name: 'skill_units')]
-class SkillsUnit
+#[ORM\Entity(repositoryClass: SkillUnitRepository::class)]
+class SkillUnit
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,9 +23,9 @@ class SkillsUnit
     private ?string $description = null;
 
     /**
-     * @var Collection<int, Skills>
+     * @var Collection<int, Skill>
      */
-    #[ORM\OneToMany(targetEntity: Skills::class, mappedBy: 'skillUnit')]
+    #[ORM\OneToMany(targetEntity: Skill::class, mappedBy: 'skillUnit')]
     private Collection $skills;
 
     public function __construct()
@@ -64,14 +63,14 @@ class SkillsUnit
     }
 
     /**
-     * @return Collection<int, Skills>
+     * @return Collection<int, Skill>
      */
     public function getSkills(): Collection
     {
         return $this->skills;
     }
 
-    public function addSkill(Skills $skill): static
+    public function addSkill(Skill $skill): static
     {
         if (!$this->skills->contains($skill)) {
             $this->skills->add($skill);
@@ -81,7 +80,7 @@ class SkillsUnit
         return $this;
     }
 
-    public function removeSkill(Skills $skill): static
+    public function removeSkill(Skill $skill): static
     {
         if ($this->skills->removeElement($skill)) {
             // set the owning side to null (unless already changed)

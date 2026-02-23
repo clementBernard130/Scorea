@@ -2,15 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\SkillsRepository;
+use App\Repository\SkillRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SkillsRepository::class)]
-#[ORM\Table(name: 'skills')]
-class Skills
+#[ORM\Entity(repositoryClass: SkillRepository::class)]
+class Skill
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,12 +24,12 @@ class Skills
 
     #[ORM\ManyToOne(inversedBy: 'skills')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?SkillsUnit $skillUnit = null;
+    private ?SkillUnit $skillUnit = null;
 
     /**
-     * @var Collection<int, Subjects>
+     * @var Collection<int, Subject>
      */
-    #[ORM\ManyToMany(targetEntity: Subjects::class, mappedBy: 'skills')]
+    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'skills')]
     private Collection $subjects;
 
     public function __construct()
@@ -67,12 +66,12 @@ class Skills
         return $this;
     }
 
-    public function getSkillUnit(): ?SkillsUnit
+    public function getSkillUnit(): ?SkillUnit
     {
         return $this->skillUnit;
     }
 
-    public function setSkillUnit(?SkillsUnit $skillUnit): static
+    public function setSkillUnit(?SkillUnit $skillUnit): static
     {
         $this->skillUnit = $skillUnit;
 
@@ -80,14 +79,14 @@ class Skills
     }
 
     /**
-     * @return Collection<int, Subjects>
+     * @return Collection<int, Subject>
      */
     public function getSubjects(): Collection
     {
         return $this->subjects;
     }
 
-    public function addSubject(Subjects $subject): static
+    public function addSubject(Subject $subject): static
     {
         if (!$this->subjects->contains($subject)) {
             $this->subjects->add($subject);
@@ -97,7 +96,7 @@ class Skills
         return $this;
     }
 
-    public function removeSubject(Subjects $subject): static
+    public function removeSubject(Subject $subject): static
     {
         if ($this->subjects->removeElement($subject)) {
             $subject->removeSkill($this);

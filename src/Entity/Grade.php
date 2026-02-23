@@ -2,12 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\GradesRepository;
+use App\Repository\GradeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: GradesRepository::class)]
-#[ORM\Table(name: 'grades')]
-class Grades
+#[ORM\Entity(repositoryClass: GradeRepository::class)]
+class Grade
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -19,15 +18,15 @@ class Grades
 
     #[ORM\ManyToOne(inversedBy: 'grades')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Subjects $subject = null;
+    private ?Subject $subject = null;
 
     #[ORM\ManyToOne(inversedBy: 'grades')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Users $student = null;
+    private ?User $student = null;
 
     #[ORM\ManyToOne(inversedBy: 'givenGrades')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Users $teacher = null;
+    private ?User $teacher = null;
 
     public function getId(): ?int
     {
@@ -46,36 +45,36 @@ class Grades
         return $this;
     }
 
-    public function getSubject(): ?Subjects
+    public function getSubject(): ?Subject
     {
         return $this->subject;
     }
 
-    public function setSubject(?Subjects $subject): static
+    public function setSubject(?Subject $subject): static
     {
         $this->subject = $subject;
 
         return $this;
     }
 
-    public function getStudent(): ?Users
+    public function getStudent(): ?User
     {
         return $this->student;
     }
 
-    public function setStudent(?Users $student): static
+    public function setStudent(?User $student): static
     {
         $this->student = $student;
 
         return $this;
     }
 
-    public function getTeacher(): ?Users
+    public function getTeacher(): ?User
     {
         return $this->teacher;
     }
 
-    public function setTeacher(?Users $teacher): static
+    public function setTeacher(?User $teacher): static
     {
         $this->teacher = $teacher;
 

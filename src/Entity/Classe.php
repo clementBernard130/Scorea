@@ -2,14 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\SectionsRepository;
+use App\Repository\ClasseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SectionsRepository::class)]
-class Sections
+#[ORM\Entity(repositoryClass: ClasseRepository::class)]
+class Classe
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -19,20 +18,23 @@ class Sections
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column]
+    private ?int $duration = null;
+
+    #[ORM\Column]
     private ?\DateTime $start_date = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column]
     private ?\DateTime $end_date = null;
 
-    #[ORM\ManyToOne(inversedBy: 'sections')]
+    #[ORM\ManyToOne(inversedBy: 'classes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Trainings $training = null;
+    private ?Training $training = null;
 
     /**
-     * @var Collection<int, Users>
+     * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: Users::class, mappedBy: 'sections')]
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'classe')]
     private Collection $users;
 
     public function __construct()
@@ -53,6 +55,18 @@ class Sections
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(int $duration): static
+    {
+        $this->duration = $duration;
 
         return $this;
     }
@@ -81,12 +95,12 @@ class Sections
         return $this;
     }
 
-    public function getTrainingId(): ?Trainings
+    public function getTraining(): ?Training
     {
         return $this->training;
     }
 
-    public function setTrainingId(?Trainings $training): static
+    public function setTraining(?Training $training): static
     {
         $this->training = $training;
 
@@ -94,34 +108,32 @@ class Sections
     }
 
     /**
-     * @return Collection<int, Users>
+     * @return Collection<int, User>
      */
     public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(Users $user): static
+    public function addUser(User $user): static
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->addSection($this);
+            $user->setClasse($this);
         }
 
         return $this;
     }
 
-    public function removeUser(Users $user): static
+    public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
-            $user->removeSection($this);
+            // set the owning side to null (unless already changed)
+            if ($user->getClasse() === $this) {
+                $user->setClasse(null);
+            }
         }
 
         return $this;
-    }
-
-    public function __toString(): string
-    {
-        return (string) $this->name;
     }
 }
