@@ -30,9 +30,9 @@ class Sections
     private ?Training $training = null;
 
     /**
-     * @var Collection<int, User>
+     * @var Collection<int, Users>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'sections')]
+    #[ORM\ManyToMany(targetEntity: Users::class, mappedBy: 'sections')]
     private Collection $users;
 
     public function __construct()
@@ -94,14 +94,14 @@ class Sections
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Users>
      */
     public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(User $user): static
+    public function addUser(Users $user): static
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
@@ -111,7 +111,7 @@ class Sections
         return $this;
     }
 
-    public function removeUser(User $user): static
+    public function removeUser(Users $user): static
     {
         if ($this->users->removeElement($user)) {
             $user->removeSection($this);

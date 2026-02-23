@@ -4,7 +4,7 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use App\Entity\User;
+use App\Entity\Users;
 use App\Entity\Training;
 use App\Entity\Subject;
 use App\Entity\SkillUnit;
@@ -116,7 +116,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($admin as $adminData) {
-            $user = new User();
+            $user = new Users();
             $user->setUsername($adminData['username']);
             $user->setFirstName($adminData['first_name']);
             $user->setLastName($adminData['last_name']);
@@ -234,7 +234,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($teachers as $teacherData) {
-            $user = new User();
+            $user = new Users();
             $user->setUsername($teacherData['username']);
             $user->setFirstName($teacherData['first_name']);
             $user->setLastName($teacherData['last_name']);
@@ -282,7 +282,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($students as $studentData) {
-            $user = new User();
+            $user = new Users();
             $user->setUsername($studentData['username']);
             $user->setFirstName($studentData['first_name']);
             $user->setLastName($studentData['last_name']);
@@ -391,13 +391,13 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         // === Grades ===     
-        $student1 = $manager->getRepository(User::class)->findOneBy(['username' => 'student1']);
-        $student2 = $manager->getRepository(User::class)->findOneBy(['username' => 'student2']);
-        $student3 = $manager->getRepository(User::class)->findOneBy(['username' => 'student3']);
-        $student4 = $manager->getRepository(User::class)->findOneBy(['username' => 'student4']);
+        $student1 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student1']);
+        $student2 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student2']);
+        $student3 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student3']);
+        $student4 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student4']);
         
-        $teacher1 = $manager->getRepository(User::class)->findOneBy(['username' => 'teacher1']);
-        $teacher2 = $manager->getRepository(User::class)->findOneBy(['username' => 'teacher2']);
+        $teacher1 = $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher1']);
+        $teacher2 = $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher2']);
 
         $grades = [
             // Notes pour student1

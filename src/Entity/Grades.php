@@ -22,11 +22,11 @@ class Grades
 
     #[ORM\ManyToOne(inversedBy: 'grades')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $student = null;
+    private ?Users $student = null;
 
     #[ORM\ManyToOne(inversedBy: 'givenGrades')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $teacher = null;
+    private ?Users $teacher = null;
 
     public function getId(): ?int
     {
@@ -57,24 +57,24 @@ class Grades
         return $this;
     }
 
-    public function getStudent(): ?User
+    public function getStudent(): ?Users
     {
         return $this->student;
     }
 
-    public function setStudent(?User $student): static
+    public function setStudent(?Users $student): static
     {
         $this->student = $student;
 
         return $this;
     }
 
-    public function getTeacher(): ?User
+    public function getTeacher(): ?Users
     {
         return $this->teacher;
     }
 
-    public function setTeacher(?User $teacher): static
+    public function setTeacher(?Users $teacher): static
     {
         $this->teacher = $teacher;
 
