@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\Subject;
+use App\Entity\Subjects;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Subject>
+ * @extends ServiceEntityRepository<Subjects>
  */
-class SubjectRepository extends ServiceEntityRepository
+class SubjectsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Subject::class);
+        parent::__construct($registry, Subjects::class);
     }
 
     //    /**
-    //     * @return Subject[] Returns an array of Subject objects
+    //     * @return Subjects[] Returns an array of Subjects objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class SubjectRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Subject
+    //    public function findOneBySomeField($value): ?Subjects
     //    {
     //        return $this->createQueryBuilder('s')
     //            ->andWhere('s.exampleField = :val')

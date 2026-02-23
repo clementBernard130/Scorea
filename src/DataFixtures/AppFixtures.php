@@ -6,7 +6,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\Users;
 use App\Entity\Training;
-use App\Entity\Subject;
+use App\Entity\Subjects;
 use App\Entity\SkillsUnit;
 use App\Entity\Skills;
 use App\Entity\Grades;
@@ -92,7 +92,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($subjects as $subjectData) {
-            $subject = new Subject();
+            $subject = new Subjects();
             $subject->setName($subjectData['name']);
             $subject->setDescription('Description pour ' . $subjectData['name']);
             $subject->setCoefficient($subjectData['coefficient']);
@@ -368,10 +368,10 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         // === Lier Skills aux Subjects ===
-        $pythonSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Python']);
-        $frameworkSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Framework PHP']);
-        $bddSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Base de données']);
-        $projetSubject = $manager->getRepository(Subject::class)->findOneBy(['name' => 'Projet']);
+        $pythonSubject = $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Python']);
+        $frameworkSubject = $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Framework PHP']);
+        $bddSubject = $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Base de données']);
+        $projetSubject = $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Projet']);
         
         $analyserSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Analyser les besoins métiers']);
         $concevoirSkill = $manager->getRepository(Skills::class)->findOneBy(['name' => 'Concevoir une architecture applicative']);

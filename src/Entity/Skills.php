@@ -28,9 +28,9 @@ class Skills
     private ?SkillsUnit $skillUnit = null;
 
     /**
-     * @var Collection<int, Subject>
+     * @var Collection<int, Subjects>
      */
-    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'skills')]
+    #[ORM\ManyToMany(targetEntity: Subjects::class, mappedBy: 'skills')]
     private Collection $subjects;
 
     public function __construct()
@@ -80,14 +80,14 @@ class Skills
     }
 
     /**
-     * @return Collection<int, Subject>
+     * @return Collection<int, Subjects>
      */
     public function getSubjects(): Collection
     {
         return $this->subjects;
     }
 
-    public function addSubject(Subject $subject): static
+    public function addSubject(Subjects $subject): static
     {
         if (!$this->subjects->contains($subject)) {
             $this->subjects->add($subject);
@@ -97,7 +97,7 @@ class Skills
         return $this;
     }
 
-    public function removeSubject(Subject $subject): static
+    public function removeSubject(Subjects $subject): static
     {
         if ($this->subjects->removeElement($subject)) {
             $subject->removeSkill($this);

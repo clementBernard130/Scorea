@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Subject;
+use App\Entity\Subjects;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -12,7 +12,7 @@ class SubjectCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Subject::class;
+        return Subjects::class;
     }
 
     /*

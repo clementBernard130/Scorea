@@ -19,7 +19,7 @@ class Grades
 
     #[ORM\ManyToOne(inversedBy: 'grades')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Subject $subject = null;
+    private ?Subjects $subject = null;
 
     #[ORM\ManyToOne(inversedBy: 'grades')]
     #[ORM\JoinColumn(nullable: false)]
@@ -46,12 +46,12 @@ class Grades
         return $this;
     }
 
-    public function getSubject(): ?Subject
+    public function getSubject(): ?Subjects
     {
         return $this->subject;
     }
 
-    public function setSubject(?Subject $subject): static
+    public function setSubject(?Subjects $subject): static
     {
         $this->subject = $subject;
 

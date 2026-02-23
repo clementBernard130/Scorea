@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\SubjectRepository;
+use App\Repository\SubjectsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SubjectRepository::class)]
-class Subject
+#[ORM\Entity(repositoryClass: SubjectsRepository::class)]
+#[ORM\Table(name: 'subjects')]
+class Subjects
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -29,6 +30,9 @@ class Subject
      * @var Collection<int, Skills>
      */
     #[ORM\ManyToMany(targetEntity: Skills::class, inversedBy: 'subjects')]
+    #[ORM\JoinTable(name: 'subject_skills')]
+    #[ORM\JoinColumn(name: 'subject_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'skills_id', referencedColumnName: 'id')]
     private Collection $skills;
 
     /**
