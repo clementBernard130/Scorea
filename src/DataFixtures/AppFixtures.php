@@ -5,7 +5,7 @@ namespace App\DataFixtures;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\Users;
-use App\Entity\Training;
+use App\Entity\Trainings;
 use App\Entity\Subjects;
 use App\Entity\SkillsUnit;
 use App\Entity\Skills;
@@ -38,7 +38,7 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($trainings as $trainingName) {
-            $training = new Training();
+            $training = new Trainings();
             $training->setName($trainingName);
             $manager->persist($training);
         }
@@ -173,7 +173,7 @@ class AppFixtures extends Fixture
         foreach ($sections as $sectionData) {
             $section = new Sections();
             $section->setName($sectionData['name']);
-            $section->setTrainingId($manager->getRepository(Training::class)->findOneBy(['name' => $sectionData['training']]));
+            $section->setTrainingId($manager->getRepository(Trainings::class)->findOneBy(['name' => $sectionData['training']]));
             $section->setStartDate(new DateTime('2025-09-01'));
             $section->setEndDate(new DateTime('2026-07-30'));
             $manager->persist($section);

@@ -27,7 +27,7 @@ class Sections
 
     #[ORM\ManyToOne(inversedBy: 'sections')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Training $training = null;
+    private ?Trainings $training = null;
 
     /**
      * @var Collection<int, Users>
@@ -81,12 +81,12 @@ class Sections
         return $this;
     }
 
-    public function getTrainingId(): ?Training
+    public function getTrainingId(): ?Trainings
     {
         return $this->training;
     }
 
-    public function setTrainingId(?Training $training): static
+    public function setTrainingId(?Trainings $training): static
     {
         $this->training = $training;
 
