@@ -1,7 +1,7 @@
 <div class="text-right w-[40%] max-w-[40%]">
 {% if field.value is not empty %}
     {% for user in field.value %}
-        <span class="badge" style="background-color: {{ user|user_role_color }}; color: white; margin-right: 4px; margin-bottom: 4px;">
+        <span class="badge" style="background-color: {{ user|user_role_color|e('html_attr') }}; color: white; margin-right: 4px; margin-bottom: 4px;">
             {{ user }}
         </span>
     {% endfor %}
