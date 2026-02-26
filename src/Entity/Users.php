@@ -248,16 +248,16 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->getRoles();
 
         // Priority order: ADMIN > TEACHER > ASSISTANT > STUDENT
-        if (in_array('ROLE_ADMIN', $roles)) {
+        if (in_array('ROLE_ADMIN', $roles, true)) {
             return '#dc3545'; // Red
         }
-        if (in_array('ROLE_TEACHER', $roles)) {
+        if (in_array('ROLE_TEACHER', $roles, true)) {
             return '#6f42c1'; // Purple
         }
-        if (in_array('ROLE_ASSISTANT', $roles)) {
+        if (in_array('ROLE_ASSISTANT', $roles, true)) {
             return '#fd7e14'; // Orange
         }
-        if (in_array('ROLE_STUDENT', $roles)) {
+        if (in_array('ROLE_STUDENT', $roles, true)) {
             return '#0d6efd'; // Blue
         }
 
