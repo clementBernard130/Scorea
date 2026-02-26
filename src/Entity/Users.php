@@ -225,4 +225,45 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function __toString(): string
+    {
+        $firstName = (string) $this->first_name;
+        $lastName = (string) $this->last_name;
+
+        return trim($firstName . ' ' . $lastName);
+    }
+
+    /**
+     * Get the color associated with the user's highest priority role.
+     * Red (#dc3545) = ROLE_ADMIN
+     * Purple (#6f42c1) = ROLE_TEACHER
+     * Orange (#fd7e14) = ROLE_ASSISTANT
+     * Blue (#0d6efd) = ROLE_STUDENT
+     * Gray (#6c757d) = Default
+     * 
+     * @return string Hex color code
+     */
+    public function getRoleColor(): string
+    {
+        $roles = $this->getRoles();
+
+        // Priority order: ADMIN > TEACHER > ASSISTANT > STUDENT
+        if (in_array('ROLE_ADMIN', $roles, true)) {
+            return '#dc3545'; // Red
+        }
+        if (in_array('ROLE_TEACHER', $roles, true)) {
+            return '#6f42c1'; // Purple
+        }
+        if (in_array('ROLE_ASSISTANT', $roles, true)) {
+            return '#fd7e14'; // Orange
+        }
+        if (in_array('ROLE_STUDENT', $roles, true)) {
+            return '#0d6efd'; // Blue
+        }
+
+        // Default color for ROLE_USER or unknown roles
+        return '#6c757d'; // Gray
+    }
+
 }
+
