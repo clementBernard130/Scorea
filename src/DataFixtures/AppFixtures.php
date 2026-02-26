@@ -173,7 +173,7 @@ class AppFixtures extends Fixture
         foreach ($sections as $sectionData) {
             $section = new Sections();
             $section->setName($sectionData['name']);
-            $section->setTrainingId($manager->getRepository(Trainings::class)->findOneBy(['name' => $sectionData['training']]));
+            $section->setTraining($manager->getRepository(Trainings::class)->findOneBy(['name' => $sectionData['training']]));
             $section->setStartDate(new DateTime('2025-09-01'));
             $section->setEndDate(new DateTime('2026-07-30'));
             $manager->persist($section);
