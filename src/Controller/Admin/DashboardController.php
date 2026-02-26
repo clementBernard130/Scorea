@@ -11,6 +11,7 @@ use App\Entity\Subjects;
 use App\Entity\Trainings;
 use App\Repository\UsersRepository;
 use App\Repository\SectionsRepository;
+use App\Repository\TrainingsRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -23,7 +24,8 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private UsersRepository $userRepository,
-        private SectionsRepository $sectionsRepository
+        private SectionsRepository $sectionsRepository,
+        private TrainingsRepository $trainingsRepository
     ) {}
 
     public function index(): Response 
@@ -42,7 +44,7 @@ class DashboardController extends AbstractDashboardController
         $classes = $this->sectionsRepository->findAll();
         $classCount = count($classes);
 
-        $trainings = $this->sectionsRepository->findAll();
+        $trainings = $this->trainingsRepository->findAll();
         $trainingCount = count($trainings);
 
         $alerts = $this->generateAlerts($studentCount, $teacherCount, $classCount, $allUsers, $classes);
