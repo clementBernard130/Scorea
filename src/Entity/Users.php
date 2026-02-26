@@ -227,7 +227,10 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __toString(): string
     {
-        return $this->first_name . ' ' . $this->last_name;
+        $firstName = (string) $this->first_name;
+        $lastName = (string) $this->last_name;
+
+        return trim($firstName . ' ' . $lastName);
     }
 
     /**
