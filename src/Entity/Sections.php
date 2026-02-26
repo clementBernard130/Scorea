@@ -81,12 +81,12 @@ class Sections
         return $this;
     }
 
-    public function getTrainingId(): ?Trainings
+    public function getTraining(): ?Trainings
     {
         return $this->training;
     }
 
-    public function setTrainingId(?Trainings $training): static
+    public function setTraining(?Trainings $training): static
     {
         $this->training = $training;
 

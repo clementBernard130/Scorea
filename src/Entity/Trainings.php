@@ -23,7 +23,7 @@ class Trainings
     /**
      * @var Collection<int, Sections>
      */
-    #[ORM\OneToMany(targetEntity: Sections::class, mappedBy: 'training_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Sections::class, mappedBy: 'training', orphanRemoval: true)]
     private Collection $sections;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -63,7 +63,7 @@ class Trainings
     {
         if (!$this->sections->contains($section)) {
             $this->sections->add($section);
-            $section->setTrainingId($this);
+            $section->setTraining($this);
         }
 
         return $this;
@@ -73,8 +73,8 @@ class Trainings
     {
         if ($this->sections->removeElement($section)) {
             // set the owning side to null (unless already changed)
-            if ($section->getTrainingId() === $this) {
-                $section->setTrainingId(null);
+            if ($section->getTraining() === $this) {
+                $section->setTraining(null);
             }
         }
 
@@ -93,4 +93,8 @@ class Trainings
         return $this;
     }
 
+    public function __toString(): string
+    {
+        return (string) $this->name;
+    }
 }
