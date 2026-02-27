@@ -15,7 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 
-class UserCrudController extends AbstractCrudController
+class TeacherCrudController extends AbstractCrudController
 {
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher
@@ -29,7 +29,6 @@ class UserCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->hideOnForm();
-
     
         yield TextField::new('username', 'username');
         yield TextField::new('first_name', 'Prénom');
