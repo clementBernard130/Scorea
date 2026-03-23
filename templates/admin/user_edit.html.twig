@@ -1,0 +1,211 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --surface: #fff;
+            --text: #2b2f3a;
+            --border: #e8ecf5;
+        }
+
+        .user-edit-page {
+            max-width: 980px;
+            margin: auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        /* Toolbar */
+        .user-edit-toolbar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .btn-scorea-back {
+            background: #f0f3fb;
+            border: 1px solid #dfe5f3;
+        }
+
+        /* Hero */
+        .user-edit-hero {
+            position: relative;
+            padding: 1.5rem;
+            border-radius: 16px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .user-edit-hero::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            top: -60px;
+            right: -60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .user-edit-hero-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            background: #fff;
+            color: var(--primary);
+        }
+
+        .user-name {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .user-username {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .user-edit-form-card {
+            padding: 1rem;
+            border-radius: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        .user-edit-form-section + .user-edit-form-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #ddd;
+        }
+
+        .user-edit-form-title {
+            margin-bottom: 0.8rem;
+            font-weight: bold;
+        }
+
+        .user-edit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+
+        .user-edit-grid .form-group {
+            margin: 0;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 1px solid #dfe5f3;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.15rem rgba(102,126,234,0.2);
+        }
+
+        .btn-primary {
+            border: none !important;
+            color: #fff !important;
+            background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+        }
+
+        @media (max-width: 640px) {
+            .user-edit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-avatar {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}Modifier un utilisateur{% endblock %}
+
+{% block main %}
+    {% set firstName = entity.instance.firstName|default('') %}
+    {% set lastName = entity.instance.lastName|default('') %}
+    {% set initials = (firstName|slice(0, 1) ~ lastName|slice(0, 1))|upper %}
+
+    <div class="user-edit-page">
+        <div class="user-edit-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="btn btn-scorea-back">
+                <i class="fa fa-arrow-left"></i> Retour a la liste
+            </a>
+        </div>
+
+        <section class="user-edit-hero">
+            <div class="user-edit-hero-content">
+                <div class="user-avatar">{{ initials ?: 'U' }}</div>
+                <div>
+                    <h2 class="user-name">{{ lastName|upper }} {{ firstName }}</h2>
+                    <p class="user-username">{{ entity.instance.username }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="user-edit-form-card">
+            {{ form_start(edit_form) }}
+
+            <div class="user-edit-form-section">
+                <h3 class="user-edit-form-title">Identite</h3>
+                <div class="user-edit-grid">
+                    {% if edit_form.last_name is defined %}
+                        {{ form_row(edit_form.last_name) }}
+                    {% endif %}
+                    {% if edit_form.first_name is defined %}
+                        {{ form_row(edit_form.first_name) }}
+                    {% endif %}
+                    {% if edit_form.email is defined %}
+                        {{ form_row(edit_form.email) }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="user-edit-form-section">
+                <h3 class="user-edit-form-title">Securite</h3>
+                {% if edit_form.password is defined %}
+                    {{ form_row(edit_form.password) }}
+                {% endif %}
+            </div>
+
+            <div class="user-edit-form-section">
+                <h3 class="user-edit-form-title">Roles</h3>
+                {% if edit_form.roles is defined %}
+                    {{ form_row(edit_form.roles) }}
+                {% endif %}
+            </div>
+
+            <div class="user-edit-form-section">
+                <h3 class="user-edit-form-title">Sections</h3>
+                {% if edit_form.sections is defined %}
+                    {{ form_row(edit_form.sections) }}
+                {% endif %}
+            </div>
+
+            {{ form_rest(edit_form) }}
+            {{ form_end(edit_form, { render_rest: false }) }}
+        </section>
+    </div>
+
+    {% block delete_form %}
+        {{ include('@EasyAdmin/crud/includes/_delete_form.html.twig', {entity_id: entity.primaryKeyValue}, with_context: false) }}
+    {% endblock delete_form %}
+{% endblock %}

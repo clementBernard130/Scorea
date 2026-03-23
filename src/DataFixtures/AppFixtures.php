@@ -105,13 +105,15 @@ class AppFixtures extends Fixture
                 'username' => 'admin1', 
                 'first_name' => 'Damien', 
                 'last_name' => 'Admin',
-                'password' => 'adminpass',
+                'password' => 'password',
+                'email' => 'admin1@example.com'
             ],
             [
                 'username' => 'admin2', 
                 'first_name' => 'Margaux', 
                 'last_name' => 'Admin',
-                'password' => 'adminpass',
+                'password' => 'password',
+                'email' => 'admin2@example.com'
             ],
         ];
 
@@ -120,6 +122,7 @@ class AppFixtures extends Fixture
             $user->setUsername($adminData['username']);
             $user->setFirstName($adminData['first_name']);
             $user->setLastName($adminData['last_name']);
+            $user->setEmail($adminData['email']);
             $hashedPassword = $this->passwordHasher->hashPassword($user, $adminData['password']);
             $user->setPassword($hashedPassword);
             $user->setRoles(['ROLE_ADMIN']);
@@ -187,7 +190,8 @@ class AppFixtures extends Fixture
                 'username' => 'teacher1', 
                 'first_name' => 'Mathias', 
                 'last_name' => 'Teacher',
-                'password' => 'teacherpass',
+                'email' => 'teacher1@example.com',
+                'password' => 'password',
                 'section' => [
                     'DSNS1-2026',
                     'CYBER1-2026',
@@ -200,7 +204,8 @@ class AppFixtures extends Fixture
                 'username' => 'teacher2', 
                 'first_name' => 'Christophe', 
                 'last_name' => 'Teacher',
-                'password' => 'teacherpass',
+                'email' => 'teacher2@example.com',
+                'password' => 'password',
                 'section' => [
                     'DSNS1-2026',
                     'CYBER1-2026',
@@ -213,7 +218,8 @@ class AppFixtures extends Fixture
                 'username' => 'teacher3', 
                 'first_name' => 'Anne', 
                 'last_name' => 'Teacher',
-                'password' => 'teacherpass',
+                'password' => 'password',
+                'email' => 'teacher3@example.com',
                 'section' => [
                     'DSNS1-2026',
                     'CYBER1-2026',
@@ -224,7 +230,8 @@ class AppFixtures extends Fixture
                 'username' => 'teacher4', 
                 'first_name' => 'Antonin', 
                 'last_name' => 'Teacher',
-                'password' => 'teacherpass',
+                'password' => 'password',
+                'email' => 'teacher4@example.com',
                 'section' => [
                     'DSNS1-2026',
                     'CYBER1-2026',
@@ -241,6 +248,7 @@ class AppFixtures extends Fixture
             $hashedPassword = $this->passwordHasher->hashPassword($user, $teacherData['password']);
             $user->setPassword($hashedPassword);
             $user->setRoles(['ROLE_TEACHER']);
+            $user->setEmail($teacherData['email']);
             $user->setCreatedAt(new DateTimeImmutable());
             $user->setUpdatedAt(new DateTimeImmutable());
             foreach ($teacherData['section'] as $sectionName) {
@@ -255,29 +263,33 @@ class AppFixtures extends Fixture
                 'username' => 'student1', 
                 'first_name' => 'Aymeric', 
                 'last_name' => 'Student',
-                'password' => 'studentpass',
+                'password' => 'password',
                 'section' => 'DSNS1-2026',
-        ],
+                'email' => 'student1@example.com'
+            ],
             [
                 'username' => 'student2', 
                 'first_name' => 'Enzo', 
                 'last_name' => 'Student',
-                'password' => 'studentpass',
+                'password' => 'password',
                 'section' => 'DSNS1-2026',
+                'email' => 'student2@example.com'
             ],
             [
                 'username' => 'student3', 
                 'first_name' => 'Clément', 
                 'last_name' => 'Student',
-                'password' => 'studentpass',
+                'password' => 'password',
                 'section' => 'DSNS1-2026',
+                'email' => 'student3@example.com'
             ],
             [
                 'username' => 'student4', 
                 'first_name' => 'Philippe', 
                 'last_name' => 'Student',
-                'password' => 'studentpass',
+                'password' => 'password',
                 'section' => 'DSNS1-2026',
+                'email' => 'student4@example.com'
             ]
         ];
 
@@ -289,6 +301,7 @@ class AppFixtures extends Fixture
             $hashedPassword = $this->passwordHasher->hashPassword($user, $studentData['password']);
             $user->setPassword($hashedPassword);
             $user->setRoles(['ROLE_STUDENT']);
+            $user->setEmail($studentData['email']);
             $user->setCreatedAt(new DateTimeImmutable());
             $user->setUpdatedAt(new DateTimeImmutable());
             $user->addSection($manager->getRepository(Sections::class)->findOneBy(['name' => $studentData['section']]));

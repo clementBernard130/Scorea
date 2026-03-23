@@ -1,0 +1,308 @@
+{# templates/admin/user_detail.html.twig #}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --surface: #fff;
+            --text: #2b2f3a;
+            --muted: #6b7385;
+            --border: #e8ecf5;
+        }
+
+        .user-detail-page {
+            max-width: 980px;
+            margin: auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .user-toolbar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .user-toolbar .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .user-toolbar .btn .btn-icon,
+        .user-toolbar .btn .btn-label {
+            pointer-events: none;
+        }
+
+        .btn-scorea-back {
+            background: #f0f3fb;
+            border: 1px solid #dfe5f3;
+        }
+
+        .btn-scorea-back:hover {
+            background: #e9eefb;
+        }
+
+        .btn-scorea-edit {
+            border: none;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .btn-scorea-edit:hover,
+        .btn-scorea-edit:focus {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .user-hero {
+            position: relative;
+            padding: 1.5rem;
+            border-radius: 16px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .user-hero::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            top: -60px;
+            right: -60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .user-hero-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            background: #fff;
+            color: var(--primary);
+        }
+
+        .user-name {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .user-username {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .user-card {
+            padding: 1rem;
+            border-radius: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        .user-card-title {
+            margin-bottom: 0.8rem;
+            font-weight: bold;
+        }
+
+        .user-kv {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .user-kv-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 0.5rem;
+        }
+
+        .user-kv-row dt {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .user-kv-row dd {
+            margin: 0;
+            color: var(--text);
+        }
+
+        .chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .chip {
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .role-admin { background: #e8f7ef; color: #177245; }
+        .role-teacher { background: #fff4de; color: #9f6300; }
+        .role-student { background: #eaf2ff; color: #2452a8; }
+
+        .section-chip {
+            background: #f6f8ff;
+            border: 1px solid #dfe6fb;
+        }
+
+        .empty-text {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        @media (max-width: 900px) {
+            .user-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .user-kv-row {
+                grid-template-columns: 1fr;
+            }
+
+            .user-avatar {
+                width: 50px;
+                height: 50px;
+            }
+
+            .user-name {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}Fiche utilisateur{% endblock %}
+
+{% block main %}
+    {% set firstName = entity.instance.firstName|default('') %}
+    {% set lastName = entity.instance.lastName|default('') %}
+    {% set initials = (firstName|slice(0, 1) ~ lastName|slice(0, 1))|upper %}
+
+    <div class="user-detail-page">
+        <div class="user-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="btn btn-scorea-back">
+                <span class="btn-icon"><i class="fa fa-arrow-left"></i></span>
+                <span class="btn-label">Retour a la liste</span>
+            </a>
+            <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-scorea-edit">
+                <span class="btn-icon"><i class="fa fa-edit"></i></span>
+                <span class="btn-label">Modifier le profil</span>
+            </a>
+        </div>
+
+        <section class="user-hero">
+            <div class="user-hero-content">
+                <div class="user-avatar">{{ initials ?: 'U' }}</div>
+                <div>
+                    <h2 class="user-name">{{ lastName|upper }} {{ firstName }}</h2>
+                    <p class="user-username">{{ entity.instance.username }}</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="user-grid">
+            <section class="user-card">
+                <h3 class="user-card-title">Identite</h3>
+                <dl class="user-kv">
+                    <div class="user-kv-row">
+                        <dt>Nom d'utilisateur</dt>
+                        <dd>{{ entity.instance.username }}</dd>
+                    </div>
+                    <div class="user-kv-row">
+                        <dt>Nom</dt>
+                        <dd>{{ entity.instance.lastName }}</dd>
+                    </div>
+                    <div class="user-kv-row">
+                        <dt>Prenom</dt>
+                        <dd>{{ entity.instance.firstName }}</dd>
+                    </div>
+                    {% if entity.instance.email is not empty %}
+                    <div class="user-kv-row">
+                        <dt>Email</dt>
+                        <dd>{{ entity.instance.email }}</dd>
+                    </div>
+                    {% endif %}
+                </dl>
+            </section>
+
+            <section class="user-card">
+                <h3 class="user-card-title">Suivi</h3>
+                <dl class="user-kv">
+                    <div class="user-kv-row">
+                        <dt>Cree le</dt>
+                        <dd>{{ entity.instance.createdAt ? entity.instance.createdAt|date('d/m/Y H:i') : 'Non renseigne' }}</dd>
+                    </div>
+                    <div class="user-kv-row">
+                        <dt>Derniere modification</dt>
+                        <dd>{{ entity.instance.updatedAt ? entity.instance.updatedAt|date('d/m/Y H:i') : 'Non renseigne' }}</dd>
+                    </div>
+                </dl>
+            </section>
+        </div>
+
+        {% set visibleRoles = [] %}
+        {% for role in entity.instance.roles %}
+            {% if role != 'ROLE_USER' %}
+                {% set visibleRoles = visibleRoles|merge([role]) %}
+            {% endif %}
+        {% endfor %}
+        {% if visibleRoles is not empty %}
+            <section class="user-card">
+                <h3 class="user-card-title">Roles</h3>
+                <div class="chip-wrap">
+                    {% for role in visibleRoles %}
+                        {% if role == 'ROLE_ADMIN' %}
+                            <span class="chip role-admin">Administrateur</span>
+                        {% elseif role == 'ROLE_TEACHER' %}
+                            <span class="chip role-teacher">Professeur</span>
+                        {% elseif role == 'ROLE_STUDENT' %}
+                            <span class="chip role-student">Etudiant</span>
+                        {% else %}
+                            <span class="chip section-chip">{{ role }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% set userSections = entity.instance.sections|default([]) %}
+        {% if userSections|length > 0 %}
+            <section class="user-card">
+                <h3 class="user-card-title">Sections</h3>
+                <div class="chip-wrap">
+                    {% for section in userSections %}
+                        <span class="chip section-chip">{{ section.name }}</span>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </div>
+{% endblock %}
