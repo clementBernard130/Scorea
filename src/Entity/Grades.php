@@ -6,7 +6,6 @@ use App\Repository\GradesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GradesRepository::class)]
-#[ORM\Table(name: 'grades')]
 class Grades
 {
     #[ORM\Id]
@@ -14,48 +13,27 @@ class Grades
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?float $grade = null;
-
-    #[ORM\ManyToOne(inversedBy: 'grades')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Subjects $subject = null;
-
     #[ORM\ManyToOne(inversedBy: 'grades')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $student = null;
 
-    #[ORM\ManyToOne(inversedBy: 'givenGrades')]
+    #[ORM\ManyToOne(inversedBy: 'grades')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Users $teacher = null;
+    private ?Tests $test = null;
+
+    #[ORM\ManyToOne(inversedBy: 'grades')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?GradeTypeNames $gradeType = null;
+
+    #[ORM\Column]
+    private ?float $grade = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $comment = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getGrade(): ?float
-    {
-        return $this->grade;
-    }
-
-    public function setGrade(float $grade): static
-    {
-        $this->grade = $grade;
-
-        return $this;
-    }
-
-    public function getSubject(): ?Subjects
-    {
-        return $this->subject;
-    }
-
-    public function setSubject(?Subjects $subject): static
-    {
-        $this->subject = $subject;
-
-        return $this;
     }
 
     public function getStudent(): ?Users
@@ -70,14 +48,50 @@ class Grades
         return $this;
     }
 
-    public function getTeacher(): ?Users
+    public function getTest(): ?Tests
     {
-        return $this->teacher;
+        return $this->test;
     }
 
-    public function setTeacher(?Users $teacher): static
+    public function setTest(?Tests $test): static
     {
-        $this->teacher = $teacher;
+        $this->test = $test;
+
+        return $this;
+    }
+
+    public function getGradeType(): ?GradeTypeNames
+    {
+        return $this->gradeType;
+    }
+
+    public function setGradeType(?GradeTypeNames $gradeType): static
+    {
+        $this->gradeType = $gradeType;
+
+        return $this;
+    }
+
+    public function getGrade(): ?float
+    {
+        return $this->grade;
+    }
+
+    public function setGrade(float $grade): static
+    {
+        $this->grade = $grade;
+
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?string $comment): static
+    {
+        $this->comment = $comment;
 
         return $this;
     }

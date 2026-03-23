@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TestsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TestsRepository::class)]
@@ -26,6 +28,17 @@ class Tests
 
     #[ORM\Column]
     private ?\DateTime $testDate = null;
+
+    /**
+     * @var Collection<int, Grades>
+     */
+    #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'test')]
+    private Collection $grades;
+
+    public function __construct()
+    {
+        $this->grades = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -76,6 +89,36 @@ class Tests
     public function setTestDate(\DateTime $testDate): static
     {
         $this->testDate = $testDate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Grades>
+     */
+    public function getGrades(): Collection
+    {
+        return $this->grades;
+    }
+
+    public function addGrade(Grades $grade): static
+    {
+        if (!$this->grades->contains($grade)) {
+            $this->grades->add($grade);
+            $grade->setTest($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGrade(Grades $grade): static
+    {
+        if ($this->grades->removeElement($grade)) {
+            // set the owning side to null (unless already changed)
+            if ($grade->getTest() === $this) {
+                $grade->setTest(null);
+            }
+        }
 
         return $this;
     }
