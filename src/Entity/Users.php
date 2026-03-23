@@ -67,11 +67,25 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'student')]
     private Collection $grades;
 
+    /**
+     * @var Collection<int, ApprenticeMentors>
+     */
+    #[ORM\OneToMany(targetEntity: ApprenticeMentors::class, mappedBy: 'apprentice')]
+    private Collection $apprentice;
+
+    /**
+     * @var Collection<int, ApprenticeMentors>
+     */
+    #[ORM\OneToMany(targetEntity: ApprenticeMentors::class, mappedBy: 'mentor')]
+    private Collection $mentor;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
         $this->tests = new ArrayCollection();
         $this->grades = new ArrayCollection();
+        $this->apprentice = new ArrayCollection();
+        $this->mentor = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -333,6 +347,66 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($grade->getStudent() === $this) {
                 $grade->setStudent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ApprenticeMentors>
+     */
+    public function getApprentice(): Collection
+    {
+        return $this->apprentice;
+    }
+
+    public function addApprentice(ApprenticeMentors $apprentice): static
+    {
+        if (!$this->apprentice->contains($apprentice)) {
+            $this->apprentice->add($apprentice);
+            $apprentice->setApprentice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApprentice(ApprenticeMentors $apprentice): static
+    {
+        if ($this->apprentice->removeElement($apprentice)) {
+            // set the owning side to null (unless already changed)
+            if ($apprentice->getApprentice() === $this) {
+                $apprentice->setApprentice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ApprenticeMentors>
+     */
+    public function getMentor(): Collection
+    {
+        return $this->mentor;
+    }
+
+    public function addMentor(ApprenticeMentors $mentor): static
+    {
+        if (!$this->mentor->contains($mentor)) {
+            $this->mentor->add($mentor);
+            $mentor->setMentor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMentor(ApprenticeMentors $mentor): static
+    {
+        if ($this->mentor->removeElement($mentor)) {
+            // set the owning side to null (unless already changed)
+            if ($mentor->getMentor() === $this) {
+                $mentor->setMentor(null);
             }
         }
 
