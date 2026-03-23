@@ -35,11 +35,7 @@ class Subjects
     #[ORM\InverseJoinColumn(name: 'skills_id', referencedColumnName: 'id')]
     private Collection $skills;
 
-    /**
-     * @var Collection<int, Grades>
-     */
-    #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'subject', orphanRemoval: true)]
-    private Collection $grades;
+
 
     /**
      * @var Collection<int, Tests>
@@ -50,7 +46,6 @@ class Subjects
     public function __construct()
     {
         $this->skills = new ArrayCollection();
-        $this->grades = new ArrayCollection();
         $this->tests = new ArrayCollection();
     }
 
@@ -119,35 +114,6 @@ class Subjects
         return $this;
     }
 
-    /**
-     * @return Collection<int, Grades>
-     */
-    public function getGrades(): Collection
-    {
-        return $this->grades;
-    }
-
-    public function addGrade(Grades $grade): static
-    {
-        if (!$this->grades->contains($grade)) {
-            $this->grades->add($grade);
-            $grade->setSubject($this);
-        }
-
-        return $this;
-    }
-
-    public function removeGrade(Grades $grade): static
-    {
-        if ($this->grades->removeElement($grade)) {
-            // set the owning side to null (unless already changed)
-            if ($grade->getSubject() === $this) {
-                $grade->setSubject(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Tests>
