@@ -122,4 +122,13 @@ class Tests
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $subjectName = $this->subject?->getName() ?? 'Matiere inconnue';
+        $teacherName = $this->teacher !== null ? (string) $this->teacher : 'Professeur inconnu';
+        $testDate = $this->testDate?->format('d/m/Y') ?? 'Date inconnue';
+
+        return sprintf('%s - %s - %s', $subjectName, $teacherName, $testDate);
+    }
 }
