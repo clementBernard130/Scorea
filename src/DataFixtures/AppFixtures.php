@@ -10,7 +10,9 @@ use App\Entity\Subjects;
 use App\Entity\SkillsUnit;
 use App\Entity\Skills;
 use App\Entity\Grades;
+use App\Entity\GradeTypeNames;
 use App\Entity\Sections;
+use App\Entity\Tests;
 use DateTime;
 use DateTimeImmutable;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -399,6 +401,15 @@ class AppFixtures extends Fixture
         $teacher1 = $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher1']);
         $teacher2 = $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher2']);
 
+        $gradeType = $manager->getRepository(GradeTypeNames::class)->findOneBy(['name' => 'Contrôle continu']);
+        if ($gradeType === null) {
+            $gradeType = new GradeTypeNames();
+            $gradeType->setName('Contrôle continu');
+            $gradeType->setIsCertificative(false);
+            $manager->persist($gradeType);
+            $manager->flush();
+        }
+
         $grades = [
             // Notes pour student1
             ['student' => $student1, 'subject' => $pythonSubject, 'teacher' => $teacher1, 'grade' => 15.5],
@@ -421,12 +432,40 @@ class AppFixtures extends Fixture
             ['student' => $student4, 'subject' => $bddSubject, 'teacher' => $teacher2, 'grade' => 13.0],
         ];
 
+        $tests = [];
+
         foreach ($grades as $gradeData) {
+            $testKey = sprintf(
+                '%d-%d',
+                $gradeData['subject']->getId(),
+                $gradeData['teacher']->getId()
+            );
+
+            if (!isset($tests[$testKey])) {
+                $test = $manager->getRepository(Tests::class)->findOneBy([
+                    'subject' => $gradeData['subject'],
+                    'teacher' => $gradeData['teacher'],
+                ]);
+
+                if ($test === null) {
+                    $test = new Tests();
+                    $test->setSubject($gradeData['subject']);
+                    $test->setTeacher($gradeData['teacher']);
+                    $test->setComment('Évaluation ' . $gradeData['subject']->getName());
+                    $test->setTestDate(new DateTime());
+                    $manager->persist($test);
+                }
+
+                $tests[$testKey] = $test;
+            }
+
             $grade = new Grades();
             $grade->setStudent($gradeData['student']);
-            $grade->setSubject($gradeData['subject']);
-            $grade->setTeacher($gradeData['teacher']);
+            $grade->setTest($tests[$testKey]);
+            $grade->setGradeType($gradeType);
             $grade->setGrade($gradeData['grade']);
+            $grade->setCreatedAt(new DateTimeImmutable());
+            $grade->setUpdatedAt(new DateTimeImmutable());
             $manager->persist($grade);
         }
 
