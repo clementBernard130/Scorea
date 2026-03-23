@@ -41,10 +41,17 @@ class Subjects
     #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'subject', orphanRemoval: true)]
     private Collection $grades;
 
+    /**
+     * @var Collection<int, Tests>
+     */
+    #[ORM\OneToMany(targetEntity: Tests::class, mappedBy: 'subject', orphanRemoval: true)]
+    private Collection $tests;
+
     public function __construct()
     {
         $this->skills = new ArrayCollection();
         $this->grades = new ArrayCollection();
+        $this->tests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -136,6 +143,36 @@ class Subjects
             // set the owning side to null (unless already changed)
             if ($grade->getSubject() === $this) {
                 $grade->setSubject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tests>
+     */
+    public function getTests(): Collection
+    {
+        return $this->tests;
+    }
+
+    public function addTest(Tests $test): static
+    {
+        if (!$this->tests->contains($test)) {
+            $this->tests->add($test);
+            $test->setSubject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTest(Tests $test): static
+    {
+        if ($this->tests->removeElement($test)) {
+            // set the owning side to null (unless already changed)
+            if ($test->getSubject() === $this) {
+                $test->setSubject(null);
             }
         }
 

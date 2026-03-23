@@ -55,9 +55,16 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Sections::class, inversedBy: 'users')]
     private Collection $sections;
 
+    /**
+     * @var Collection<int, Tests>
+     */
+    #[ORM\OneToMany(targetEntity: Tests::class, mappedBy: 'teacher')]
+    private Collection $tests;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
+        $this->tests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -263,6 +270,36 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
         // Default color for ROLE_USER or unknown roles
         return '#6c757d'; // Gray
+    }
+
+    /**
+     * @return Collection<int, Tests>
+     */
+    public function getTests(): Collection
+    {
+        return $this->tests;
+    }
+
+    public function addTest(Tests $test): static
+    {
+        if (!$this->tests->contains($test)) {
+            $this->tests->add($test);
+            $test->setTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTest(Tests $test): static
+    {
+        if ($this->tests->removeElement($test)) {
+            // set the owning side to null (unless already changed)
+            if ($test->getTeacher() === $this) {
+                $test->setTeacher(null);
+            }
+        }
+
+        return $this;
     }
 
 }
