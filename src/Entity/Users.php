@@ -79,6 +79,9 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ApprenticeMentors::class, mappedBy: 'mentor')]
     private Collection $mentor;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
@@ -409,6 +412,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
                 $mentor->setMentor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
 
         return $this;
     }
