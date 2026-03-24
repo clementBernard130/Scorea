@@ -24,6 +24,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class StudentCrudController extends AbstractCrudController
 {
+    private const EXPECTED_ROLE = 'ROLE_STUDENT';
+
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher
     ) {}
@@ -31,6 +33,14 @@ class StudentCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return Users::class;
+    }
+
+    public function createEntity(string $entityFqcn): Users
+    {
+        $user = new Users();
+        $user->setRoles([self::EXPECTED_ROLE]);
+
+        return $user;
     }
 
     public function configureActions(Actions $actions): Actions
@@ -43,14 +53,14 @@ class StudentCrudController extends AbstractCrudController
                 ->setLabel(false)
                 ->setHtmlAttributes(['title' => 'Consulter'])
             )
+            ->remove(Crud::PAGE_NEW, Action::SAVE_AND_ADD_ANOTHER)
             ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE)
-            ->disable(Action::DELETE);
+                ->remove(Crud::PAGE_INDEX, Action::DELETE);
     }
 
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('username')
             ->add('first_name')
             ->add('last_name')
             ->add('sections');
@@ -70,6 +80,7 @@ class StudentCrudController extends AbstractCrudController
             ->setDefaultSort(['created_at' => 'DESC'])
             ->overrideTemplates([
                 'crud/detail' => 'admin/user_detail.html.twig',
+                'crud/new' => 'admin/user_new.html.twig',
                 'crud/edit' => 'admin/user_edit.html.twig',
             ]);
     }
@@ -118,13 +129,13 @@ class StudentCrudController extends AbstractCrudController
                 'Professeur' => 'ROLE_TEACHER',
                 "Etudiant" => 'ROLE_STUDENT',
             ])
-            ->allowMultipleChoices()
-            ->renderExpanded()
             ->renderAsBadges([
                 'ROLE_ADMIN' => 'success',
                 'ROLE_TEACHER' => 'warning',
                 'ROLE_STUDENT' => 'info',
-            ])->hideOnIndex();
+            ])
+            ->hideOnForm()
+            ->hideOnIndex();
 
         yield AssociationField::new('sections', 'Sections')
             ->setFormTypeOptions([
@@ -136,8 +147,12 @@ class StudentCrudController extends AbstractCrudController
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->hashPassword($entityInstance);
-        
-    
+
+        if ($entityInstance instanceof Users) {
+            $this->enforceExpectedRole($entityInstance);
+            $this->syncUsername($entityInstance, $entityManager);
+        }
+
         if ($entityInstance instanceof Users && !$entityInstance->getCreatedAt()) {
             $entityInstance->setCreatedAt(new \DateTimeImmutable());
             $entityInstance->setUpdatedAt(new \DateTimeImmutable());
@@ -152,9 +167,10 @@ class StudentCrudController extends AbstractCrudController
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->hashPassword($entityInstance);
-        
-    
+
         if ($entityInstance instanceof Users) {
+            $this->enforceExpectedRole($entityInstance);
+            $this->syncUsername($entityInstance, $entityManager);
             $entityInstance->setUpdatedAt(new \DateTimeImmutable());
         }
 
@@ -177,5 +193,38 @@ class StudentCrudController extends AbstractCrudController
             $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
         }
+    }
+
+    private function syncUsername(Users $user, EntityManagerInterface $entityManager): void
+    {
+        $firstName = $this->normalizeUsernamePart((string) $user->getFirstName());
+        $lastName = $this->normalizeUsernamePart((string) $user->getLastName());
+
+        $baseUsername = trim($firstName . '.' . $lastName, '.');
+        if ($baseUsername === '') {
+            $baseUsername = 'user';
+        }
+
+        $user->setUsername($baseUsername);
+    }
+
+    private function normalizeUsernamePart(string $value): string
+    {
+        $value = trim($value);
+
+        $asciiValue = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+        if ($asciiValue !== false) {
+            $value = $asciiValue;
+        }
+
+        $value = mb_strtolower($value);
+        $value = preg_replace('/[^a-z0-9]+/', '.', $value) ?? '';
+
+        return trim($value, '.');
+    }
+
+    private function enforceExpectedRole(Users $user): void
+    {
+        $user->setRoles([self::EXPECTED_ROLE]);
     }
 }
