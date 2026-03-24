@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Users;
 use App\Entity\Sections;
 use App\Entity\Grades;
+use App\Entity\Tests;
 use App\Entity\Skills;
 use App\Entity\SkillsUnit;
 use App\Entity\Subjects;
@@ -101,6 +102,7 @@ class DashboardController extends AbstractDashboardController
 
         // Section Évaluations
         yield MenuItem::section('Évaluations', 'fa fa-chart-bar');
+        yield MenuItem::linkToCrud('Tests', 'fa fa-clipboard-list', Tests::class);
         yield MenuItem::linkToCrud('Notes', 'fa fa-graduation-cap', Grades::class);
     }
 }
