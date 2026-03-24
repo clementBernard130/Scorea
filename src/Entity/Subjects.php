@@ -35,16 +35,18 @@ class Subjects
     #[ORM\InverseJoinColumn(name: 'skills_id', referencedColumnName: 'id')]
     private Collection $skills;
 
+
+
     /**
-     * @var Collection<int, Grades>
+     * @var Collection<int, Tests>
      */
-    #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'subject', orphanRemoval: true)]
-    private Collection $grades;
+    #[ORM\OneToMany(targetEntity: Tests::class, mappedBy: 'subject', orphanRemoval: true)]
+    private Collection $tests;
 
     public function __construct()
     {
         $this->skills = new ArrayCollection();
-        $this->grades = new ArrayCollection();
+        $this->tests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -112,30 +114,31 @@ class Subjects
         return $this;
     }
 
+
     /**
-     * @return Collection<int, Grades>
+     * @return Collection<int, Tests>
      */
-    public function getGrades(): Collection
+    public function getTests(): Collection
     {
-        return $this->grades;
+        return $this->tests;
     }
 
-    public function addGrade(Grades $grade): static
+    public function addTest(Tests $test): static
     {
-        if (!$this->grades->contains($grade)) {
-            $this->grades->add($grade);
-            $grade->setSubject($this);
+        if (!$this->tests->contains($test)) {
+            $this->tests->add($test);
+            $test->setSubject($this);
         }
 
         return $this;
     }
 
-    public function removeGrade(Grades $grade): static
+    public function removeTest(Tests $test): static
     {
-        if ($this->grades->removeElement($grade)) {
+        if ($this->tests->removeElement($test)) {
             // set the owning side to null (unless already changed)
-            if ($grade->getSubject() === $this) {
-                $grade->setSubject(null);
+            if ($test->getSubject() === $this) {
+                $test->setSubject(null);
             }
         }
 

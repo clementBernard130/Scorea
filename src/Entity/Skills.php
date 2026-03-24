@@ -33,9 +33,16 @@ class Skills
     #[ORM\ManyToMany(targetEntity: Subjects::class, mappedBy: 'skills')]
     private Collection $subjects;
 
+    /**
+     * @var Collection<int, GradeTypes>
+     */
+    #[ORM\OneToMany(targetEntity: GradeTypes::class, mappedBy: 'skill', orphanRemoval: true)]
+    private Collection $gradeTypes;
+
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
+        $this->gradeTypes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -101,6 +108,36 @@ class Skills
     {
         if ($this->subjects->removeElement($subject)) {
             $subject->removeSkill($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GradeTypes>
+     */
+    public function getGradeTypes(): Collection
+    {
+        return $this->gradeTypes;
+    }
+
+    public function addGradeType(GradeTypes $gradeType): static
+    {
+        if (!$this->gradeTypes->contains($gradeType)) {
+            $this->gradeTypes->add($gradeType);
+            $gradeType->setSkill($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGradeType(GradeTypes $gradeType): static
+    {
+        if ($this->gradeTypes->removeElement($gradeType)) {
+            // set the owning side to null (unless already changed)
+            if ($gradeType->getSkill() === $this) {
+                $gradeType->setSkill(null);
+            }
         }
 
         return $this;
