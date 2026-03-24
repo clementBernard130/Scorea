@@ -58,9 +58,40 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Sections::class, inversedBy: 'users')]
     private Collection $sections;
 
+    /**
+     * @var Collection<int, Tests>
+     */
+    #[ORM\OneToMany(targetEntity: Tests::class, mappedBy: 'teacher')]
+    private Collection $tests;
+
+    /**
+     * @var Collection<int, Grades>
+     */
+    #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'student')]
+    private Collection $grades;
+
+    /**
+     * @var Collection<int, ApprenticeMentors>
+     */
+    #[ORM\OneToMany(targetEntity: ApprenticeMentors::class, mappedBy: 'apprentice')]
+    private Collection $apprentice;
+
+    /**
+     * @var Collection<int, ApprenticeMentors>
+     */
+    #[ORM\OneToMany(targetEntity: ApprenticeMentors::class, mappedBy: 'mentor')]
+    private Collection $mentor;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
+        $this->tests = new ArrayCollection();
+        $this->grades = new ArrayCollection();
+        $this->apprentice = new ArrayCollection();
+        $this->mentor = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -278,6 +309,138 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
         // Default color for ROLE_USER or unknown roles
         return '#6c757d'; // Gray
+    }
+
+    /**
+     * @return Collection<int, Tests>
+     */
+    public function getTests(): Collection
+    {
+        return $this->tests;
+    }
+
+    public function addTest(Tests $test): static
+    {
+        if (!$this->tests->contains($test)) {
+            $this->tests->add($test);
+            $test->setTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTest(Tests $test): static
+    {
+        if ($this->tests->removeElement($test)) {
+            // set the owning side to null (unless already changed)
+            if ($test->getTeacher() === $this) {
+                $test->setTeacher(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Grades>
+     */
+    public function getGrades(): Collection
+    {
+        return $this->grades;
+    }
+
+    public function addGrade(Grades $grade): static
+    {
+        if (!$this->grades->contains($grade)) {
+            $this->grades->add($grade);
+            $grade->setStudent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGrade(Grades $grade): static
+    {
+        if ($this->grades->removeElement($grade)) {
+            // set the owning side to null (unless already changed)
+            if ($grade->getStudent() === $this) {
+                $grade->setStudent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ApprenticeMentors>
+     */
+    public function getApprentice(): Collection
+    {
+        return $this->apprentice;
+    }
+
+    public function addApprentice(ApprenticeMentors $apprentice): static
+    {
+        if (!$this->apprentice->contains($apprentice)) {
+            $this->apprentice->add($apprentice);
+            $apprentice->setApprentice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApprentice(ApprenticeMentors $apprentice): static
+    {
+        if ($this->apprentice->removeElement($apprentice)) {
+            // set the owning side to null (unless already changed)
+            if ($apprentice->getApprentice() === $this) {
+                $apprentice->setApprentice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ApprenticeMentors>
+     */
+    public function getMentor(): Collection
+    {
+        return $this->mentor;
+    }
+
+    public function addMentor(ApprenticeMentors $mentor): static
+    {
+        if (!$this->mentor->contains($mentor)) {
+            $this->mentor->add($mentor);
+            $mentor->setMentor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMentor(ApprenticeMentors $mentor): static
+    {
+        if ($this->mentor->removeElement($mentor)) {
+            // set the owning side to null (unless already changed)
+            if ($mentor->getMentor() === $this) {
+                $mentor->setMentor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
     }
 
 }

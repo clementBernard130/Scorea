@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Grades;
+use App\Entity\GradeTypeNames;
+use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -28,30 +30,35 @@ class GradesCrudController extends AbstractCrudController
             NumberField::new('grade', 'Note'),
             AssociationField::new('student', 'Eleve')
                 ->setFormTypeOption('choices', $this->getUsersByRole('ROLE_STUDENT'))
-                ->setFormTypeOption('choice_label', function (Users $user): string {
-                    $fullName = trim(sprintf('%s %s', $user->getFirstName(), $user->getLastName()));
-
-                    return $fullName !== '' ? $fullName : (string) $user->getUsername();
-                })
-                ->formatValue(function ($value, Grades $grade): string {
-                    return (string) $grade->getStudent();
-                }),
-            AssociationField::new('subject', 'Matiere')
-                ->setFormTypeOption('choice_label', 'name')
-                ->formatValue(function ($value, Grades $grade): string {
-                    return (string) ($grade->getSubject()?->getName() ?? '');
-                }),
-            AssociationField::new('teacher', 'Professeur')
-                ->setFormTypeOption('choices', $this->getUsersByRole('ROLE_TEACHER'))
-                ->setFormTypeOption('choice_label', function (Users $user): string {
-                    $fullName = trim(sprintf('%s %s', $user->getFirstName(), $user->getLastName()));
-
-                    return $fullName !== '' ? $fullName : (string) $user->getUsername();
-                })
-                ->formatValue(function ($value, Grades $grade): string {
-                    return (string) $grade->getTeacher();
-                }),
+                ->setFormTypeOption('choice_label', fn(Users $u) => $this->formatUserLabel($u)),
+            AssociationField::new('test', 'Test')
+                ->setFormTypeOption('choice_label', fn(Tests $test) => $this->formatTestLabel($test)),
+            AssociationField::new('gradeType', 'Type de note')
+                ->setFormTypeOption('choice_label', fn(GradeTypeNames $gradeType) => $this->formatGradeTypeLabel($gradeType)),
         ];
+    }
+
+    public function formatUserLabel(Users $user): string
+    {
+        $fullName = trim($user->getFirstName() . ' ' . $user->getLastName());
+
+        return $fullName !== '' ? $fullName : (string) $user->getUsername();
+    }
+
+    public function formatTestLabel(Tests $test): string
+    {
+        $subjectName = $test->getSubject()?->getName() ?? 'Matiere inconnue';
+        $teacherName = $test->getTeacher() !== null
+            ? $this->formatUserLabel($test->getTeacher())
+            : 'Professeur inconnu';
+        $testDate = $test->getTestDate()?->format('d/m/Y') ?? 'Date inconnue';
+
+        return sprintf('%s - %s - %s', $subjectName, $teacherName, $testDate);
+    }
+
+    public function formatGradeTypeLabel(GradeTypeNames $gradeType): string
+    {
+        return $gradeType->getName() ?? 'Type inconnu';
     }
 
     /**
