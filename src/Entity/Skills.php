@@ -24,7 +24,7 @@ class Skills
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'skills')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?SkillsUnit $skillUnit = null;
 
     /**
