@@ -2,10 +2,12 @@
 
 namespace App\Controller\Admin;
 
+use App\Form\SkillType;
 use App\Entity\SkillsUnit;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -24,13 +26,14 @@ class SkillUnitCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
             TextField::new('name', 'Nom du Bloc'),
             TextEditorField::new('description', 'Description'),
-            AssociationField::new('skills', 'Compétences associées')
-                ->onlyOnForms()
+            CollectionField::new('skills', 'Compétences')
+                ->setEntryType(SkillType::class) // Votre formulaire Symfony
                 ->setFormTypeOption('by_reference', false)
-                ->setCrudController(SkillCrudController::class) 
-                ->autocomplete()
+                ->allowAdd(true)
+                ->allowDelete(true)
+                ->renderExpanded(true)
+                ->setEntryIsComplex(true),
 
-                ->setHelp('Recherchez et associez des compétences existantes à ce bloc.'),
             AssociationField::new('skills', 'Compétences')
                 ->onlyOnIndex()
                 ->formatValue(function ($value, SkillsUnit $entity) {

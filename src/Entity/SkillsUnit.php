@@ -26,7 +26,7 @@ class SkillsUnit
     /**
      * @var Collection<int, Skills>
      */
-    #[ORM\OneToMany(targetEntity: Skills::class, mappedBy: 'skillUnit')]
+    #[ORM\OneToMany(targetEntity: Skills::class, mappedBy: 'skillUnit', cascade: ['persist'])]
     private Collection $skills;
 
     public function __construct()
