@@ -2,17 +2,16 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Grades;
-use App\Entity\GradeTypeNames;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 
-class GradesCrudController extends AbstractCrudController
+class TestsCrudController extends AbstractCrudController
 {
     public function __construct(
         private UsersRepository $usersRepository
@@ -20,20 +19,19 @@ class GradesCrudController extends AbstractCrudController
 
     public static function getEntityFqcn(): string
     {
-        return Grades::class;
+        return Tests::class;
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
-            NumberField::new('grade', 'Note'),
-            AssociationField::new('student', 'Eleve')
-                ->setFormTypeOption('choices', $this->getUsersByRole('ROLE_STUDENT'))
-                ->setFormTypeOption('choice_label', fn(Users $u) => $this->formatUserLabel($u)),
-            AssociationField::new('test', 'Test')
-                ->setFormTypeOption('choice_label', fn(Tests $test) => $this->formatTestLabel($test)),
-            AssociationField::new('gradeType', 'Type de note')
-                ->setFormTypeOption('choice_label', fn(GradeTypeNames $gradeType) => $this->formatGradeTypeLabel($gradeType)),
+            AssociationField::new('subject', 'Matière')
+                ->setFormTypeOption('choice_label', 'name'),
+            AssociationField::new('teacher', 'Enseignant')
+                ->setFormTypeOption('choices', $this->getUsersByRole('ROLE_TEACHER'))
+                ->setFormTypeOption('choice_label', fn(Users $user) => $this->formatUserLabel($user)),
+            TextEditorField::new('comment')->setLabel('Commentaire'),
+            DateField::new('testDate')->setLabel('Date du test'),
         ];
     }
 
@@ -42,22 +40,6 @@ class GradesCrudController extends AbstractCrudController
         $fullName = trim($user->getFirstName() . ' ' . $user->getLastName());
 
         return $fullName !== '' ? $fullName : (string) $user->getUsername();
-    }
-
-    public function formatTestLabel(Tests $test): string
-    {
-        $subjectName = $test->getSubject()?->getName() ?? 'Matiere inconnue';
-        $teacherName = $test->getTeacher() !== null
-            ? $this->formatUserLabel($test->getTeacher())
-            : 'Professeur inconnu';
-        $testDate = $test->getTestDate()?->format('d/m/Y') ?? 'Date inconnue';
-
-        return sprintf('%s - %s - %s', $subjectName, $teacherName, $testDate);
-    }
-
-    public function formatGradeTypeLabel(GradeTypeNames $gradeType): string
-    {
-        return $gradeType->getName() ?? 'Type inconnu';
     }
 
     /**

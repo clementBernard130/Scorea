@@ -405,6 +405,40 @@ class AppFixtures extends Fixture
         
         $manager->flush();
 
+        // === Tests ===
+
+        $tests = [
+            [
+                'subject' => $pythonSubject,
+                'teacher' => $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher1']),
+                'comment' => 'Test de Python',
+                'testDate' => new DateTime('2026-01-15')
+            ],
+            [
+                'subject' => $frameworkSubject,
+                'teacher' => $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher1']),
+                'comment' => 'Test de Framework PHP',
+                'testDate' => new DateTime('2026-02-20')
+            ],
+            [
+                'subject' => $bddSubject,
+                'teacher' => $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher2']),
+                'comment' => 'Test de Base de données',
+                'testDate' => new DateTime('2026-03-10')
+            ]
+        ];
+
+        foreach ($tests as $testData) {
+            $test = new Tests();
+            $test->setSubject($testData['subject']);
+            $test->setTeacher($testData['teacher']);
+            $test->setComment($testData['comment']);
+            $test->setTestDate($testData['testDate']);
+            $manager->persist($test);
+        }
+
+        $manager->flush();
+
         // === Grades ===     
         $student1 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student1']);
         $student2 = $manager->getRepository(Users::class)->findOneBy(['username' => 'student2']);
@@ -424,59 +458,97 @@ class AppFixtures extends Fixture
         }
 
         $grades = [
-            // Notes pour student1
-            ['student' => $student1, 'subject' => $pythonSubject, 'teacher' => $teacher1, 'grade' => 15.5],
-            ['student' => $student1, 'subject' => $frameworkSubject, 'teacher' => $teacher1, 'grade' => 14.0],
-            ['student' => $student1, 'subject' => $bddSubject, 'teacher' => $teacher2, 'grade' => 16.5],
-            
-            // Notes pour student2
-            ['student' => $student2, 'subject' => $pythonSubject, 'teacher' => $teacher1, 'grade' => 12.0],
-            ['student' => $student2, 'subject' => $frameworkSubject, 'teacher' => $teacher1, 'grade' => 13.5],
-            ['student' => $student2, 'subject' => $bddSubject, 'teacher' => $teacher2, 'grade' => 11.0],
-            
-            // Notes pour student3
-            ['student' => $student3, 'subject' => $pythonSubject, 'teacher' => $teacher1, 'grade' => 17.0],
-            ['student' => $student3, 'subject' => $frameworkSubject, 'teacher' => $teacher1, 'grade' => 15.5],
-            ['student' => $student3, 'subject' => $bddSubject, 'teacher' => $teacher2, 'grade' => 18.0],
-            
-            // Notes pour student4
-            ['student' => $student4, 'subject' => $pythonSubject, 'teacher' => $teacher1, 'grade' => 10.5],
-            ['student' => $student4, 'subject' => $frameworkSubject, 'teacher' => $teacher1, 'grade' => 12.0],
-            ['student' => $student4, 'subject' => $bddSubject, 'teacher' => $teacher2, 'grade' => 13.0],
+            [
+                'student' => $student1,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $pythonSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 15.5,
+                'comment' => 'Bon travail sur Python',
+            ],
+            [
+                'student' => $student2,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $pythonSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 14.0,
+            ],
+            [
+                'student' => $student3,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $pythonSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 13.0,
+                'comment' => 'Travail satisfaisant sur Python',
+            ],
+            [
+                'student' => $student4,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $pythonSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 12.5,
+            ],
+            [
+                'student' => $student1,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $frameworkSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 14.5,
+                'comment' => 'Bon travail sur Framework PHP',
+            ],
+            [
+                'student' => $student2,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $frameworkSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 13.0,
+            ],
+            [
+                'student' => $student3,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $frameworkSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 12.0,
+                'comment' => 'Travail satisfaisant sur Framework PHP',
+            ],
+            [
+                'student' => $student4,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $frameworkSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 11.5,
+            ],
+            [
+                'student' => $student1,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $bddSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 13.5,
+                'comment' => 'Bon travail sur Base de données',
+            ],
+            [
+                'student' => $student2,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $bddSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 12.0,
+            ],
+            [
+                'student' => $student3,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $bddSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 11.0,
+                'comment' => 'Travail satisfaisant sur Base de données',
+            ],
+            [
+                'student' => $student4,
+                'test' => $manager->getRepository(Tests::class)->findOneBy(['subject' => $bddSubject]),
+                'gradeType' => $gradeType,
+                'grade' => 10.5,
+                'comment' => 'Travail satisfaisant sur Base de données',
+
+            ],
         ];
 
-        $tests = [];
-
         foreach ($grades as $gradeData) {
-            $testKey = sprintf(
-                '%d-%d',
-                $gradeData['subject']->getId(),
-                $gradeData['teacher']->getId()
-            );
-
-            if (!isset($tests[$testKey])) {
-                $test = $manager->getRepository(Tests::class)->findOneBy([
-                    'subject' => $gradeData['subject'],
-                    'teacher' => $gradeData['teacher'],
-                ]);
-
-                if ($test === null) {
-                    $test = new Tests();
-                    $test->setSubject($gradeData['subject']);
-                    $test->setTeacher($gradeData['teacher']);
-                    $test->setComment('Évaluation ' . $gradeData['subject']->getName());
-                    $test->setTestDate(new DateTime());
-                    $manager->persist($test);
-                }
-
-                $tests[$testKey] = $test;
-            }
-
             $grade = new Grades();
             $grade->setStudent($gradeData['student']);
-            $grade->setTest($tests[$testKey]);
-            $grade->setGradeType($gradeType);
+            $grade->setTest($gradeData['test']);
+            $grade->setGradeType($gradeData['gradeType']);
             $grade->setGrade($gradeData['grade']);
+            if (isset($gradeData['comment'])) {
+                $grade->setComment($gradeData['comment']);
+            }
             $grade->setCreatedAt(new DateTimeImmutable());
             $grade->setUpdatedAt(new DateTimeImmutable());
             $manager->persist($grade);
