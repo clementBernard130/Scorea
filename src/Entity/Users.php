@@ -82,6 +82,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $email = null;
 
+    /**
+     * @var Collection<int, Alerts>
+     */
+    #[ORM\OneToMany(targetEntity: Alerts::class, mappedBy: 'users')]
+    private Collection $alerts;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
@@ -89,6 +95,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $this->grades = new ArrayCollection();
         $this->apprentice = new ArrayCollection();
         $this->mentor = new ArrayCollection();
+        $this->alerts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -424,6 +431,36 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(?string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Alerts>
+     */
+    public function getAlerts(): Collection
+    {
+        return $this->alerts;
+    }
+
+    public function addAlert(Alerts $alert): static
+    {
+        if (!$this->alerts->contains($alert)) {
+            $this->alerts->add($alert);
+            $alert->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlert(Alerts $alert): static
+    {
+        if ($this->alerts->removeElement($alert)) {
+            // set the owning side to null (unless already changed)
+            if ($alert->getUsers() === $this) {
+                $alert->setUsers(null);
+            }
+        }
 
         return $this;
     }

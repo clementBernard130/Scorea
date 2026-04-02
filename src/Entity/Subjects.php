@@ -43,10 +43,17 @@ class Subjects
     #[ORM\OneToMany(targetEntity: Tests::class, mappedBy: 'subject', orphanRemoval: true)]
     private Collection $tests;
 
+    /**
+     * @var Collection<int, Alerts>
+     */
+    #[ORM\OneToMany(targetEntity: Alerts::class, mappedBy: 'subject')]
+    private Collection $alerts;
+
     public function __construct()
     {
         $this->skills = new ArrayCollection();
         $this->tests = new ArrayCollection();
+        $this->alerts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -139,6 +146,36 @@ class Subjects
             // set the owning side to null (unless already changed)
             if ($test->getSubject() === $this) {
                 $test->setSubject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Alerts>
+     */
+    public function getAlerts(): Collection
+    {
+        return $this->alerts;
+    }
+
+    public function addAlert(Alerts $alert): static
+    {
+        if (!$this->alerts->contains($alert)) {
+            $this->alerts->add($alert);
+            $alert->setSubject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlert(Alerts $alert): static
+    {
+        if ($this->alerts->removeElement($alert)) {
+            // set the owning side to null (unless already changed)
+            if ($alert->getSubject() === $this) {
+                $alert->setSubject(null);
             }
         }
 
