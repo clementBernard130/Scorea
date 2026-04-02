@@ -15,6 +15,7 @@ use App\Repository\TrainingsRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ColorScheme;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -76,7 +77,9 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Scorea - Administration');
+            ->setTitle('Scorea - Administration')
+            ->disableDarkMode()
+            ->setDefaultColorScheme(ColorScheme::LIGHT);
     }
 
     public function configureMenuItems(): iterable
@@ -85,11 +88,16 @@ class DashboardController extends AbstractDashboardController
 
         // Section Gestion des Utilisateurs
         yield MenuItem::section('Gestion des Utilisateurs', 'fa fa-users');
-        yield MenuItem::linkToCrud('Utilisateurs', 'fa fa-user', Users::class);
-        yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
+        yield MenuItem::linkToCrud('Administrateurs', 'fa fa-user-shield', Users::class)
+            ->setController(AdminCrudController::class);
+        yield MenuItem::linkToCrud('Professeurs', 'fa fa-chalkboard-user', Users::class)
+            ->setController(TeacherCrudController::class);
+        yield MenuItem::linkToCrud('Étudiants', 'fa fa-user-graduate', Users::class)
+            ->setController(StudentCrudController::class);
 
         // Section Formations
         yield MenuItem::section('Formations & Matières', 'fa fa-graduation-cap');
+        yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
         yield MenuItem::linkToCrud('Formations', 'fa fa-school', Trainings::class);
         yield MenuItem::linkToCrud('Matières', 'fa fa-book', Subjects::class);
 
