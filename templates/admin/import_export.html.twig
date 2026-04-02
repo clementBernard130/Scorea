@@ -21,17 +21,17 @@
         <div class="ie-grid">
             <section class="ie-card">
                 <div class="ie-card-head">
-                    <h2><i class="fa fa-user-graduate"></i> Eleves</h2>
+                    <h2><i class="fa fa-user-graduate"></i> Élèves</h2>
                     <span class="ie-tag">CSV</span>
                 </div>
 
                 <p class="ie-hint">Colonnes attendues: <strong>first_name;last_name;email</strong></p>
 
                 <form action="{{ path('admin_import_students') }}" method="post" enctype="multipart/form-data" class="ie-form">
-                    <label for="students_file">Fichier CSV eleves</label>
+                    <label for="students_file">Fichier CSV élèves</label>
                     <input id="students_file" name="students_file" type="file" accept=".csv,text/csv" required>
                     <button type="submit" class="ie-btn ie-btn-primary">
-                        <i class="fa fa-file-import"></i> Importer les eleves
+                        <i class="fa fa-file-import"></i> Importer les élèves
                     </button>
                 </form>
 
