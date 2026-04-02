@@ -170,7 +170,7 @@ class ImportExportController extends AbstractController
 
         $this->entityManager->flush();
 
-        $this->addFlash('success', sprintf('Import formations terminé ! %d créée(s), %d mise(s) a jour.', $imported, $updated));
+        $this->addFlash('success', sprintf('Import formations terminé ! %d créée(s), %d mise(s) à jour.', $imported, $updated));
 
         return $this->redirect($backUrl);
     }
