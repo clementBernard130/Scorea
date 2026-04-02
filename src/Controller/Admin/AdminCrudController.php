@@ -127,7 +127,7 @@ class AdminCrudController extends AbstractCrudController
             ->setChoices([
                 'Administrateur' => 'ROLE_ADMIN',
                 'Professeur' => 'ROLE_TEACHER',
-                'Etudiant' => 'ROLE_STUDENT',
+                'Étudiant' => 'ROLE_STUDENT',
             ])
             ->renderAsBadges([
                 'ROLE_ADMIN' => 'success',
