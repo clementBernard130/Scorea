@@ -56,7 +56,7 @@ class SkillUnitCrudController extends AbstractCrudController
     public function createEntity(string $entityFqcn): SkillsUnit
     {
         $skillUnit = new SkillsUnit();
-        $trainingId = $this->getContext()?->getRequest()->query->get('trainingId');
+        $trainingId = $this->getTrainingId();
 
         if ($trainingId !== null) {
             $training = $this->trainingsRepository->find($trainingId);
@@ -72,7 +72,7 @@ class SkillUnitCrudController extends AbstractCrudController
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-        $trainingId = $this->getContext()?->getRequest()->query->get('trainingId');
+        $trainingId = $this->getTrainingId();
 
         if ($trainingId !== null) {
             $queryBuilder
@@ -85,7 +85,7 @@ class SkillUnitCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $trainingId = $this->getContext()?->getRequest()->query->get('trainingId');
+        $trainingId = $this->getTrainingId();
 
         $trainingField = AssociationField::new('trainings', 'Formation')
             ->autocomplete()
@@ -131,17 +131,16 @@ class SkillUnitCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        $trainingId = $this->getContext()?->getRequest()->query->get('trainingId');
-
         return $crud
-            ->setPageTitle('index', $trainingId !== null ? 'Blocs de compétences de la formation' : 'Blocs de compétences')
-            ->setPageTitle('new', $trainingId !== null ? 'Créer un bloc pour la formation' : 'Créer un bloc')
-            ->setPageTitle('edit', 'Modifier le bloc');
+            ->setPageTitle('index', fn () => $this->buildPageTitle('index'))
+            ->setPageTitle('new', fn () => $this->buildPageTitle('new'))
+            ->setPageTitle('edit', fn (?SkillsUnit $skillUnit) => $this->buildPageTitle('edit', $skillUnit));
     }
 
     protected function getRedirectResponseAfterSave(AdminContext $context, string $action): RedirectResponse
     {
-        $trainingId = $context->getRequest()->query->get('trainingId');
+        $trainingId = $context->getRequest()->query->get('trainingId')
+            ?? $context->getRequest()->attributes->get('trainingId');
 
         if ($trainingId !== null) {
             $submitButtonName = $context->getRequest()->request->all()['ea']['newForm']['btn'] ?? null;
@@ -182,7 +181,7 @@ class SkillUnitCrudController extends AbstractCrudController
             ->setAction($action)
             ->setEntityId($skillUnit->getId());
 
-        $trainingId = $this->getContext()?->getRequest()->query->get('trainingId');
+        $trainingId = $this->getTrainingId();
 
         if ($trainingId !== null) {
             $url->set('trainingId', $trainingId);
@@ -198,7 +197,7 @@ class SkillUnitCrudController extends AbstractCrudController
             ->setController(self::class)
             ->setAction(Action::NEW);
 
-        $trainingId = $this->getContext()?->getRequest()->query->get('trainingId');
+        $trainingId = $this->getTrainingId();
 
         if ($trainingId !== null) {
             $url->set('trainingId', $trainingId);
@@ -214,7 +213,7 @@ class SkillUnitCrudController extends AbstractCrudController
             ->setController(self::class)
             ->setAction(Action::INDEX);
 
-        $trainingId = $this->getContext()?->getRequest()->query->get('trainingId')
+        $trainingId = $this->getTrainingId()
             ?? $skillUnit->getTrainings()?->getId();
 
         if ($trainingId !== null) {
@@ -222,5 +221,37 @@ class SkillUnitCrudController extends AbstractCrudController
         }
 
         return $url->generateUrl();
+    }
+
+    private function getTrainingId(): ?string
+    {
+        $request = $this->getContext()?->getRequest();
+
+        if ($request === null) {
+            return null;
+        }
+
+        return $request->query->get('trainingId')
+            ?? $request->attributes->get('trainingId');
+    }
+
+    private function buildPageTitle(string $pageName, ?SkillsUnit $skillUnit = null): string
+    {
+        $trainingId = $this->getTrainingId() ?? $skillUnit?->getTrainings()?->getId();
+        $training = $trainingId !== null ? $this->trainingsRepository->find($trainingId) : null;
+        $trainingName = $training?->getName();
+
+        return match ($pageName) {
+            'index' => $trainingName !== null
+                ? sprintf('Blocs de compétences de la formation : %s', $trainingName)
+                : 'Blocs de compétences',
+            'new' => $trainingName !== null
+                ? sprintf('Créer un bloc pour la formation : %s', $trainingName)
+                : 'Créer un bloc',
+            'edit' => $trainingName !== null
+                ? sprintf('Modifier le bloc de la formation : %s', $trainingName)
+                : 'Modifier le bloc',
+            default => 'Blocs de compétences',
+        };
     }
 }
