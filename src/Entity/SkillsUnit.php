@@ -29,6 +29,9 @@ class SkillsUnit
     #[ORM\OneToMany(targetEntity: Skills::class, mappedBy: 'skillUnit', cascade: ['persist'])]
     private Collection $skills;
 
+    #[ORM\ManyToOne(inversedBy: 'skillUnits')]
+    private ?Trainings $trainings = null;
+
     public function __construct()
     {
         $this->skills = new ArrayCollection();
@@ -96,5 +99,17 @@ class SkillsUnit
     public function __toString(): string
     {
         return (string) $this->name;
+    }
+
+    public function getTrainings(): ?Trainings
+    {
+        return $this->trainings;
+    }
+
+    public function setTrainings(?Trainings $trainings): static
+    {
+        $this->trainings = $trainings;
+
+        return $this;
     }
 }
