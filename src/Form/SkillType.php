@@ -37,7 +37,7 @@ class SkillType extends AbstractType
             ->add('subjects', EntityType::class, [
                 'class' => Subjects::class,
                 'choice_label' => 'name',
-                'label' => 'Matieres existantes',
+                'label' => 'Matières existantes',
                 'multiple' => true,
                 'expanded' => false,
                 'required' => false,
