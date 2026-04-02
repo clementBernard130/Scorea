@@ -41,6 +41,15 @@ class SkillUnitCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
+            ->remove(Crud::PAGE_NEW, Action::SAVE_AND_ADD_ANOTHER)
+            ->add(Crud::PAGE_NEW, Action::SAVE_AND_CONTINUE)
+            ->update(Crud::PAGE_NEW, Action::SAVE_AND_CONTINUE, fn (Action $action) => $action
+                ->asPrimaryAction()
+            )
+            ->update(Crud::PAGE_NEW, Action::SAVE_AND_RETURN, fn (Action $action) => $action
+                ->asDefaultAction()
+            )
+            ->reorder(Crud::PAGE_NEW, [Action::SAVE_AND_CONTINUE, Action::SAVE_AND_RETURN])
             ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $action) => $action
                 ->linkToUrl(fn (): string => $this->generateContextualNewUrl())
             )
@@ -173,7 +182,15 @@ class SkillUnitCrudController extends AbstractCrudController
                     ->setAction(Action::NEW)
                     ->set('trainingId', $trainingId)
                     ->generateUrl(),
-                default => $this->adminUrlGenerator
+                default => Action::NEW === $action
+                    ? $this->adminUrlGenerator
+                        ->unsetAll()
+                        ->setController(self::class)
+                        ->setAction(Action::EDIT)
+                        ->setEntityId($context->getEntity()->getPrimaryKeyValue())
+                        ->set('trainingId', $trainingId)
+                        ->generateUrl()
+                    : $this->adminUrlGenerator
                     ->unsetAll()
                     ->setController(self::class)
                     ->setAction(Action::INDEX)
