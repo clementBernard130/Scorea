@@ -177,32 +177,72 @@ class ImportExportController extends AbstractController
 
     private function readCsvRows(UploadedFile $file): array
     {
-        $content = file_get_contents($file->getPathname());
-        if (false === $content || '' === trim($content)) {
+        $path = $file->getPathname();
+
+        if (!is_readable($path)) {
             return [];
         }
 
-        $lines = preg_split('/\r\n|\r|\n/', trim($content));
-        if (!is_array($lines) || [] === $lines) {
+        $handle = fopen($path, 'rb');
+        if (false === $handle) {
             return [];
         }
 
-        $delimiter = str_contains((string) $lines[0], ';') ? ';' : ',';
+        $delimiter = ',';
+        $foundNonEmptyLine = false;
+
+        // Detect delimiter from the first non-empty physical line, without loading the whole file.
+        while (false !== ($line = fgets($handle))) {
+            if ('' === trim($line)) {
+                continue;
+            }
+
+            $foundNonEmptyLine = true;
+            $delimiter = str_contains($line, ';') ? ';' : ',';
+            break;
+        }
+
+        if (false === $foundNonEmptyLine) {
+            fclose($handle);
+            return [];
+        }
+
+        // Rewind so that the header line is processed by fgetcsv as well.
+        rewind($handle);
+
         $rows = [];
 
-        foreach ($lines as $line) {
-            if ('' === trim((string) $line)) {
+        while (false !== ($data = fgetcsv($handle, 0, $delimiter))) {
+            // fgetcsv may return [null] for completely empty lines.
+            if ($data === null || $data === [null]) {
                 continue;
             }
 
-            $parsedLine = str_getcsv((string) $line, $delimiter);
-            if (false === $parsedLine) {
+            // Trim string values, preserving non-string types as-is.
+            $trimmedRow = array_map(
+                static function ($value) {
+                    return is_string($value) ? trim($value) : $value;
+                },
+                $data
+            );
+
+            // Skip rows that are effectively empty after trimming.
+            $allEmpty = true;
+            foreach ($trimmedRow as $value) {
+                if ($value !== '' && $value !== null) {
+                    $allEmpty = false;
+                    break;
+                }
+            }
+
+            if ($allEmpty) {
                 continue;
             }
 
-            $rows[] = array_map('trim', $parsedLine);
+            $rows[] = $trimmedRow;
         }
 
+        fclose($handle);
         return $rows;
     }
 
