@@ -82,6 +82,15 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ApprenticeMentors::class, mappedBy: 'mentor')]
     private Collection $mentor;
 
+    /**
+     * @var Collection<int, Subjects>
+     */
+    #[ORM\ManyToMany(targetEntity: Subjects::class, inversedBy: 'teachers')]
+    #[ORM\JoinTable(name: 'users_subjects')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'subject_id', referencedColumnName: 'id')]
+    private Collection $subjects;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
@@ -89,6 +98,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $this->grades = new ArrayCollection();
         $this->apprentice = new ArrayCollection();
         $this->mentor = new ArrayCollection();
+        $this->subjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -264,6 +274,33 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeSection(Sections $section): static
     {
         $this->sections->removeElement($section);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subjects>
+     */
+    public function getSubjects(): Collection
+    {
+        return $this->subjects;
+    }
+
+    public function addSubject(Subjects $subject): static
+    {
+        if (!$this->subjects->contains($subject)) {
+            $this->subjects->add($subject);
+            $subject->addTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubject(Subjects $subject): static
+    {
+        if ($this->subjects->removeElement($subject)) {
+            $subject->removeTeacher($this);
+        }
 
         return $this;
     }

@@ -200,6 +200,12 @@ class AppFixtures extends Fixture
                     'CYBER2-2026',
                     'M1-DSNS-2026',
                     'M2-DSNS-2026'
+                ],
+                'subject' => [
+                    'Gestion de projet',
+                    'Python',
+                    'Framework PHP',
+                    'Projet'
                 ]
             ],
             [
@@ -214,6 +220,10 @@ class AppFixtures extends Fixture
                     'CYBER2-2026',
                     'M1-DSNS-2026',
                     'M2-DSNS-2026'
+                ],
+                'subject' => [
+                    'Base de données',
+                    'Linux'
                 ]
             ],
             [
@@ -226,6 +236,9 @@ class AppFixtures extends Fixture
                     'DSNS1-2026',
                     'CYBER1-2026',
                     'CYBER2-2026'
+                ],
+                'subject' => [
+                    'Cryptographie',
                 ]
             ],
             [
@@ -238,6 +251,9 @@ class AppFixtures extends Fixture
                     'DSNS1-2026',
                     'CYBER1-2026',
                     'CYBER2-2026'
+                ],
+                'subject' => [
+                    'Communication',
                 ]
             ]
         ];
@@ -255,6 +271,9 @@ class AppFixtures extends Fixture
             $user->setUpdatedAt(new DateTimeImmutable());
             foreach ($teacherData['section'] as $sectionName) {
                 $user->addSection($manager->getRepository(Sections::class)->findOneBy(['name' => $sectionName]));
+            }
+            foreach ($teacherData['subject'] as $subjectName) {
+                $user->addSubject($manager->getRepository(Subjects::class)->findOneBy(['name' => $subjectName]));
             }
             $manager->persist($user);
         }
