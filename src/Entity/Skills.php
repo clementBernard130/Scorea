@@ -30,7 +30,7 @@ class Skills
     /**
      * @var Collection<int, Subjects>
      */
-    #[ORM\ManyToMany(targetEntity: Subjects::class, mappedBy: 'skills')]
+    #[ORM\ManyToMany(targetEntity: Subjects::class, mappedBy: 'skills', cascade: ['persist'])]
     private Collection $subjects;
 
     /**

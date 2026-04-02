@@ -6,8 +6,6 @@ use App\Entity\Users;
 use App\Entity\Sections;
 use App\Entity\Grades;
 use App\Entity\Tests;
-use App\Entity\SkillsUnit;
-use App\Entity\Subjects;
 use App\Entity\Trainings;
 use App\Repository\UsersRepository;
 use App\Repository\SectionsRepository;
@@ -96,10 +94,9 @@ class DashboardController extends AbstractDashboardController
             ->setController(StudentCrudController::class);
 
         // Section Formations
-        yield MenuItem::section('Formations & Matières', 'fa fa-graduation-cap');
+        yield MenuItem::section('Formations', 'fa fa-graduation-cap');
         yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
         yield MenuItem::linkToCrud('Formations', 'fa fa-school', Trainings::class);
-        yield MenuItem::linkToCrud('Matières', 'fa fa-book', Subjects::class);
 
         // Section Évaluations
         yield MenuItem::section('Évaluations', 'fa fa-chart-bar');
