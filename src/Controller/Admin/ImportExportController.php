@@ -101,7 +101,18 @@ class ImportExportController extends AbstractController
             $user->setLastName($lastName);
             $user->setEmail($email ?: null);
             $user->setUsername($username);
-            $user->setRoles(['ROLE_STUDENT']);
+
+            if ($isNew) {
+                // Nouvel utilisateur : définir explicitement le rôle étudiant
+                $user->setRoles(['ROLE_STUDENT']);
+            } else {
+                // Utilisateur existant : ne pas écraser les rôles existants
+                $existingRoles = $user->getRoles();
+                if (!in_array('ROLE_STUDENT', $existingRoles, true)) {
+                    $existingRoles[] = 'ROLE_STUDENT';
+                }
+                $user->setRoles($existingRoles);
+            }
             $user->setUpdatedAt(new \DateTimeImmutable());
 
             $this->entityManager->persist($user);
