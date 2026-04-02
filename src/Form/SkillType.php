@@ -48,18 +48,18 @@ class SkillType extends AbstractType
             ])
 
             ->add('newSubjectName', TextType::class, [
-                'label' => 'Nouvelle matiere',
+                'label' => 'Nouvelle matière',
                 'mapped' => false,
                 'required' => false,
             ])
             ->add('newSubjectDescription', TextareaType::class, [
-                'label' => 'Description de la nouvelle matiere',
+                'label' => 'Description de la nouvelle matière',
                 'mapped' => false,
                 'required' => false,
                 'empty_data' => '',
             ])
             ->add('newSubjectCoefficient', NumberType::class, [
-                'label' => 'Coefficient de la nouvelle matiere',
+                'label' => 'Coefficient de la nouvelle matière',
                 'mapped' => false,
                 'required' => false,
                 'html5' => true,
