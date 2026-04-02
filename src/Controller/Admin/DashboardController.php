@@ -93,10 +93,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Formations', 'fa fa-school', Trainings::class);
         yield MenuItem::linkToCrud('Matières', 'fa fa-book', Subjects::class);
 
-        // Section Compétences
-        yield MenuItem::section('Compétences', 'fa fa-star');
-        yield MenuItem::linkToCrud('Blocs de Compétences', 'fa fa-cubes', SkillsUnit::class);
-
         // Section Évaluations
         yield MenuItem::section('Évaluations', 'fa fa-chart-bar');
         yield MenuItem::linkToCrud('Tests', 'fa fa-clipboard-list', Tests::class);
