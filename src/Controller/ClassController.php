@@ -32,6 +32,7 @@ class ClassController extends AbstractController
         $tests = $this->testsRepository->findByTeacher($teacher);
 
         return $this->render('class/show.html.twig', [
+            'user' => $teacher,
             'section' => $section,
             'students' => $students,
             'tests' => $tests,
