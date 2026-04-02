@@ -10,6 +10,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -61,10 +62,16 @@ class SkillType extends AbstractType
                 'label' => 'Coefficient de la nouvelle matiere',
                 'mapped' => false,
                 'required' => false,
+                'html5' => true,
                 'scale' => 2,
+                'attr' => [
+                    'inputmode' => 'decimal',
+                    'step' => '0.01',
+                    'min' => '0',
+                ],
             ]);
 
-        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             $skill = $event->getData();
 
             if (!$skill instanceof Skills) {
@@ -73,7 +80,35 @@ class SkillType extends AbstractType
 
             $form = $event->getForm();
             $name = trim((string) $form->get('newSubjectName')->getData());
+            $description = trim((string) $form->get('newSubjectDescription')->getData());
+            $coefficient = $form->get('newSubjectCoefficient')->getData();
+
+            $hasNewSubjectData = $name !== ''
+                || $description !== ''
+                || $coefficient !== null;
+
+            if (!$hasNewSubjectData) {
+                return;
+            }
+
+            $hasErrors = false;
+
             if ($name === '') {
+                $form->get('newSubjectName')->addError(new FormError('Le nom de la matière est obligatoire.'));
+                $hasErrors = true;
+            }
+
+            if ($description === '') {
+                $form->get('newSubjectDescription')->addError(new FormError('La description de la matière est obligatoire.'));
+                $hasErrors = true;
+            }
+
+            if ($coefficient === null) {
+                $form->get('newSubjectCoefficient')->addError(new FormError('Le coefficient de la matière est obligatoire.'));
+                $hasErrors = true;
+            }
+
+            if ($hasErrors) {
                 return;
             }
 
@@ -87,8 +122,8 @@ class SkillType extends AbstractType
 
             $newSubject = (new Subjects())
                 ->setName($name)
-                ->setDescription((string) $form->get('newSubjectDescription')->getData())
-                ->setCoefficient((float) ($form->get('newSubjectCoefficient')->getData() ?? 0));
+                ->setDescription($description)
+                ->setCoefficient((float) $coefficient);
 
             $skill->addSubject($newSubject);
         });
