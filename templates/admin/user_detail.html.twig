@@ -1,0 +1,474 @@
+{# templates/admin/user_detail.html.twig #}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --surface: #fff;
+            --text: #2b2f3a;
+            --muted: #6b7385;
+            --border: #e8ecf5;
+            --back-btn-bg: #f0f3fb;
+            --back-btn-bg-hover: #e9eefb;
+        }
+
+        .user-detail-page.theme-admin {
+            --primary: #c53929;
+            --secondary: #7f1d16;
+            --surface: #fff6f5;
+            --text: #351d1a;
+            --muted: #7a5c57;
+            --border: #f1d6d1;
+            --back-btn-bg: #fde9e6;
+            --back-btn-bg-hover: #fbded9;
+        }
+
+        .user-detail-page.theme-teacher {
+            --primary: #c87b18;
+            --secondary: #8a4f00;
+            --surface: #fffbf5;
+            --text: #3b2914;
+            --muted: #7d6548;
+            --border: #f1e3cd;
+            --back-btn-bg: #fff1dc;
+            --back-btn-bg-hover: #ffe8c8;
+        }
+
+        .user-detail-page.theme-student {
+            --primary: #1f6feb;
+            --secondary: #12439b;
+            --surface: #f8fbff;
+            --text: #1c2e4a;
+            --muted: #5f7293;
+            --border: #d9e6fb;
+            --back-btn-bg: #eaf2ff;
+            --back-btn-bg-hover: #dce9ff;
+        }
+
+        .user-detail-page.theme-assistant {
+            --primary: #7b4db3;
+            --secondary: #512f79;
+            --surface: #fbf8ff;
+            --text: #2f2540;
+            --muted: #6a5c82;
+            --border: #e6dbf6;
+            --back-btn-bg: #f0eaff;
+            --back-btn-bg-hover: #e6dbff;
+        }
+
+        .user-detail-page {
+            max-width: 980px;
+            margin: auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .user-toolbar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .user-toolbar .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .user-toolbar .btn .btn-icon,
+        .user-toolbar .btn .btn-label {
+            pointer-events: none;
+        }
+
+        .btn-scorea-back {
+            color: var(--text);
+            background: var(--back-btn-bg);
+            border: 1px solid var(--border);
+        }
+
+        .btn-scorea-back:hover,
+        .btn-scorea-back:focus,
+        .btn-scorea-back:active,
+        .btn-scorea-back:focus-visible {
+            color: var(--text) !important;
+            background-color: var(--back-btn-bg-hover) !important;
+            border-color: var(--border) !important;
+        }
+
+        .btn-scorea-edit {
+            border: none;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .btn-scorea-edit:hover,
+        .btn-scorea-edit:focus,
+        .btn-scorea-edit:active,
+        .btn-scorea-edit:focus-visible {
+            color: #fff !important;
+            background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+            border-color: transparent !important;
+        }
+
+        .user-hero {
+            position: relative;
+            padding: 1.5rem;
+            border-radius: 16px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            overflow: hidden;
+        }
+
+        .user-hero::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            top: -60px;
+            right: -60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+
+        .user-hero-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            background: #fff;
+            color: var(--primary);
+        }
+
+        .user-name {
+            margin: 0;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .user-username {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .user-card {
+            padding: 1rem;
+            border-radius: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        .user-card-title {
+            margin-bottom: 0.8rem;
+            font-weight: bold;
+        }
+
+        .user-kv {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .user-kv-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 0.5rem;
+        }
+
+        .user-kv-row dt {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .user-kv-row dd {
+            margin: 0;
+            color: var(--text);
+        }
+
+        .chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .chip {
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .role-admin { background: #e8f7ef; color: #177245; }
+        .role-teacher { background: #fff4de; color: #9f6300; }
+        .role-student { background: #eaf2ff; color: #2452a8; }
+
+        .section-chip {
+            background: #f6f8ff;
+            border: 1px solid #dfe6fb;
+        }
+
+        .empty-text {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .danger-zone {
+            border: 1px solid #f2c3c3;
+            background: linear-gradient(180deg, #fff7f7, #fff0f0);
+        }
+
+        .danger-zone-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .danger-zone-title {
+            margin: 0;
+            font-size: 1rem;
+            color: #8d1f1f;
+            font-weight: 700;
+        }
+
+        .danger-zone-help {
+            margin: 0.35rem 0 0;
+            color: #9d4b4b;
+            font-size: 0.88rem;
+        }
+
+        .btn-danger-zone {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border: none;
+            border-radius: 10px;
+            padding: 0.55rem 0.9rem;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, #d73a49, #9e1f2d);
+            box-shadow: 0 10px 20px rgba(153, 28, 39, 0.2);
+        }
+
+        .btn-danger-zone:hover,
+        .btn-danger-zone:focus,
+        .btn-danger-zone:active,
+        .btn-danger-zone:focus-visible {
+            color: #fff !important;
+            background: linear-gradient(135deg, #bf2f3c, #851926) !important;
+        }
+
+        .danger-zone .ea-delete-form {
+            margin: 0;
+        }
+
+        .danger-zone .ea-delete-form .action-delete,
+        .danger-zone .ea-delete-form button[type='submit'] {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 0.55rem 0.9rem !important;
+            color: #fff !important;
+            text-decoration: none;
+            background: linear-gradient(135deg, #d73a49, #9e1f2d) !important;
+            box-shadow: 0 10px 20px rgba(153, 28, 39, 0.2);
+        }
+
+        .danger-zone .ea-delete-form .action-delete:hover,
+        .danger-zone .ea-delete-form .action-delete:focus,
+        .danger-zone .ea-delete-form .action-delete:active,
+        .danger-zone .ea-delete-form button[type='submit']:hover,
+        .danger-zone .ea-delete-form button[type='submit']:focus,
+        .danger-zone .ea-delete-form button[type='submit']:active {
+            color: #fff !important;
+            background: linear-gradient(135deg, #bf2f3c, #851926) !important;
+        }
+
+        @media (max-width: 900px) {
+            .user-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .user-kv-row {
+                grid-template-columns: 1fr;
+            }
+
+            .user-avatar {
+                width: 50px;
+                height: 50px;
+            }
+
+            .user-name {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}Fiche utilisateur{% endblock %}
+
+{% block main %}
+    {% set roles = entity.instance.roles|default([]) %}
+    {% set themeClass = 'theme-student' %}
+    {% if 'ROLE_ADMIN' in roles %}
+        {% set themeClass = 'theme-admin' %}
+    {% elseif 'ROLE_TEACHER' in roles %}
+        {% set themeClass = 'theme-teacher' %}
+    {% elseif 'ROLE_ASSISTANT' in roles %}
+        {% set themeClass = 'theme-assistant' %}
+    {% endif %}
+
+    {% set firstName = entity.instance.firstName|default('') %}
+    {% set lastName = entity.instance.lastName|default('') %}
+    {% set initials = (firstName|slice(0, 1) ~ lastName|slice(0, 1))|upper %}
+
+    <div class="user-detail-page {{ themeClass }}">
+        <div class="user-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="btn btn-scorea-back">
+                <span class="btn-icon"><i class="fa fa-arrow-left"></i></span>
+                <span class="btn-label">Retour a la liste</span>
+            </a>
+            <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-scorea-edit">
+                <span class="btn-icon"><i class="fa fa-edit"></i></span>
+                <span class="btn-label">Modifier le profil</span>
+            </a>
+        </div>
+
+        <section class="user-hero">
+            <div class="user-hero-content">
+                <div class="user-avatar">{{ initials ?: 'U' }}</div>
+                <div>
+                    <h2 class="user-name">{{ lastName|upper }} {{ firstName }}</h2>
+                    <p class="user-username">{{ entity.instance.username }}</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="user-grid">
+            <section class="user-card">
+                <h3 class="user-card-title">Identité</h3>
+                <dl class="user-kv">
+                    <div class="user-kv-row">
+                        <dt>Nom d'utilisateur</dt>
+                        <dd>{{ entity.instance.username }}</dd>
+                    </div>
+                    <div class="user-kv-row">
+                        <dt>Nom</dt>
+                        <dd>{{ entity.instance.lastName }}</dd>
+                    </div>
+                    <div class="user-kv-row">
+                        <dt>Prénom</dt>
+                        <dd>{{ entity.instance.firstName }}</dd>
+                    </div>
+                    {% if entity.instance.email is not empty %}
+                    <div class="user-kv-row">
+                        <dt>Email</dt>
+                        <dd>{{ entity.instance.email }}</dd>
+                    </div>
+                    {% endif %}
+                </dl>
+            </section>
+
+            <section class="user-card">
+                <h3 class="user-card-title">Suivi</h3>
+                <dl class="user-kv">
+                    <div class="user-kv-row">
+                        <dt>Crée le</dt>
+                        <dd>{{ entity.instance.createdAt ? entity.instance.createdAt|date('d/m/Y H:i') : 'Non renseigne' }}</dd>
+                    </div>
+                    <div class="user-kv-row">
+                        <dt>Dernière modification</dt>
+                        <dd>{{ entity.instance.updatedAt ? entity.instance.updatedAt|date('d/m/Y H:i') : 'Non renseigne' }}</dd>
+                    </div>
+                </dl>
+            </section>
+        </div>
+
+        {% set visibleRoles = [] %}
+        {% for role in roles %}
+            {% if role != 'ROLE_USER' %}
+                {% set visibleRoles = visibleRoles|merge([role]) %}
+            {% endif %}
+        {% endfor %}
+        {% if visibleRoles is not empty %}
+            <section class="user-card">
+                <h3 class="user-card-title">Rôles</h3>
+                <div class="chip-wrap">
+                    {% for role in visibleRoles %}
+                        {% if role == 'ROLE_ADMIN' %}
+                            <span class="chip role-admin">Administrateur</span>
+                        {% elseif role == 'ROLE_TEACHER' %}
+                            <span class="chip role-teacher">Professeur</span>
+                        {% elseif role == 'ROLE_STUDENT' %}
+                            <span class="chip role-student">Étudiant</span>
+                        {% else %}
+                            <span class="chip section-chip">{{ role }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% set userSections = entity.instance.sections|default([]) %}
+        {% if userSections|length > 0 %}
+            <section class="user-card">
+                <h3 class="user-card-title">Sections</h3>
+                <div class="chip-wrap">
+                    {% for section in userSections %}
+                        <span class="chip section-chip">{{ section.name }}</span>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="user-card danger-zone">
+            <div class="danger-zone-header">
+                <div>
+                    <h3 class="danger-zone-title">Zone de danger</h3>
+                </div>
+                {% set deleteUrl = ea_url().setAction('delete').setEntityId(entity.primaryKeyValue) %}
+                <button
+                    type="button"
+                    class="btn-danger-zone"
+                    data-action-name="delete"
+                    formaction="{{ deleteUrl }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modal-delete"
+                >
+                    <i class="fa fa-trash"></i>
+                    <span>Supprimer le profil</span>
+                </button>
+                {{ include('@EasyAdmin/crud/includes/_delete_form.html.twig', { entity_id: entity.primaryKeyValue }, with_context: false) }}
+            </div>
+        </section>
+    </div>
+{% endblock %}
