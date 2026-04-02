@@ -71,8 +71,7 @@ class ImportExportController extends AbstractController
                 continue;
             }
 
-            $username = strtolower($firstName . '.' . $lastName);
-            $username = preg_replace('/[^a-z0-9.]/', '', $username);
+            $username = $this->generateUsernameFromNames($firstName, $lastName);
 
             $user = null;
 
