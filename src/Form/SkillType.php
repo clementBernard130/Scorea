@@ -112,7 +112,7 @@ class SkillType extends AbstractType
                 return;
             }
 
-            $existingSubject = $this->subjectsRepository->findOneBy(['name' => $name]);
+            $existingSubject = $this->subjectsRepository->findOneByNormalizedName($name);
 
             if ($existingSubject instanceof Subjects) {
                 $skill->addSubject($existingSubject);
