@@ -143,7 +143,8 @@ class SkillUnitCrudController extends AbstractCrudController
             ?? $context->getRequest()->attributes->get('trainingId');
 
         if ($trainingId !== null) {
-            $submitButtonName = $context->getRequest()->request->all()['ea']['newForm']['btn'] ?? null;
+            $requestData = $context->getRequest()->request->all()['ea'] ?? [];
+            $submitButtonName = $requestData['newForm']['btn'] ?? $requestData['editForm']['btn'] ?? null;
 
             $url = match ($submitButtonName) {
                 Action::SAVE_AND_CONTINUE => $this->adminUrlGenerator
