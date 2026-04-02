@@ -273,7 +273,8 @@ class AppFixtures extends Fixture
                 $user->addSection($manager->getRepository(Sections::class)->findOneBy(['name' => $sectionName]));
             }
             foreach ($teacherData['subject'] as $subjectName) {
-                $user->addSubject($manager->getRepository(Subjects::class)->findOneBy(['name' => $subjectName]));
+                $subject = $manager->getRepository(Subjects::class)->findOneBy(['name' => $subjectName]);
+                $subject->addTeacher($user);
             }
             $manager->persist($user);
         }
