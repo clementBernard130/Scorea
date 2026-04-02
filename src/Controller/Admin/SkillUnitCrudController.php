@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Trainings;
 use App\Form\SkillType;
 use App\Entity\SkillsUnit;
+use App\Repository\SkillsUnitRepository;
 use App\Repository\TrainingsRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -28,6 +29,7 @@ class SkillUnitCrudController extends AbstractCrudController
 {
     public function __construct(
         private TrainingsRepository $trainingsRepository,
+        private SkillsUnitRepository $skillsUnitRepository,
         private AdminUrlGenerator $adminUrlGenerator
     ) {}
 
@@ -67,6 +69,17 @@ class SkillUnitCrudController extends AbstractCrudController
         }
 
         return $skillUnit;
+    }
+
+    public function index(AdminContext $context)
+    {
+        $trainingId = $this->getTrainingId();
+
+        if ($trainingId !== null && 0 === $this->skillsUnitRepository->count(['trainings' => $trainingId])) {
+            return $this->redirect($this->generateContextualNewUrl());
+        }
+
+        return parent::index($context);
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder

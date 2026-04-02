@@ -39,13 +39,15 @@ class TrainingCrudController extends AbstractCrudController
         $skillUnitsAction = Action::new('skillUnits', 'Blocs de competences')
             ->setIcon('fa fa-cubes')
             ->linkToUrl(function (?Trainings $training): string {
-                if (!$training) return '';
-                
-                $action = $training->getSkillUnits()->isEmpty() ? Action::NEW : Action::INDEX;
-                
+                if (!$training) {
+                    return '';
+                }
+
                 return $this->adminUrlGenerator->unsetAll()
                     ->setController(SkillUnitCrudController::class)
-                    ->setAction($action)->set('trainingId', $training->getId())->generateUrl();
+                    ->setAction(Action::INDEX)
+                    ->set('trainingId', $training->getId())
+                    ->generateUrl();
             });
 
         return $actions->add(Crud::PAGE_INDEX, $skillUnitsAction)
