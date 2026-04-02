@@ -6,7 +6,6 @@ use App\Entity\Users;
 use App\Entity\Sections;
 use App\Entity\Grades;
 use App\Entity\Tests;
-use App\Entity\SkillsUnit;
 use App\Entity\Subjects;
 use App\Entity\Trainings;
 use App\Repository\UsersRepository;
