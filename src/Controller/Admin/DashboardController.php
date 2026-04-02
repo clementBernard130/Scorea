@@ -6,7 +6,6 @@ use App\Entity\Users;
 use App\Entity\Sections;
 use App\Entity\Grades;
 use App\Entity\Tests;
-use App\Entity\Skills;
 use App\Entity\SkillsUnit;
 use App\Entity\Subjects;
 use App\Entity\Trainings;
@@ -19,7 +18,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ColorScheme;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
-use DateTime;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
@@ -105,7 +103,6 @@ class DashboardController extends AbstractDashboardController
 
         // Section Compétences
         yield MenuItem::section('Compétences', 'fa fa-star');
-        yield MenuItem::linkToCrud('Compétences', 'fa fa-lightbulb', Skills::class);
         yield MenuItem::linkToCrud('Blocs de Compétences', 'fa fa-cubes', SkillsUnit::class);
 
         // Section Évaluations
