@@ -109,5 +109,9 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Évaluations', 'fa fa-chart-bar');
         yield MenuItem::linkToCrud('Tests', 'fa fa-clipboard-list', Tests::class);
         yield MenuItem::linkToCrud('Notes', 'fa fa-graduation-cap', Grades::class);
+
+        // Section Synchronisation
+        yield MenuItem::section('Synchronisation', 'fa fa-file-arrow-up');
+        yield MenuItem::linkToRoute('Données élèves & formations', 'fa fa-file-import', 'admin_import_export');
     }
 }
