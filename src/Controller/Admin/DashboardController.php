@@ -94,7 +94,7 @@ class DashboardController extends AbstractDashboardController
             ->setController(StudentCrudController::class);
 
         // Section Formations
-        yield MenuItem::section('Formations & Matières', 'fa fa-graduation-cap');
+        yield MenuItem::section('Formations', 'fa fa-graduation-cap');
         yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
         yield MenuItem::linkToCrud('Formations', 'fa fa-school', Trainings::class);
 
