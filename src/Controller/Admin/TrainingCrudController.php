@@ -50,7 +50,6 @@ class TrainingCrudController extends AbstractCrudController
 
         return $actions->add(Crud::PAGE_INDEX, $skillUnitsAction)
             ->add(Crud::PAGE_DETAIL, $skillUnitsAction)
-            ->add(Crud::PAGE_NEW, $skillUnitsAction)
             ->add(Crud::PAGE_EDIT, $skillUnitsAction);
     }
 
@@ -92,6 +91,6 @@ class TrainingCrudController extends AbstractCrudController
             ->autocomplete()
             ->setFormTypeOption('by_reference', false)
             ->setRequired(false)
-            ->onlyOnForms();
+            ->onlyWhenUpdating();
     }
 }
