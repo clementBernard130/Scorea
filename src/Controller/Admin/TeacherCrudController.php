@@ -67,9 +67,9 @@ class TeacherCrudController extends AbstractCrudController
             ->setSearchFields(['username', 'first_name', 'last_name'])
             ->setDefaultSort(['created_at' => 'DESC'])
             ->overrideTemplates([
-                'crud/detail' => 'admin/user_detail.html.twig',
-                'crud/new' => 'admin/user_new.html.twig',
-                'crud/edit' => 'admin/user_edit.html.twig',
+                'crud/detail' => 'admin/users/user_detail.html.twig',
+                'crud/new' => 'admin/users/user_new.html.twig',
+                'crud/edit' => 'admin/users/user_edit.html.twig',
             ]);
     }
 
