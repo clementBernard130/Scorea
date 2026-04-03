@@ -192,7 +192,7 @@
 {% block main %}
     <div class="skill-edit-page">
         <div class="skill-edit-toolbar">
-            <a href="{{ ea_url().setAction('index') }}" class="skill-edit-back">
+            <a href="{{ app.request.query.get('trainingId') ? ea_url().setAction('index').set('trainingId', app.request.query.get('trainingId')) : ea_url().setAction('index') }}" class="skill-edit-back">
                 <i class="fa fa-arrow-left"></i> Retour a la liste
             </a>
             <span class="skill-edit-pill"><i class="fa fa-pen"></i> Edition</span>
