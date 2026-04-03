@@ -43,6 +43,7 @@ final class StudentSkillsPageBuilder
             skillGrades: $this->studentSkillGradeResolver->resolve($student),
             sectionNames: array_values($sectionNames),
             trainingNames: array_values($trainingNames),
+            globalAverage: $this->studentSkillGradeResolver->resolveGlobalAverage($student),
         );
     }
 }
