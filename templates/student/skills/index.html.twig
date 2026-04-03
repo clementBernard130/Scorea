@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes compétences{% endblock %}
+{% block title %}Mon Espace{% endblock %}
 
 {% block body %}
 <div class="min-h-screen overflow-hidden bg-gradient-to-b from-sky-50 via-white to-slate-100 px-4 py-10 relative">
@@ -9,29 +9,27 @@
     <div class="mx-auto max-w-6xl relative z-10">
         <header class="mb-6 flex flex-col gap-4 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur md:flex-row md:items-center md:justify-between md:p-8">
             <div>
-                <p class="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-sky-700">Espace étudiant</p>
-                <h1 class="text-4xl font-black tracking-tight text-slate-900 md:text-5xl">Mes compétences</h1>
-                <p class="mt-3 text-base text-slate-600">{{ user.firstName }} {{ user.lastName }}</p>
+                <h1 class="text-4xl font-black tracking-tight text-slate-900 md:text-5xl">Mon espace</h1>
             </div>
             <a href="{{ path('app_logout') }}" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 transition hover:-translate-y-0.5 hover:shadow-red-300">
                 Déconnexion
             </a>
         </header>
 
-        <section class="mb-8 grid gap-4 md:grid-cols-2">
-            {% for label, values in {
-                'Sections': page.sectionNames,
-                'Formations': page.trainingNames
-            } %}
+        <section class="mb-8 grid gap-4 grid-cols-1">
             <div>
                 <div class="rounded-[24px] border border-white/70 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
-                    <p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">{{ label }}</p>
+                    <p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Dernière matière évaluée</p>
                     <p class="mt-2 text-base font-semibold text-slate-900">
-                        {{ values is not empty ? values|join(', ') : 'Aucune donnée' }}
+                       {{ page.latestEvaluatedSubject ? page.latestEvaluatedSubject.name : 'Aucune évaluation' }}
                     </p>
+                    {% if page.latestEvaluatedSubject %}
+                        <p class="mt-1 text-sm text-slate-500">
+                            Évaluée le {{ page.latestEvaluatedSubject.date }}
+                        </p>
+                    {% endif %}
                 </div>
             </div>
-            {% endfor %}
         </section>
 
         {% if page.units is empty %}

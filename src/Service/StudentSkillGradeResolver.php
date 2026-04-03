@@ -96,4 +96,33 @@ final class StudentSkillGradeResolver
 
         return round($weightedSum / $coefficientSum, 2);
     }
+
+    /**
+     * @return array{name: string, date: string}|null
+     */
+    public function resolveLatestEvaluatedSubject(Users $student): ?array
+    {
+        $latestSubject = null;
+        $latestDate = null;
+
+        foreach ($student->getGrades() as $grade) {
+            $test = $grade->getTest();
+            $subject = $test?->getSubject();
+            $testDate = $test?->getTestDate();
+
+            if ($subject === null || $testDate === null) {
+                continue;
+            }
+
+            if ($latestDate === null || $testDate > $latestDate) {
+                $latestDate = $testDate;
+                $latestSubject = [
+                    'name' => $subject->getName() ?? 'Matière inconnue',
+                    'date' => $testDate->format('d/m/Y'),
+                ];
+            }
+        }
+
+        return $latestSubject;
+    }
 }

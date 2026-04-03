@@ -14,6 +14,7 @@ final readonly class StudentSkillsPage
      * }> $skillGrades
      * @param list<string> $sectionNames
      * @param list<string> $trainingNames
+     * @param array{name: string, date: string}|null $latestEvaluatedSubject
      */
     public function __construct(
         public array $units,
@@ -21,6 +22,7 @@ final readonly class StudentSkillsPage
         public array $sectionNames,
         public array $trainingNames,
         public ?float $globalAverage,
+        public ?array $latestEvaluatedSubject,
     ) {
     }
 }

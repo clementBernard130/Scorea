@@ -44,6 +44,7 @@ final class StudentSkillsPageBuilder
             sectionNames: array_values($sectionNames),
             trainingNames: array_values($trainingNames),
             globalAverage: $this->studentSkillGradeResolver->resolveGlobalAverage($student),
+            latestEvaluatedSubject: $this->studentSkillGradeResolver->resolveLatestEvaluatedSubject($student),
         );
     }
 }
