@@ -231,12 +231,13 @@
 {% block content_title %}Fiche bloc de compétences{% endblock %}
 
 {% block main %}
+    {% set trainingId = app.request.query.get('trainingId') %}
     <div class="skill-detail-page">
         <div class="skill-detail-toolbar">
-            <a href="{{ ea_url().setAction('index') }}" class="btn btn-skill-back">
+            <a href="{{ trainingId ? ea_url().setAction('index').set('trainingId', trainingId) : ea_url().setAction('index') }}" class="btn btn-skill-back">
                 <i class="fa fa-arrow-left"></i> Retour a la liste
             </a>
-            <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-skill-edit">
+            <a href="{{ trainingId ? ea_url().setAction('edit').setEntityId(entity.primaryKeyValue).set('trainingId', trainingId) : ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-skill-edit">
                 <i class="fa fa-pen"></i> Modifier
             </a>
         </div>
