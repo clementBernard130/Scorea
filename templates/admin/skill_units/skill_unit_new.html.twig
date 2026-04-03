@@ -192,7 +192,7 @@
 {% block main %}
     <div class="skill-create-page">
         <div class="skill-create-toolbar">
-            <a href="{{ ea_url().setAction('index') }}" class="skill-create-back">
+            <a href="{{ app.request.query.get('trainingId') ? ea_url().setAction('index').set('trainingId', app.request.query.get('trainingId')) : ea_url().setAction('index') }}" class="skill-create-back">
                 <i class="fa fa-arrow-left"></i> Retour a la liste
             </a>
             <span class="skill-create-pill"><i class="fa fa-cube"></i> Nouveau bloc</span>
