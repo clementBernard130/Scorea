@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Service;
+
+use App\Entity\SkillsUnit;
+
+final readonly class StudentSkillsPage
+{
+    /**
+     * @param list<SkillsUnit> $units
+     * @param array<int, float> $skillGrades
+     * @param list<string> $sectionNames
+     * @param list<string> $trainingNames
+     */
+    public function __construct(
+        public array $units,
+        public array $skillGrades,
+        public array $sectionNames,
+        public array $trainingNames,
+    ) {
+    }
+}
