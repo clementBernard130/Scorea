@@ -75,20 +75,25 @@ final class StudentSkillGradeResolver
 
     public function resolveGlobalAverage(Users $student): ?float
     {
-        $grades = [];
+        $weightedSum = 0.0;
+        $coefficientSum = 0.0;
 
         foreach ($student->getGrades() as $grade) {
             $gradeValue = $grade->getGrade();
+            $coefficient = $grade->getTest()?->getSubject()?->getCoefficient();
 
-            if ($gradeValue !== null) {
-                $grades[] = $gradeValue;
+            if ($gradeValue === null || $coefficient === null || $coefficient <= 0) {
+                continue;
             }
+
+            $weightedSum += $gradeValue * $coefficient;
+            $coefficientSum += $coefficient;
         }
 
-        if ($grades === []) {
+        if ($coefficientSum <= 0) {
             return null;
         }
 
-        return round(array_sum($grades) / count($grades), 2);
+        return round($weightedSum / $coefficientSum, 2);
     }
 }
