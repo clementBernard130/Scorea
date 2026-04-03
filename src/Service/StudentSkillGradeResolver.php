@@ -72,4 +72,23 @@ final class StudentSkillGradeResolver
 
         return $skillGrades;
     }
+
+    public function resolveGlobalAverage(Users $student): ?float
+    {
+        $grades = [];
+
+        foreach ($student->getGrades() as $grade) {
+            $gradeValue = $grade->getGrade();
+
+            if ($gradeValue !== null) {
+                $grades[] = $gradeValue;
+            }
+        }
+
+        if ($grades === []) {
+            return null;
+        }
+
+        return round(array_sum($grades) / count($grades), 2);
+    }
 }
