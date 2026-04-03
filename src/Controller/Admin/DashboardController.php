@@ -6,8 +6,6 @@ use App\Entity\Users;
 use App\Entity\Sections;
 use App\Entity\Grades;
 use App\Entity\Tests;
-use App\Entity\SkillsUnit;
-use App\Entity\Subjects;
 use App\Entity\Trainings;
 use App\Repository\UsersRepository;
 use App\Repository\SectionsRepository;
@@ -15,6 +13,7 @@ use App\Repository\TrainingsRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ColorScheme;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -76,7 +75,9 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Scorea - Administration');
+            ->setTitle('Scorea - Administration')
+            ->disableDarkMode()
+            ->setDefaultColorScheme(ColorScheme::LIGHT);
     }
 
     public function configureMenuItems(): iterable

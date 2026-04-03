@@ -16,6 +16,23 @@ class SubjectsRepository extends ServiceEntityRepository
         parent::__construct($registry, Subjects::class);
     }
 
+    public function findOneByNormalizedName(string $name): ?Subjects
+    {
+        $normalizedName = mb_strtolower(trim($name));
+
+        if ($normalizedName === '') {
+            return null;
+        }
+
+        return $this->createQueryBuilder('s')
+            ->andWhere('LOWER(TRIM(s.name)) = :normalizedName')
+            ->setParameter('normalizedName', $normalizedName)
+            ->orderBy('s.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Subjects[] Returns an array of Subjects objects
     //     */

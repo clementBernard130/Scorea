@@ -20,7 +20,7 @@ class SkillsUnit
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
     /**
@@ -28,6 +28,9 @@ class SkillsUnit
      */
     #[ORM\OneToMany(targetEntity: Skills::class, mappedBy: 'skillUnit', cascade: ['persist'])]
     private Collection $skills;
+
+    #[ORM\ManyToOne(inversedBy: 'skillUnits')]
+    private ?Trainings $trainings = null;
 
     public function __construct()
     {
@@ -56,7 +59,7 @@ class SkillsUnit
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -96,5 +99,17 @@ class SkillsUnit
     public function __toString(): string
     {
         return (string) $this->name;
+    }
+
+    public function getTrainings(): ?Trainings
+    {
+        return $this->trainings;
+    }
+
+    public function setTrainings(?Trainings $trainings): static
+    {
+        $this->trainings = $trainings;
+
+        return $this;
     }
 }

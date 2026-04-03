@@ -29,9 +29,16 @@ class Trainings
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    /**
+     * @var Collection<int, SkillsUnit>
+     */
+    #[ORM\OneToMany(targetEntity: SkillsUnit::class, mappedBy: 'trainings')]
+    private Collection $skillUnits;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
+        $this->skillUnits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -96,5 +103,35 @@ class Trainings
     public function __toString(): string
     {
         return (string) $this->name;
+    }
+
+    /**
+     * @return Collection<int, SkillsUnit>
+     */
+    public function getSkillUnits(): Collection
+    {
+        return $this->skillUnits;
+    }
+
+    public function addSkillUnit(SkillsUnit $skillUnit): static
+    {
+        if (!$this->skillUnits->contains($skillUnit)) {
+            $this->skillUnits->add($skillUnit);
+            $skillUnit->setTrainings($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSkillUnit(SkillsUnit $skillUnit): static
+    {
+        if ($this->skillUnits->removeElement($skillUnit)) {
+            // set the owning side to null (unless already changed)
+            if ($skillUnit->getTrainings() === $this) {
+                $skillUnit->setTrainings(null);
+            }
+        }
+
+        return $this;
     }
 }
