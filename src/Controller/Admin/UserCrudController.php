@@ -67,8 +67,8 @@ class UserCrudController extends AbstractCrudController
             ->setPageTitle('detail', 'Détails de l\'utilisateur')
             ->setSearchFields(['username', 'email', 'first_name', 'last_name'])
             ->overrideTemplates([
-                'crud/detail' => 'admin/user_detail.html.twig',
-                'crud/edit' => 'admin/user_edit.html.twig',
+                'crud/detail' => 'admin/users/user_detail.html.twig',
+                'crud/edit' => 'admin/users/user_edit.html.twig',
             ]);
     }
 

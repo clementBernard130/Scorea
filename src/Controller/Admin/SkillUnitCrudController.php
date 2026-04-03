@@ -20,8 +20,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -42,26 +43,20 @@ class SkillUnitCrudController extends AbstractCrudController
     {
         return $actions
             ->remove(Crud::PAGE_NEW, Action::SAVE_AND_ADD_ANOTHER)
-            ->add(Crud::PAGE_NEW, Action::SAVE_AND_CONTINUE)
-            ->update(Crud::PAGE_NEW, Action::SAVE_AND_CONTINUE, fn (Action $action) => $action
+            ->remove(Crud::PAGE_NEW, Action::SAVE_AND_RETURN)
+            ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE)
+            ->add(Crud::PAGE_NEW, Action::SAVE_AND_RETURN)
+            ->update(Crud::PAGE_NEW, Action::SAVE_AND_RETURN, fn (Action $action) => $action
                 ->asPrimaryAction()
             )
-            ->update(Crud::PAGE_NEW, Action::SAVE_AND_RETURN, fn (Action $action) => $action
-                ->asDefaultAction()
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action) => $action
+                ->setIcon('fa fa-eye')
+                ->setLabel(false)
+                ->setHtmlAttributes(['title' => 'Consulter'])
             )
-            ->reorder(Crud::PAGE_NEW, [Action::SAVE_AND_CONTINUE, Action::SAVE_AND_RETURN])
-            ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $action) => $action
-                ->linkToUrl(fn (): string => $this->generateContextualNewUrl())
-            )
-            ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action) => $action
-                ->linkToUrl(fn (SkillsUnit $skillUnit): string => $this->generateContextualUrl(Action::EDIT, $skillUnit))
-            )
-            ->update(Crud::PAGE_DETAIL, Action::EDIT, fn (Action $action) => $action
-                ->linkToUrl(fn (SkillsUnit $skillUnit): string => $this->generateContextualUrl(Action::EDIT, $skillUnit))
-            )
-            ->update(Crud::PAGE_DETAIL, Action::INDEX, fn (Action $action) => $action
-                ->linkToUrl(fn (SkillsUnit $skillUnit): string => $this->generateContextualIndexUrl($skillUnit))
-            );
+            ->remove(Crud::PAGE_INDEX, Action::EDIT)
+            ->remove(Crud::PAGE_INDEX, Action::DELETE);
     }
 
     public function createEntity(string $entityFqcn): SkillsUnit
@@ -118,45 +113,46 @@ class SkillUnitCrudController extends AbstractCrudController
         }
 
         return [
-            IdField::new('id')->hideOnForm(),
+            IdField::new('id')
+            ->hideOnForm()
+            ->hideOnIndex(),
+
             TextField::new('name', 'Nom du Bloc'),
+
             $trainingField,
-            TextEditorField::new('description', 'Description'),
+
+            TextareaField::new('description', 'Description')
+                ->setRequired(false),
+
             CollectionField::new('skills', 'Compétences')
-                ->setEntryType(SkillType::class) // Votre formulaire Symfony
+                ->setEntryType(SkillType::class)
                 ->setFormTypeOption('by_reference', false)
                 ->allowAdd(true)
                 ->allowDelete(true)
                 ->renderExpanded(true)
-                ->setEntryIsComplex(true),
+                ->setEntryIsComplex(true)
+                ->hideOnIndex(),
 
-            AssociationField::new('skills', 'Compétences')
+            IntegerField::new('id', 'Nombre de compétences')
                 ->onlyOnIndex()
-                ->formatValue(function ($value, SkillsUnit $entity) {
-                    $count = $entity->getSkills()->count();
-                    if ($count === 0) {
-                        return 'Aucune';
-                    }
-
-                    $names = array_slice(
-                        $entity->getSkills()->map(fn($skill) => $skill->getName())->toArray(), 0, 3
-                    );
-
-                    $namesList = implode(', ', $names);
-
-                    return $count > 3
-                        ? "$namesList (+".($count - 3)." de plus)"
-                        : ($namesList ?: 'Aucune');
-                }),
+                ->setSortable(false)
+                ->formatValue(static fn ($value, SkillsUnit $entity): string => (string) $entity->getSkills()->count()),
         ];
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+            ->showEntityActionsInlined()
             ->setPageTitle('index', fn () => $this->buildPageTitle('index'))
             ->setPageTitle('new', fn () => $this->buildPageTitle('new'))
-            ->setPageTitle('edit', fn (?SkillsUnit $skillUnit) => $this->buildPageTitle('edit', $skillUnit));
+            ->setPageTitle('edit', fn (?SkillsUnit $skillUnit) => $this->buildPageTitle('edit', $skillUnit))
+            ->setPageTitle('detail', fn (?SkillsUnit $skillUnit) => $this->buildPageTitle('detail', $skillUnit))
+            ->overrideTemplates([
+                'crud/new' => 'admin/skill_units/skill_unit_new.html.twig',
+                'crud/edit' => 'admin/skill_units/skill_unit_edit.html.twig',
+                'crud/detail' => 'admin/skill_units/skill_unit_detail.html.twig',
+            ]);
     }
 
     protected function getRedirectResponseAfterSave(AdminContext $context, string $action): RedirectResponse
@@ -186,8 +182,7 @@ class SkillUnitCrudController extends AbstractCrudController
                     ? $this->adminUrlGenerator
                         ->unsetAll()
                         ->setController(self::class)
-                        ->setAction(Action::EDIT)
-                        ->setEntityId($context->getEntity()->getPrimaryKeyValue())
+                        ->setAction(Action::INDEX)
                         ->set('trainingId', $trainingId)
                         ->generateUrl()
                     : $this->adminUrlGenerator
@@ -282,6 +277,9 @@ class SkillUnitCrudController extends AbstractCrudController
             'edit' => $trainingName !== null
                 ? sprintf('Modifier le bloc de la formation : %s', $trainingName)
                 : 'Modifier le bloc',
+            'detail' => $trainingName !== null
+                ? sprintf('Détails du bloc de la formation : %s', $trainingName)
+                : 'Détails du bloc',
             default => 'Blocs de compétences',
         };
     }
