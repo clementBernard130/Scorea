@@ -20,6 +20,7 @@ final readonly class StudentSkillsPage
         public array $skillGrades,
         public array $sectionNames,
         public array $trainingNames,
+        public ?float $globalAverage,
     ) {
     }
 }
