@@ -66,6 +66,13 @@ class SectionsCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        $trainingField = AssociationField::new('training', 'Formation')
+            ->setRequired(true);
+
+        if (Crud::PAGE_NEW === $pageName) {
+            $trainingField->setFormTypeOption('placeholder', 'Sélectionner une formation');
+        }
+
         return [
             IdField::new('id')
                 ->onlyOnIndex(),
@@ -75,8 +82,7 @@ class SectionsCrudController extends AbstractCrudController
             DateField::new('start_date', 'Date de début'),
             DateField::new('end_date', 'Date de fin'),
 
-            AssociationField::new('training', 'Formation')
-                ->setRequired(true),
+            $trainingField,
 
             IntegerField::new('id', 'Nombre d\'utilisateurs')
                 ->setSortable(false)

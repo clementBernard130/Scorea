@@ -11,8 +11,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 
 class TrainingCrudController extends AbstractCrudController
@@ -85,12 +85,13 @@ class TrainingCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
-            ->hideOnForm();
+            ->hideOnForm()
+            ->hideOnIndex();
 
         yield TextField::new('name', 'Nom')
             ->setRequired(true);
 
-        yield TextEditorField::new('description', 'Description')
+        yield TextareaField::new('description', 'Description')
             ->hideOnIndex()
             ->setRequired(false);
 
