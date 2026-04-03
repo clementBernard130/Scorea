@@ -7,6 +7,7 @@ use App\Entity\GradeTypeNames;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -35,6 +36,17 @@ class GradesCrudController extends AbstractCrudController
             AssociationField::new('gradeType', 'Type de note')
                 ->setFormTypeOption('choice_label', fn(GradeTypeNames $gradeType) => $this->formatGradeTypeLabel($gradeType)),
         ];
+    }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof Grades && !$entityInstance->getCreatedAt()) {
+            $now = new \DateTimeImmutable();
+            $entityInstance->setCreatedAt($now);
+            $entityInstance->setUpdatedAt($now);
+        }
+
+        parent::persistEntity($entityManager, $entityInstance);
     }
 
     public function formatUserLabel(Users $user): string
