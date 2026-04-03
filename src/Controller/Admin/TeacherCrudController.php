@@ -18,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -138,11 +139,21 @@ class TeacherCrudController extends AbstractCrudController
             ->hideOnForm()
             ->hideOnIndex();
 
+        yield IntegerField::new('id', 'Nombre de sections')
+            ->onlyOnIndex()
+            ->setSortable(false)
+            ->formatValue(static fn ($value, Users $user): string => (string) $user->getSections()->count());
+
         yield AssociationField::new('sections', 'Sections')
+            ->setTemplatePath('admin/field/sections.html.twig')
+            ->onlyOnDetail();
+
+        yield AssociationField::new('sections', 'Sections')
+            ->autocomplete()
             ->setFormTypeOptions([
                 'by_reference' => false,
             ])
-            ->setTemplatePath('admin/field/sections.html.twig');
+            ->onlyOnForms();
     }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
