@@ -201,11 +201,14 @@ class TeacherPortalController extends AbstractController
                 'label' => 'Note',
                 'scale' => 2,
                 'attr' => [
+                    'min' => 0,
                     'max' => 20,
                     'step' => '0.01',
                 ],
                 'constraints' => [
                     new Range([
+                        'min' => 0,
+                        'minMessage' => 'La note minimale est 0.',
                         'max' => 20,
                         'maxMessage' => 'La note maximale est 20.',
                     ]),
@@ -286,11 +289,14 @@ class TeacherPortalController extends AbstractController
                 'label' => 'Note',
                 'scale' => 2,
                 'attr' => [
+                    'min' => 0,
                     'max' => 20,
                     'step' => '0.01',
                 ],
                 'constraints' => [
                     new Range([
+                        'min' => 0,
+                        'minMessage' => 'La note minimale est 0.',
                         'max' => 20,
                         'maxMessage' => 'La note maximale est 20.',
                     ]),

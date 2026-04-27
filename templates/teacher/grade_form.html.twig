@@ -37,7 +37,7 @@
                     </div>
                     <div>
                         {{ form_label(form.grade, null, {'label_attr': {'class': 'mb-2 block text-sm font-semibold text-gray-800'}}) }}
-                        {{ form_widget(form.grade, {'attr': {'class': 'w-full rounded-md border border-gray-300 bg-white px-3 py-2', 'inputmode': 'decimal', 'pattern': '[0-9]*([.,][0-9]+)?', 'max': 20, 'step': '0.01', 'data-grade-input': 'true'}}) }}
+                        {{ form_widget(form.grade, {'attr': {'class': 'w-full rounded-md border border-gray-300 bg-white px-3 py-2', 'inputmode': 'decimal', 'min': 0, 'max': 20, 'step': '0.01', 'data-grade-input': 'true'}}) }}
                         {{ form_errors(form.grade) }}
                     </div>
                     <div>
@@ -84,6 +84,8 @@
             }
 
             if (gradeInput) {
+                const rangeMessage = 'La note doit être comprise entre 0 et 20.';
+
                 const sanitizeGrade = function () {
                     let value = gradeInput.value.replace(/,/g, '.');
                     value = value.replace(/[^0-9.]/g, '');
@@ -96,15 +98,38 @@
                     gradeInput.value = value;
                 };
 
+                const validateGrade = function () {
+                    const value = gradeInput.value.trim();
+                    if (value === '') {
+                        gradeInput.setCustomValidity('');
+                        return;
+                    }
+
+                    const numericValue = Number(value);
+                    if (Number.isNaN(numericValue) || numericValue < 0 || numericValue > 20) {
+                        gradeInput.setCustomValidity(rangeMessage);
+                        return;
+                    }
+
+                    gradeInput.setCustomValidity('');
+                };
+
                 gradeInput.addEventListener('beforeinput', function (event) {
                     if (event.data && /[^0-9.,]/.test(event.data)) {
                         event.preventDefault();
                     }
                 });
 
-                gradeInput.addEventListener('input', sanitizeGrade);
+                gradeInput.addEventListener('input', function () {
+                    sanitizeGrade();
+                    validateGrade();
+                });
+                gradeInput.addEventListener('blur', validateGrade);
                 gradeInput.addEventListener('paste', function () {
-                    window.setTimeout(sanitizeGrade, 0);
+                    window.setTimeout(function () {
+                        sanitizeGrade();
+                        validateGrade();
+                    }, 0);
                 });
             }
         });
