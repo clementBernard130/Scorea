@@ -8,8 +8,8 @@ final class StudentSkillGradeResolver
 {
     /**
      * @return array<int, array{
-     *     average: float|null,
-     *     subjects: list<array{name: string, average: float, grades: list<float>}>
+     * average: float|null,
+     * subjects: list<array{name: string, average: float, grades: list<array{id: int, value: float}>}>
      * }>
      */
     public function resolve(Users $student): array
@@ -19,8 +19,9 @@ final class StudentSkillGradeResolver
         foreach ($student->getGrades() as $grade) {
             $subject = $grade->getTest()?->getSubject();
             $gradeValue = $grade->getGrade();
+            $gradeId = $grade->getId(); // On récupère l'ID
 
-            if ($subject === null || $gradeValue === null) {
+            if ($subject === null || $gradeValue === null || $gradeId === null) {
                 continue;
             }
 
@@ -33,7 +34,12 @@ final class StudentSkillGradeResolver
                 }
 
                 $skillGrades[$skillId]['subjects'][$subjectId]['name'] = $subject->getName() ?? 'Matière inconnue';
-                $skillGrades[$skillId]['subjects'][$subjectId]['grades'][] = $gradeValue;
+                
+                // On stocke maintenant un tableau avec l'id et la valeur
+                $skillGrades[$skillId]['subjects'][$subjectId]['grades'][] = [
+                    'id' => $gradeId,
+                    'value' => $gradeValue,
+                ];
             }
         }
 
@@ -48,7 +54,10 @@ final class StudentSkillGradeResolver
                     continue;
                 }
 
-                $subjectAverage = round(array_sum($grades) / count($grades), 1);
+                // On extrait uniquement les valeurs pour calculer la moyenne
+                $gradeValues = array_column($grades, 'value');
+                $subjectAverage = round(array_sum($gradeValues) / count($gradeValues), 1);
+                
                 $subjectAverages[] = $subjectAverage;
                 $subjects[] = [
                     'name' => $subjectData['name'] ?? 'Matière inconnue',

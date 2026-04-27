@@ -1,0 +1,25 @@
+<turbo-frame id="modal_content">
+    <div class="flex flex-col gap-3 text-slate-800">
+        <h3 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2">
+            Détails de l'évaluation
+        </h3>
+        
+        <div class="mt-2">
+            <span class="font-semibold text-slate-500 uppercase text-xs tracking-wider">Note obtenue</span>
+            <p class="text-2xl font-black text-slate-900">
+                {% if grade.grade is not null %}
+                    {{ grade.grade|number_format(2, ',', '') }}/20
+                {% else %}
+                    Non notée
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="mt-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <span class="font-semibold text-slate-500 uppercase text-xs tracking-wider">Appréciation</span>
+            <p class="mt-1 text-sm italic text-slate-700">
+                {{ grade.comment|default('Aucune appréciation saisie pour cette évaluation.') }}
+            </p>
+        </div>
+    </div>
+</turbo-frame>

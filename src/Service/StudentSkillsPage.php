@@ -9,8 +9,8 @@ final readonly class StudentSkillsPage
     /**
      * @param list<SkillsUnit> $units
      * @param array<int, array{
-     *     average: float|null,
-     *     subjects: list<array{name: string, average: float, grades: list<float>}>
+     * average: float|null,
+     * subjects: list<array{name: string, average: float, grades: list<array{id: int, value: float}>}>
      * }> $skillGrades
      * @param list<string> $sectionNames
      * @param list<string> $trainingNames
