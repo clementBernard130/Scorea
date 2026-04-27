@@ -102,9 +102,15 @@
                                 <a href="{{ path('teacher_portal_test_edit', { id: test.id, section: section.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                                     Modifier le test
                                 </a>
-                                <a href="{{ path('teacher_portal_grade_new', { id: test.id, section: section.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
-                                    Saisir les notes
-                                </a>
+                                {% if students|length > 0 %}
+                                    <a href="{{ path('teacher_portal_grade_new', { id: test.id, section: section.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
+                                        Saisir les notes
+                                    </a>
+                                {% else %}
+                                    <span class="cursor-not-allowed rounded-md bg-gray-400 px-4 py-2 text-sm font-medium text-white" title="Aucun étudiant dans cette classe">
+                                        Saisir les notes
+                                    </span>
+                                {% endif %}
                             </div>
                         </article>
                     {% endfor %}
