@@ -208,9 +208,8 @@ class TeacherPortalController extends AbstractController
                 'constraints' => [
                     new Range([
                         'min' => 0,
-                        'minMessage' => 'La note minimale est 0.',
                         'max' => 20,
-                        'maxMessage' => 'La note maximale est 20.',
+                        'notInRangeMessage' => 'La note doit être comprise entre 0 et 20.',
                     ]),
                 ],
             ])
@@ -296,9 +295,8 @@ class TeacherPortalController extends AbstractController
                 'constraints' => [
                     new Range([
                         'min' => 0,
-                        'minMessage' => 'La note minimale est 0.',
                         'max' => 20,
-                        'maxMessage' => 'La note maximale est 20.',
+                        'notInRangeMessage' => 'La note doit être comprise entre 0 et 20.',
                     ]),
                 ],
             ])
