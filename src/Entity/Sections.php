@@ -30,6 +30,12 @@ class Sections
     private ?Trainings $training = null;
 
     /**
+     * @var Collection<int, Tests>
+     */
+    #[ORM\OneToMany(targetEntity: Tests::class, mappedBy: 'section')]
+    private Collection $tests;
+
+    /**
      * @var Collection<int, Users>
      */
     #[ORM\ManyToMany(targetEntity: Users::class, mappedBy: 'sections')]
@@ -38,6 +44,7 @@ class Sections
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->tests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,6 +96,35 @@ class Sections
     public function setTraining(?Trainings $training): static
     {
         $this->training = $training;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tests>
+     */
+    public function getTests(): Collection
+    {
+        return $this->tests;
+    }
+
+    public function addTest(Tests $test): static
+    {
+        if (!$this->tests->contains($test)) {
+            $this->tests->add($test);
+            $test->setSection($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTest(Tests $test): static
+    {
+        if ($this->tests->removeElement($test)) {
+            if ($test->getSection() === $this) {
+                $test->setSection(null);
+            }
+        }
 
         return $this;
     }

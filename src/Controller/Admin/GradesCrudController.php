@@ -8,6 +8,10 @@ use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -24,9 +28,55 @@ class GradesCrudController extends AbstractCrudController
         return Grades::class;
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->showEntityActionsInlined()
+            ->setEntityLabelInSingular('Note')
+            ->setEntityLabelInPlural('Notes')
+            ->setPageTitle('index', 'Liste des notes')
+            ->setPageTitle('new', 'Créer une note')
+            ->setPageTitle('edit', 'Modifier la note')
+            ->setPageTitle('detail', 'Détails de la note')
+            ->setDefaultSort(['updatedAt' => 'DESC'])
+            ->setSearchFields(['comment'])
+            ->overrideTemplates([
+                'crud/new' => 'admin/grades/grade_new.html.twig',
+                'crud/edit' => 'admin/grades/grade_edit.html.twig',
+                'crud/detail' => 'admin/grades/grade_detail.html.twig',
+            ]);
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('student')
+            ->add('test')
+            ->add('gradeType')
+            ->add('createdAt')
+            ->add('updatedAt');
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->remove(Crud::PAGE_NEW, Action::SAVE_AND_ADD_ANOTHER)
+            ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE)
+            ->remove(Crud::PAGE_INDEX, Action::EDIT)
+            ->remove(Crud::PAGE_INDEX, Action::DELETE)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, static fn (Action $action): Action => $action
+                ->setIcon('fa fa-eye')
+                ->setLabel(false)
+                ->setHtmlAttributes(['title' => 'Consulter'])
+            );
+    }
+
     public function configureFields(string $pageName): iterable
     {
         return [
+            IdField::new('id')
+                ->onlyOnIndex(),
             NumberField::new('grade', 'Note'),
             AssociationField::new('student', 'Eleve')
                 ->setFormTypeOption('choices', $this->getUsersByRole('ROLE_STUDENT'))

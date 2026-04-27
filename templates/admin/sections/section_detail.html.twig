@@ -353,6 +353,21 @@
             {% endif %}
         </section>
 
+        <section class="section-detail-card">
+            <h3>Evaluations effectuées</h3>
+            {% if entity.instance.tests|length > 0 %}
+                <div class="section-chip-wrap">
+                    {% for test in entity.instance.tests|sort((a, b) => b.testDate <=> a.testDate) %}
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\TestsCrudController').setAction('detail').setEntityId(test.id) }}" class="section-chip section-user-link">
+                            <i class="fa fa-file-alt"></i> {{ test }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="section-muted">Aucun test rattaché.</p>
+            {% endif %}
+        </section>
+
         <section class="section-detail-card danger-zone">
             <div class="danger-zone-header">
                 <h3 class="danger-zone-title">Zone de danger</h3>
