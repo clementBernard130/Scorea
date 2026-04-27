@@ -75,6 +75,7 @@ class TestsCrudController extends AbstractCrudController
             IdField::new('id')
                 ->onlyOnIndex(),
             AssociationField::new('subject', 'Matière')
+                ->setCrudController(SubjectCrudController::class)
                 ->setFormTypeOption('choice_label', 'name'),
             AssociationField::new('section', 'Section')
                 ->setFormTypeOption('choice_label', 'name'),
