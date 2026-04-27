@@ -27,6 +27,8 @@ class TestsCrudController extends AbstractCrudController
         return [
             AssociationField::new('subject', 'Matière')
                 ->setFormTypeOption('choice_label', 'name'),
+            AssociationField::new('section', 'Section')
+                ->setFormTypeOption('choice_label', 'name'),
             AssociationField::new('teacher', 'Enseignant')
                 ->setFormTypeOption('choices', $this->getUsersByRole('ROLE_TEACHER'))
                 ->setFormTypeOption('choice_label', fn(Users $user) => $this->formatUserLabel($user)),
