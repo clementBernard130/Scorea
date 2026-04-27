@@ -27,7 +27,7 @@
                         {{ form_widget(form.student, {'attr': {'class': 'w-full rounded-md border border-gray-300 bg-white px-3 py-2'}}) }}
                         {{ form_errors(form.student) }}
                         {% if not hasStudents %}
-                            <p class="mt-2 text-sm text-red-600">Aucun étudiant dans cette classe: la saisie est désactivée.</p>
+                            <p class="mt-2 text-sm text-red-600">Aucun étudiant disponible: soit la classe est vide, soit tous les étudiants sont déjà notés pour ce test.</p>
                         {% endif %}
                     </div>
                     <div>

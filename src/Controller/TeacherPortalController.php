@@ -7,12 +7,14 @@ use App\Entity\Sections;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\GradeTypeNamesRepository;
+use App\Repository\GradesRepository;
 use App\Repository\SectionsRepository;
 use App\Repository\TestsRepository;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -26,6 +28,7 @@ class TeacherPortalController extends AbstractController
     public function __construct(
         private UsersRepository $usersRepository,
         private GradeTypeNamesRepository $gradeTypeNamesRepository,
+        private GradesRepository $gradesRepository,
         private SectionsRepository $sectionsRepository,
         private TestsRepository $testsRepository,
         private EntityManagerInterface $entityManager
@@ -39,9 +42,30 @@ class TeacherPortalController extends AbstractController
         $section = $this->resolveSectionFromRequest($request, $teacher);
         $tests = $this->testsRepository->findByTeacher($teacher);
 
+        $studentsForContext = $section !== null
+            ? $this->usersRepository->findStudentsBySection($section)
+            : $this->getTeacherStudents($teacher);
+        $studentIdsForContext = array_values(array_filter(array_map(
+            static fn (Users $student): ?int => $student->getId(),
+            $studentsForContext
+        )));
+
+        $canAddGradeByTestId = [];
+        foreach ($tests as $test) {
+            $testId = $test->getId();
+            if ($testId === null) {
+                continue;
+            }
+
+            $gradedStudentIds = $this->gradesRepository->findStudentIdsForTest($test);
+            $remainingStudentIds = array_diff($studentIdsForContext, $gradedStudentIds);
+            $canAddGradeByTestId[$testId] = count($remainingStudentIds) > 0;
+        }
+
         return $this->render('teacher/tests_index.html.twig', [
             'tests' => $tests,
             'section' => $section,
+            'canAddGradeByTestId' => $canAddGradeByTestId,
         ]);
     }
 
@@ -150,6 +174,7 @@ class TeacherPortalController extends AbstractController
         $students = $section !== null
             ? $this->usersRepository->findStudentsBySection($section)
             : $this->getTeacherStudents($teacher);
+        $availableStudents = $this->filterStudentsNotYetGradedForTest($test, $students);
 
         $grade = new Grades();
         $grade->setTest($test);
@@ -157,7 +182,7 @@ class TeacherPortalController extends AbstractController
         $form = $this->createFormBuilder($grade)
             ->add('student', EntityType::class, [
                 'class' => Users::class,
-                'choices' => $students,
+                'choices' => $availableStudents,
                 'choice_label' => static function (Users $user): string {
                     $fullName = trim(sprintf('%s %s', $user->getFirstName(), $user->getLastName()));
 
@@ -182,6 +207,13 @@ class TeacherPortalController extends AbstractController
             ->getForm();
 
         $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $selectedStudent = $grade->getStudent();
+            if ($selectedStudent instanceof Users && $this->gradesRepository->studentAlreadyGradedForTest($test, $selectedStudent)) {
+                $form->get('student')->addError(new FormError('Cet étudiant a déjà une note pour ce test.'));
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             $now = new \DateTimeImmutable();
             $grade->setCreatedAt($now);
@@ -220,11 +252,12 @@ class TeacherPortalController extends AbstractController
         $students = $section !== null
             ? $this->usersRepository->findStudentsBySection($section)
             : $this->getTeacherStudents($teacher);
+        $availableStudents = $this->filterStudentsNotYetGradedForTest($test, $students, $grade);
 
         $form = $this->createFormBuilder($grade)
             ->add('student', EntityType::class, [
                 'class' => Users::class,
-                'choices' => $students,
+                'choices' => $availableStudents,
                 'choice_label' => static function (Users $user): string {
                     $fullName = trim(sprintf('%s %s', $user->getFirstName(), $user->getLastName()));
 
@@ -249,6 +282,13 @@ class TeacherPortalController extends AbstractController
             ->getForm();
 
         $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $selectedStudent = $grade->getStudent();
+            if ($selectedStudent instanceof Users && $this->gradesRepository->studentAlreadyGradedForTest($test, $selectedStudent, $grade->getId())) {
+                $form->get('student')->addError(new FormError('Cet étudiant a déjà une note pour ce test.'));
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             $grade->setUpdatedAt(new \DateTimeImmutable());
             $this->entityManager->flush();
@@ -347,6 +387,37 @@ class TeacherPortalController extends AbstractController
         });
 
         return $students;
+    }
+
+    /**
+     * @param Users[] $students
+     * @return Users[]
+     */
+    private function filterStudentsNotYetGradedForTest(Tests $test, array $students, ?Grades $currentGrade = null): array
+    {
+        $gradedStudentIds = $this->gradesRepository->findStudentIdsForTest($test);
+
+        $currentStudentId = $currentGrade?->getStudent()?->getId();
+        if ($currentStudentId !== null) {
+            $gradedStudentIds = array_values(array_filter(
+                $gradedStudentIds,
+                static fn (int $studentId): bool => $studentId !== $currentStudentId
+            ));
+        }
+
+        $gradedStudentIdsLookup = array_fill_keys($gradedStudentIds, true);
+
+        return array_values(array_filter(
+            $students,
+            static function (Users $student) use ($gradedStudentIdsLookup): bool {
+                $studentId = $student->getId();
+                if ($studentId === null) {
+                    return false;
+                }
+
+                return !isset($gradedStudentIdsLookup[$studentId]);
+            }
+        ));
     }
 
     private function resolveSectionFromRequest(Request $request, Users $teacher): ?Sections

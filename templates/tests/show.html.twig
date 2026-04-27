@@ -15,9 +15,15 @@
                 <a href="{{ section ? path('app_class_show', { id: section.id }) : path('app_home') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
                     Retour
                 </a>
-                <a href="{{ section ? path('teacher_portal_grade_new', { id: test.id, section: section.id }) : path('teacher_portal_grade_new', { id: test.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
-                    Saisir une note
-                </a>
+                {% if canAddGrade %}
+                    <a href="{{ section ? path('teacher_portal_grade_new', { id: test.id, section: section.id }) : path('teacher_portal_grade_new', { id: test.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                        Saisir une note
+                    </a>
+                {% else %}
+                    <span class="cursor-not-allowed rounded-md bg-gray-400 px-4 py-2 font-medium text-white" title="Tous les étudiants ont déjà une note pour ce test">
+                        Saisir une note
+                    </span>
+                {% endif %}
             </div>
         </header>
 

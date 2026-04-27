@@ -93,6 +93,7 @@
                                 <p class="mt-1 text-sm text-gray-600">{{ test.comment ?: 'Aucun commentaire' }}</p>
                             </div>
                             <div class="flex flex-wrap items-center gap-3">
+                                {% set canAddGrade = canAddGradeByTestId[test.id] ?? true %}
                                 <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">
                                     {{ test.teacher }}
                                 </div>
@@ -108,12 +109,12 @@
                                         Supprimer le test
                                     </button>
                                 </form>
-                                {% if students|length > 0 %}
+                                {% if canAddGrade %}
                                     <a href="{{ path('teacher_portal_grade_new', { id: test.id, section: section.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
                                         Saisir les notes
                                     </a>
                                 {% else %}
-                                    <span class="cursor-not-allowed rounded-md bg-gray-400 px-4 py-2 text-sm font-medium text-white" title="Aucun étudiant dans cette classe">
+                                    <span class="cursor-not-allowed rounded-md bg-gray-400 px-4 py-2 text-sm font-medium text-white" title="Tous les étudiants ont déjà une note pour ce test">
                                         Saisir les notes
                                     </span>
                                 {% endif %}

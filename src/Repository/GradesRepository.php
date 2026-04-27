@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Grades;
 use App\Entity\Tests;
+use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -42,6 +43,40 @@ class GradesRepository extends ServiceEntityRepository
             ->addOrderBy('grade.id', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return int[]
+     */
+    public function findStudentIdsForTest(Tests $test): array
+    {
+        $results = $this->createQueryBuilder('grade')
+            ->select('DISTINCT student.id AS student_id')
+            ->innerJoin('grade.student', 'student')
+            ->andWhere('grade.test = :test')
+            ->setParameter('test', $test)
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_values(array_map(static fn (array $row): int => (int) $row['student_id'], $results));
+    }
+
+    public function studentAlreadyGradedForTest(Tests $test, Users $student, ?int $excludeGradeId = null): bool
+    {
+        $qb = $this->createQueryBuilder('grade')
+            ->select('COUNT(grade.id)')
+            ->andWhere('grade.test = :test')
+            ->andWhere('grade.student = :student')
+            ->setParameter('test', $test)
+            ->setParameter('student', $student);
+
+        if ($excludeGradeId !== null) {
+            $qb
+                ->andWhere('grade.id != :excludeGradeId')
+                ->setParameter('excludeGradeId', $excludeGradeId);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
 
     //    /**

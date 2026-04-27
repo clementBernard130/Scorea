@@ -35,12 +35,29 @@ class ClassController extends AbstractController
 
         $students = $this->usersRepository->findStudentsBySection($section);
         $tests = $this->testsRepository->findByTeacher($teacher);
+        $sectionStudentIds = array_values(array_filter(array_map(
+            static fn (Users $student): ?int => $student->getId(),
+            $students
+        )));
+
+        $canAddGradeByTestId = [];
+        foreach ($tests as $test) {
+            $testId = $test->getId();
+            if ($testId === null) {
+                continue;
+            }
+
+            $gradedStudentIds = $this->gradesRepository->findStudentIdsForTest($test);
+            $remainingStudentIds = array_diff($sectionStudentIds, $gradedStudentIds);
+            $canAddGradeByTestId[$testId] = count($remainingStudentIds) > 0;
+        }
 
         return $this->render('class/show.html.twig', [
             'user' => $teacher,
             'section' => $section,
             'students' => $students,
             'tests' => $tests,
+            'canAddGradeByTestId' => $canAddGradeByTestId,
         ]);
     }
 
@@ -83,6 +100,9 @@ class ClassController extends AbstractController
         $averageGrade = $gradeCount > 0 ? array_sum($gradeValues) / $gradeCount : null;
         $minGrade = $gradeCount > 0 ? min($gradeValues) : null;
         $maxGrade = $gradeCount > 0 ? max($gradeValues) : null;
+        $gradedStudentIds = $this->gradesRepository->findStudentIdsForTest($test);
+        $remainingStudentIds = array_diff($allowedStudentIds, $gradedStudentIds);
+        $canAddGrade = count($remainingStudentIds) > 0;
 
         return $this->render('tests/show.html.twig', [
             'user' => $teacher,
@@ -93,6 +113,7 @@ class ClassController extends AbstractController
             'averageGrade' => $averageGrade,
             'minGrade' => $minGrade,
             'maxGrade' => $maxGrade,
+            'canAddGrade' => $canAddGrade,
         ]);
     }
 
