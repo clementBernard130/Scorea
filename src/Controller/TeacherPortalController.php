@@ -270,6 +270,61 @@ class TeacherPortalController extends AbstractController
         ]);
     }
 
+    #[Route('/teacher-portal/grades/{id}/delete', name: 'teacher_portal_grade_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function deleteGrade(Request $request, Grades $grade): Response
+    {
+        $teacher = $this->getTeacherUser();
+        $test = $grade->getTest();
+
+        if ($test === null || $test->getTeacher()?->getId() !== $teacher->getId()) {
+            throw new AccessDeniedException('Accès refusé à cette note.');
+        }
+
+        if (!$this->isCsrfTokenValid('delete_grade_'.$grade->getId(), (string) $request->request->get('_token'))) {
+            throw new AccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $section = $this->resolveSectionFromRequest($request, $teacher);
+        $testId = $test->getId();
+
+        $this->entityManager->remove($grade);
+        $this->entityManager->flush();
+
+        if ($testId === null) {
+            return $this->redirectToRoute('teacher_portal_tests_index');
+        }
+
+        return $this->redirectToRoute('app_test_show', $section ? ['id' => $testId, 'section' => $section->getId()] : ['id' => $testId]);
+    }
+
+    #[Route('/teacher-portal/tests/{id}/delete', name: 'teacher_portal_test_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function deleteTest(Request $request, Tests $test): Response
+    {
+        $teacher = $this->getTeacherUser();
+        if ($test->getTeacher()?->getId() !== $teacher->getId()) {
+            throw new AccessDeniedException('Accès refusé à cette évaluation.');
+        }
+
+        if (!$this->isCsrfTokenValid('delete_test_'.$test->getId(), (string) $request->request->get('_token'))) {
+            throw new AccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $section = $this->resolveSectionFromRequest($request, $teacher);
+
+        foreach ($test->getGrades() as $grade) {
+            $this->entityManager->remove($grade);
+        }
+
+        $this->entityManager->remove($test);
+        $this->entityManager->flush();
+
+        if ($section !== null) {
+            return $this->redirectToRoute('app_class_show', ['id' => $section->getId()]);
+        }
+
+        return $this->redirectToRoute('teacher_portal_tests_index');
+    }
+
     private function getTeacherStudents(Users $teacher): array
     {
         $studentIds = $this->usersRepository->findStudentIdsForTeacher($teacher);

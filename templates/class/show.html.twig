@@ -102,6 +102,12 @@
                                 <a href="{{ path('teacher_portal_test_edit', { id: test.id, section: section.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                                     Modifier le test
                                 </a>
+                                <form method="post" action="{{ path('teacher_portal_test_delete', { id: test.id, section: section.id }) }}" onsubmit="return confirm('Supprimer ce test et toutes ses notes ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_test_' ~ test.id) }}">
+                                    <button type="submit" class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700">
+                                        Supprimer le test
+                                    </button>
+                                </form>
                                 {% if students|length > 0 %}
                                     <a href="{{ path('teacher_portal_grade_new', { id: test.id, section: section.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
                                         Saisir les notes

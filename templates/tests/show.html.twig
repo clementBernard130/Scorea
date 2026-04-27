@@ -71,9 +71,17 @@
                                     <td class="px-4 py-3 text-sm font-semibold text-gray-900">{{ grade.grade|number_format(2, ',', ' ') }}</td>
                                     <td class="px-4 py-3 text-sm text-gray-700">{{ grade.comment ?: 'Aucun commentaire' }}</td>
                                     <td class="px-4 py-3 text-right">
-                                        <a href="{{ section ? path('teacher_portal_grade_edit', { id: grade.id, section: section.id }) : path('teacher_portal_grade_edit', { id: grade.id }) }}" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50">
-                                            Modifier
-                                        </a>
+                                        <div class="flex justify-end gap-2">
+                                            <a href="{{ section ? path('teacher_portal_grade_edit', { id: grade.id, section: section.id }) : path('teacher_portal_grade_edit', { id: grade.id }) }}" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50">
+                                                Modifier
+                                            </a>
+                                            <form method="post" action="{{ section ? path('teacher_portal_grade_delete', { id: grade.id, section: section.id }) : path('teacher_portal_grade_delete', { id: grade.id }) }}" onsubmit="return confirm('Supprimer cette note ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_grade_' ~ grade.id) }}">
+                                                <button type="submit" class="rounded-md bg-red-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-red-700">
+                                                    Supprimer
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}
