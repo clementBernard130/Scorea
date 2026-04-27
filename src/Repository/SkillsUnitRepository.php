@@ -16,28 +16,25 @@ class SkillsUnitRepository extends ServiceEntityRepository
         parent::__construct($registry, SkillsUnit::class);
     }
 
-    //    /**
-    //     * @return SkillUnits[] Returns an array of SkillUnits objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @param list<int> $trainingIds
+     *
+     * @return list<SkillsUnit>
+     */
+    public function findByTrainingIds(array $trainingIds): array
+    {
+        if ($trainingIds === []) {
+            return [];
+        }
 
-    //    public function findOneBySomeField($value): ?SkillUnits
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $this->createQueryBuilder('skillUnit')
+            ->leftJoin('skillUnit.skills', 'skill')
+            ->addSelect('skill')
+            ->andWhere('IDENTITY(skillUnit.trainings) IN (:trainingIds)')
+            ->setParameter('trainingIds', $trainingIds)
+            ->orderBy('skillUnit.name', 'ASC')
+            ->addOrderBy('skill.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
