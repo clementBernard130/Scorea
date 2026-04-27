@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Tests;
+use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +15,20 @@ class TestsRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Tests::class);
+    }
+
+    /**
+     * @return Tests[]
+     */
+    public function findByTeacher(Users $teacher): array
+    {
+        return $this->createQueryBuilder('test')
+            ->andWhere('test.teacher = :teacher')
+            ->setParameter('teacher', $teacher)
+            ->orderBy('test.testDate', 'DESC')
+            ->addOrderBy('test.id', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**

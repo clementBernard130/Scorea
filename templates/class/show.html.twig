@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ section.name }} - Scorea{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-100 text-gray-900">
+    <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+        <header class="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-md bg-white px-6 py-4 shadow-md">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-gray-500">Scorea</p>
+                <h1 class="text-2xl font-semibold text-gray-900">Accueil</h1>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                {% if user %}
+                    <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-2">
+                        <p class="text-gray-900">Connecté en tant que <span class="font-medium">{{ user.firstName }} {{ user.lastName }}</span></p>
+                    </div>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
+                            Administration
+                        </a>
+                    {% endif %}
+                    <a href="{{ path('app_logout') }}" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                        Déconnexion
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                        Connexion
+                    </a>
+                {% endif %}
+            </div>
+        </header>
+
+        <section class="mb-4 grid gap-4">
+            <div class="rounded-md bg-white p-4 shadow-md sm:p-6 flex flex-wrap gap-4 items-end justify-between">
+                <div>
+                    <h2 class="text-3xl font-semibold text-gray-900">{{ section.training.name }}</h2>
+                    <p class="mt-2 max-w-3xl text-gray-600">
+                        {{ section.startDate|date('d/m/Y') }} - {{ section.endDate|date('d/m/Y') }}
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-3 text-sm">
+                    <div class="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-gray-700">
+                        <p class="text-2xl font-semibold text-gray-900">{{ students|length }} <span class="text-xs uppercase tracking-wide text-gray-500">étudiant{% if students|length > 1 %}s{% endif %}</span></p>
+                    </div>
+                    <div class="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-gray-700">
+                        <p class="text-2xl font-semibold text-gray-900">{{ tests|length }} <span class="text-xs uppercase tracking-wide text-gray-500">Évaluation{% if tests|length > 1 %}s{% endif %}</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-4 rounded-md bg-white p-6 text-gray-900 shadow-md sm:p-8">
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-900">Étudiants</h2>
+                </div>
+            </div>
+
+            {% if students is not empty %}
+                <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {% for student in students %}
+                        <article class="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+                            <p class="text-xs uppercase tracking-wide text-gray-500">Étudiant</p>
+                            <h3 class="mt-2 text-lg font-semibold text-gray-900">{{ student.firstName }} {{ student.lastName }}</h3>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-gray-600">
+                    Aucun étudiant n'est associé à cette classe.
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="rounded-md bg-white p-6 text-gray-900 shadow-md sm:p-8">
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-900">Évaluations</h2>
+                </div>
+                <a href="{{ path('teacher_portal_test_new', { section: section.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                    Nouvelle évaluation
+                </a>
+            </div>
+
+            {% if tests is not empty %}
+                <div class="space-y-3">
+                    {% for test in tests %}
+                        <article class="flex flex-col gap-4 rounded-md border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-xs uppercase tracking-wide text-gray-500">{{ test.testDate|date('d/m/Y') }}</p>
+                                <h3 class="mt-1 text-lg font-semibold text-gray-900">{{ test.subject.name }}</h3>
+                                <p class="mt-1 text-sm text-gray-600">{{ test.comment ?: 'Aucun commentaire' }}</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                {% set canAddGrade = canAddGradeByTestId[test.id] ?? true %}
+                                <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">
+                                    {{ test.teacher }}
+                                </div>
+                                <a href="{{ path('app_test_show', { id: test.id, section: section.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+                                    Voir les notes
+                                </a>
+                                <a href="{{ path('teacher_portal_test_edit', { id: test.id, section: section.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+                                    Modifier le test
+                                </a>
+                                <form method="post" action="{{ path('teacher_portal_test_delete', { id: test.id, section: section.id }) }}" onsubmit="return confirm('Supprimer ce test et toutes ses notes ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_test_' ~ test.id) }}">
+                                    <button type="submit" class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700">
+                                        Supprimer le test
+                                    </button>
+                                </form>
+                                {% if canAddGrade %}
+                                    <a href="{{ path('teacher_portal_grade_new', { id: test.id, section: section.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
+                                        Saisir les notes
+                                    </a>
+                                {% else %}
+                                    <span class="cursor-not-allowed rounded-md bg-gray-400 px-4 py-2 text-sm font-medium text-white" title="Tous les étudiants ont déjà une note pour ce test">
+                                        Saisir les notes
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-gray-600">
+                    Aucun test n'a encore été créé pour cet enseignant.
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

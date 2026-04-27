@@ -91,6 +91,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\InverseJoinColumn(name: 'subject_id', referencedColumnName: 'id')]
     private Collection $subjects;
 
+    /**
+     * @var Collection<int, Alerts>
+     */
+    #[ORM\OneToMany(targetEntity: Alerts::class, mappedBy: 'users')]
+    private Collection $alerts;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
@@ -98,6 +104,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $this->grades = new ArrayCollection();
         $this->apprentice = new ArrayCollection();
         $this->mentor = new ArrayCollection();
+        $this->alerts = new ArrayCollection();
         $this->subjects = new ArrayCollection();
     }
 
@@ -465,5 +472,33 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return Collection<int, Alerts>
+     */
+    public function getAlerts(): Collection
+    {
+        return $this->alerts;
+    }
+
+    public function addAlert(Alerts $alert): static
+    {
+        if (!$this->alerts->contains($alert)) {
+            $this->alerts->add($alert);
+            $alert->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlert(Alerts $alert): static
+    {
+        if ($this->alerts->removeElement($alert)) {
+            if ($alert->getUsers() === $this) {
+                $alert->setUsers(null);
+            }
+        }
+
+        return $this;
+    }
 }
 

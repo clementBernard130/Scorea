@@ -42,6 +42,12 @@ class Subjects
     private Collection $tests;
 
     /**
+     * @var Collection<int, Alerts>
+     */
+    #[ORM\OneToMany(targetEntity: Alerts::class, mappedBy: 'subject')]
+    private Collection $alerts;
+
+    /**
      * @var Collection<int, Users>
      */
     #[ORM\ManyToMany(targetEntity: Users::class, mappedBy: 'subjects')]
@@ -51,6 +57,7 @@ class Subjects
     {
         $this->skills = new ArrayCollection();
         $this->tests = new ArrayCollection();
+        $this->alerts = new ArrayCollection();
         $this->teachers = new ArrayCollection();
     }
 
@@ -175,5 +182,41 @@ class Subjects
         }
 
         return $this;
+    }
+
+
+    /**
+     * @return Collection<int, Alerts>
+     */
+    public function getAlerts(): Collection
+    {
+        return $this->alerts;
+    }
+
+    public function addAlert(Alerts $alert): static
+    {
+        if (!$this->alerts->contains($alert)) {
+            $this->alerts->add($alert);
+            $alert->setSubject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlert(Alerts $alert): static
+    {
+        if ($this->alerts->removeElement($alert)) {
+            // set the owning side to null (unless already changed)
+            if ($alert->getSubject() === $this) {
+                $alert->setSubject(null);
+            }
+        }
+
+        return $this;
+    }
+      
+    public function __toString(): string
+    {
+        return $this->name ?? sprintf('Matiere #%d', $this->id ?? 0);
     }
 }

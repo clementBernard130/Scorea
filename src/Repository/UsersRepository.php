@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Sections;
 use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,6 +18,65 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Users::class);
+    }
+
+    /**
+     * @return Users[]
+     */
+    public function findStudentsBySection(Sections $section): array
+    {
+        $users = $this->createQueryBuilder('user')
+            ->innerJoin('user.sections', 'section')
+            ->andWhere('section = :section')
+            ->setParameter('section', $section)
+            ->orderBy('user.last_name', 'ASC')
+            ->addOrderBy('user.first_name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $studentsById = [];
+        foreach ($users as $user) {
+            if (!$user instanceof Users || !in_array('ROLE_STUDENT', $user->getRoles(), true)) {
+                continue;
+            }
+
+            $id = $user->getId();
+            if ($id !== null) {
+                $studentsById[$id] = $user;
+            }
+        }
+
+        return array_values($studentsById);
+    }
+
+    /**
+     * @return int[]
+     */
+    public function findStudentIdsForTeacher(Users $teacher): array
+    {
+        $users = $this->createQueryBuilder('user')
+            ->innerJoin('user.sections', 'studentSection')
+            ->innerJoin('studentSection.users', 'sectionUser')
+            ->andWhere('sectionUser = :teacher')
+            ->setParameter('teacher', $teacher)
+            ->orderBy('user.last_name', 'ASC')
+            ->addOrderBy('user.first_name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $studentIds = [];
+        foreach ($users as $user) {
+            if (!$user instanceof Users || !in_array('ROLE_STUDENT', $user->getRoles(), true)) {
+                continue;
+            }
+
+            $id = $user->getId();
+            if ($id !== null) {
+                $studentIds[$id] = (int) $id;
+            }
+        }
+
+        return array_values($studentIds);
     }
 
     /**

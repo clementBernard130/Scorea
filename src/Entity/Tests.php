@@ -23,6 +23,10 @@ class Tests
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $teacher = null;
 
+    #[ORM\ManyToOne(inversedBy: 'tests')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Sections $section = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $comment = null;
 
@@ -65,6 +69,18 @@ class Tests
     public function setTeacher(?Users $teacher): static
     {
         $this->teacher = $teacher;
+
+        return $this;
+    }
+
+    public function getSection(): ?Sections
+    {
+        return $this->section;
+    }
+
+    public function setSection(?Sections $section): static
+    {
+        $this->section = $section;
 
         return $this;
     }

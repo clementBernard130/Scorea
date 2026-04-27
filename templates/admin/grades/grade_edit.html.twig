@@ -1,0 +1,258 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --grade-edit-bg-start: #f7f4ee;
+            --grade-edit-bg-end: #ecf6f4;
+            --grade-edit-primary: #0e8a7d;
+            --grade-edit-secondary: #0a5e60;
+            --grade-edit-accent: #ec6f2f;
+            --grade-edit-text: #15323a;
+            --grade-edit-muted: #5f7680;
+            --grade-edit-surface: #ffffff;
+            --grade-edit-border: #d9ebe7;
+            --grade-edit-shadow: rgba(12, 64, 67, 0.14);
+        }
+
+        .grade-edit-page {
+            position: relative;
+            max-width: 1040px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .grade-edit-toolbar,
+        .grade-edit-hero,
+        .grade-edit-form-card {
+            position: relative;
+            z-index: 1;
+        }
+
+        .grade-edit-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .grade-edit-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--grade-edit-text);
+            background: color-mix(in srgb, var(--grade-edit-bg-end) 60%, #ffffff);
+            border: 1px solid var(--grade-edit-border);
+            border-radius: 12px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .grade-edit-back:hover,
+        .grade-edit-back:focus,
+        .grade-edit-back:active,
+        .grade-edit-back:focus-visible {
+            color: var(--grade-edit-text) !important;
+            background: #ffffff !important;
+            border-color: color-mix(in srgb, var(--grade-edit-primary) 32%, var(--grade-edit-border)) !important;
+        }
+
+        .grade-edit-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--grade-edit-accent) 20%, #ffffff);
+            color: color-mix(in srgb, var(--grade-edit-accent) 72%, #8a3f19);
+            font-size: 0.79rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .grade-edit-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--grade-edit-primary) 25%, var(--grade-edit-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+                linear-gradient(130deg, var(--grade-edit-bg-start), var(--grade-edit-bg-end));
+            box-shadow: 0 20px 40px var(--grade-edit-shadow);
+            padding: 1.3rem;
+        }
+
+        .grade-edit-title {
+            margin: 0;
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+            line-height: 1.12;
+            color: var(--grade-edit-text);
+            letter-spacing: -0.02em;
+        }
+
+        .grade-edit-subtitle {
+            margin: 0.55rem 0 0;
+            color: var(--grade-edit-muted);
+            font-size: 0.95rem;
+            max-width: 54ch;
+        }
+
+        .grade-edit-form-card {
+            border-radius: 18px;
+            padding: 1.1rem;
+            border: 1px solid color-mix(in srgb, var(--grade-edit-primary) 18%, var(--grade-edit-border));
+            background: var(--grade-edit-surface);
+            box-shadow: 0 16px 32px rgba(14, 76, 84, 0.1);
+        }
+
+        .grade-edit-section {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--grade-edit-primary) 16%, var(--grade-edit-border));
+            background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--grade-edit-bg-end) 22%, #ffffff));
+            padding: 0.95rem;
+        }
+
+        .grade-edit-section + .grade-edit-section {
+            margin-top: 0.85rem;
+        }
+
+        .grade-edit-section-title {
+            margin: 0 0 0.72rem;
+            color: var(--grade-edit-text);
+            font-size: 0.94rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .grade-edit-section-title::before {
+            content: '';
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--grade-edit-primary), var(--grade-edit-accent));
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--grade-edit-primary) 22%, transparent);
+        }
+
+        .grade-edit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.8rem;
+        }
+
+        .grade-edit-form-card .form-label,
+        .grade-edit-form-card label {
+            color: color-mix(in srgb, var(--grade-edit-text) 88%, #102026);
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .grade-edit-form-card .form-control,
+        .grade-edit-form-card .form-select {
+            border-radius: 10px;
+            border: 1px solid color-mix(in srgb, var(--grade-edit-primary) 18%, var(--grade-edit-border));
+            min-height: 42px;
+            background: #ffffff;
+        }
+
+        .grade-edit-form-card .form-control:focus,
+        .grade-edit-form-card .form-select:focus {
+            border-color: color-mix(in srgb, var(--grade-edit-primary) 70%, #0a5e60);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--grade-edit-primary) 22%, transparent);
+        }
+
+        .grade-edit-form-card textarea.form-control {
+            min-height: 110px;
+        }
+
+        .grade-edit-form-card .ea-form-actions,
+        .grade-edit-form-card .form-actions {
+            border-top: 1px dashed color-mix(in srgb, var(--grade-edit-primary) 26%, var(--grade-edit-border));
+            margin-top: 0.9rem;
+            padding-top: 0.9rem;
+        }
+
+        .btn-primary {
+            border: none !important;
+            color: #fff !important;
+            border-radius: 11px !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--grade-edit-primary), var(--grade-edit-secondary)) !important;
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+            padding: 0.55rem 1rem !important;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:focus-visible {
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px rgba(9, 94, 96, 0.28);
+        }
+
+        @media (max-width: 780px) {
+            .grade-edit-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="grade-edit-page">
+        <div class="grade-edit-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="grade-edit-back">
+                <i class="fa fa-arrow-left"></i> Retour à la liste
+            </a>
+            <span class="grade-edit-pill"><i class="fa fa-pen"></i> Édition</span>
+        </div>
+
+        <section class="grade-edit-hero">
+            <h2 class="grade-edit-title">Modifier la note</h2>
+            <p class="grade-edit-subtitle">Mettez à jour l'élève, le test, le type de note et la valeur.</p>
+        </section>
+
+        <section class="grade-edit-form-card">
+            {{ form_start(edit_form) }}
+
+            <div class="grade-edit-section">
+                <h3 class="grade-edit-section-title">Informations de la note</h3>
+                <div class="grade-edit-grid">
+                    {% if edit_form.student is defined %}
+                        {{ form_row(edit_form.student) }}
+                    {% endif %}
+                    {% if edit_form.test is defined %}
+                        {{ form_row(edit_form.test) }}
+                    {% endif %}
+                </div>
+                <div class="grade-edit-grid">
+                    {% if edit_form.gradeType is defined %}
+                        {{ form_row(edit_form.gradeType) }}
+                    {% endif %}
+                    {% if edit_form.grade is defined %}
+                        {{ form_row(edit_form.grade) }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grade-edit-section">
+                <h3 class="grade-edit-section-title">Commentaire</h3>
+                {% if edit_form.comment is defined %}
+                    {{ form_row(edit_form.comment) }}
+                {% endif %}
+            </div>
+
+            {{ form_rest(edit_form) }}
+            {{ form_end(edit_form, { render_rest: false }) }}
+        </section>
+    </div>
+{% endblock %}
