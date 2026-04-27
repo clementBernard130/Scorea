@@ -354,7 +354,7 @@
         </section>
 
         <section class="section-detail-card">
-            <h3>Tests de la section</h3>
+            <h3>Evaluations effectuées</h3>
             {% if entity.instance.tests|length > 0 %}
                 <div class="section-chip-wrap">
                     {% for test in entity.instance.tests|sort((a, b) => b.testDate <=> a.testDate) %}

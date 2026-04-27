@@ -98,10 +98,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
         yield MenuItem::linkToCrud('Formations', 'fa fa-school', Trainings::class);
 
-        // Section Évaluations
-        yield MenuItem::section('Évaluations', 'fa fa-chart-bar');
-        yield MenuItem::linkToCrud('Tests', 'fa fa-clipboard-list', Tests::class);
-
         // Section Synchronisation
         yield MenuItem::section('Synchronisation', 'fa fa-file-arrow-up');
         yield MenuItem::linkToRoute('Données étudiants & formations', 'fa fa-file-import', 'admin_import_export');
