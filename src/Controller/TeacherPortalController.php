@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Validator\Constraints\Range;
 
 class TeacherPortalController extends AbstractController
 {
@@ -199,6 +200,16 @@ class TeacherPortalController extends AbstractController
             ->add('grade', NumberType::class, [
                 'label' => 'Note',
                 'scale' => 2,
+                'attr' => [
+                    'max' => 20,
+                    'step' => '0.01',
+                ],
+                'constraints' => [
+                    new Range([
+                        'max' => 20,
+                        'maxMessage' => 'La note maximale est 20.',
+                    ]),
+                ],
             ])
             ->add('comment', TextareaType::class, [
                 'required' => false,
@@ -274,6 +285,16 @@ class TeacherPortalController extends AbstractController
             ->add('grade', NumberType::class, [
                 'label' => 'Note',
                 'scale' => 2,
+                'attr' => [
+                    'max' => 20,
+                    'step' => '0.01',
+                ],
+                'constraints' => [
+                    new Range([
+                        'max' => 20,
+                        'maxMessage' => 'La note maximale est 20.',
+                    ]),
+                ],
             ])
             ->add('comment', TextareaType::class, [
                 'required' => false,
