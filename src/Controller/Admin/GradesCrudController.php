@@ -43,6 +43,7 @@ class GradesCrudController extends AbstractCrudController
         if ($entityInstance instanceof Grades) {
             $this->alertService->handleGradeCreated($entityInstance);
         }
+    }
 
     public function configureCrud(Crud $crud): Crud
     {
