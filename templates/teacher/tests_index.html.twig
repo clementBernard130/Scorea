@@ -31,12 +31,28 @@
                                 <p class="mt-1 text-sm text-gray-600">{{ test.comment ?: 'Aucun commentaire' }}</p>
                             </div>
                             <div class="flex flex-wrap items-center gap-3">
+                                {% set canAddGrade = canAddGradeByTestId[test.id] ?? true %}
+                                <a href="{{ path('app_test_show', { id: test.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+                                    Voir les notes
+                                </a>
                                 <a href="{{ path('teacher_portal_test_edit', { id: test.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                                     Modifier
                                 </a>
-                                <a href="{{ path('teacher_portal_grade_new', { id: test.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
-                                    Saisir des notes
-                                </a>
+                                {% if canAddGrade %}
+                                    <a href="{{ path('teacher_portal_grade_new', { id: test.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
+                                        Saisir des notes
+                                    </a>
+                                {% else %}
+                                    <span class="cursor-not-allowed rounded-md bg-gray-400 px-4 py-2 text-sm font-medium text-white" title="Tous les étudiants ont déjà une note pour ce test">
+                                        Saisir des notes
+                                    </span>
+                                {% endif %}
+                                <form method="post" action="{{ path('teacher_portal_test_delete', { id: test.id }) }}" onsubmit="return confirm('Supprimer ce test et toutes ses notes ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_test_' ~ test.id) }}">
+                                    <button type="submit" class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700">
+                                        Supprimer
+                                    </button>
+                                </form>
                             </div>
                         </article>
                     {% endfor %}
