@@ -1,0 +1,283 @@
+{% extends '@EasyAdmin/crud/new.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --test-new-bg-start: #f7f4ee;
+            --test-new-bg-end: #ecf6f4;
+            --test-new-primary: #0e8a7d;
+            --test-new-secondary: #0a5e60;
+            --test-new-accent: #ec6f2f;
+            --test-new-text: #15323a;
+            --test-new-muted: #5f7680;
+            --test-new-surface: #ffffff;
+            --test-new-border: #d9ebe7;
+            --test-new-shadow: rgba(12, 64, 67, 0.14);
+        }
+
+        .test-create-page {
+            position: relative;
+            max-width: 1040px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .test-create-page::before,
+        .test-create-page::after {
+            content: '';
+            position: absolute;
+            z-index: 0;
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        .test-create-page::before {
+            width: 240px;
+            height: 240px;
+            top: -40px;
+            right: -30px;
+            background: radial-gradient(circle at 30% 30%, rgba(236, 111, 47, 0.34), rgba(236, 111, 47, 0));
+        }
+
+        .test-create-page::after {
+            width: 300px;
+            height: 300px;
+            bottom: -70px;
+            left: -60px;
+            background: radial-gradient(circle at 50% 50%, rgba(14, 138, 125, 0.26), rgba(14, 138, 125, 0));
+        }
+
+        .test-create-toolbar,
+        .test-create-hero,
+        .test-create-form-card {
+            position: relative;
+            z-index: 1;
+        }
+
+        .test-create-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .test-create-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--test-new-text);
+            background: color-mix(in srgb, var(--test-new-bg-end) 60%, #ffffff);
+            border: 1px solid var(--test-new-border);
+            border-radius: 12px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .test-create-back:hover,
+        .test-create-back:focus,
+        .test-create-back:active,
+        .test-create-back:focus-visible {
+            color: var(--test-new-text) !important;
+            background: #ffffff !important;
+            border-color: color-mix(in srgb, var(--test-new-primary) 32%, var(--test-new-border)) !important;
+        }
+
+        .test-create-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--test-new-accent) 20%, #ffffff);
+            color: color-mix(in srgb, var(--test-new-accent) 72%, #8a3f19);
+            font-size: 0.79rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .test-create-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--test-new-primary) 25%, var(--test-new-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+                linear-gradient(130deg, var(--test-new-bg-start), var(--test-new-bg-end));
+            box-shadow: 0 20px 40px var(--test-new-shadow);
+            padding: 1.3rem;
+        }
+
+        .test-create-title {
+            margin: 0;
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+            line-height: 1.12;
+            color: var(--test-new-text);
+            letter-spacing: -0.02em;
+        }
+
+        .test-create-subtitle {
+            margin: 0.55rem 0 0;
+            color: var(--test-new-muted);
+            font-size: 0.95rem;
+            max-width: 54ch;
+        }
+
+        .test-create-form-card {
+            border-radius: 18px;
+            padding: 1.1rem;
+            border: 1px solid color-mix(in srgb, var(--test-new-primary) 18%, var(--test-new-border));
+            background: var(--test-new-surface);
+            box-shadow: 0 16px 32px rgba(14, 76, 84, 0.1);
+        }
+
+        .test-create-section {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--test-new-primary) 16%, var(--test-new-border));
+            background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--test-new-bg-end) 22%, #ffffff));
+            padding: 0.95rem;
+        }
+
+        .test-create-section + .test-create-section {
+            margin-top: 0.85rem;
+        }
+
+        .test-create-section-title {
+            margin: 0 0 0.72rem;
+            color: var(--test-new-text);
+            font-size: 0.94rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .test-create-section-title::before {
+            content: '';
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--test-new-primary), var(--test-new-accent));
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--test-new-primary) 22%, transparent);
+        }
+
+        .test-create-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.8rem;
+        }
+
+        .test-create-form-card .form-label,
+        .test-create-form-card label {
+            color: color-mix(in srgb, var(--test-new-text) 88%, #102026);
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .test-create-form-card .form-control,
+        .test-create-form-card .form-select {
+            border-radius: 10px;
+            border: 1px solid color-mix(in srgb, var(--test-new-primary) 18%, var(--test-new-border));
+            min-height: 42px;
+            background: #ffffff;
+        }
+
+        .test-create-form-card .form-control:focus,
+        .test-create-form-card .form-select:focus {
+            border-color: color-mix(in srgb, var(--test-new-primary) 70%, #0a5e60);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--test-new-primary) 22%, transparent);
+        }
+
+        .test-create-form-card textarea.form-control {
+            min-height: 110px;
+        }
+
+        .test-create-form-card .ea-form-actions,
+        .test-create-form-card .form-actions {
+            border-top: 1px dashed color-mix(in srgb, var(--test-new-primary) 26%, var(--test-new-border));
+            margin-top: 0.9rem;
+            padding-top: 0.9rem;
+        }
+
+        .btn-primary {
+            border: none !important;
+            color: #fff !important;
+            border-radius: 11px !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--test-new-primary), var(--test-new-secondary)) !important;
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+            padding: 0.55rem 1rem !important;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:focus-visible {
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px rgba(9, 94, 96, 0.28);
+        }
+
+        @media (max-width: 780px) {
+            .test-create-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="test-create-page">
+        <div class="test-create-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="test-create-back">
+                <i class="fa fa-arrow-left"></i> Retour à la liste
+            </a>
+            <span class="test-create-pill"><i class="fa fa-file-alt"></i> Nouveau test</span>
+        </div>
+
+        <section class="test-create-hero">
+            <h2 class="test-create-title">Créer un test</h2>
+            <p class="test-create-subtitle">Définissez la matière, la section, l'enseignant et la date du test.</p>
+        </section>
+
+        <section class="test-create-form-card">
+            {{ form_start(new_form) }}
+
+            <div class="test-create-section">
+                <h3 class="test-create-section-title">Informations du test</h3>
+                <div class="test-create-grid">
+                    {% if new_form.subject is defined %}
+                        {{ form_row(new_form.subject) }}
+                    {% endif %}
+                    {% if new_form.section is defined %}
+                        {{ form_row(new_form.section) }}
+                    {% endif %}
+                </div>
+                <div class="test-create-grid">
+                    {% if new_form.teacher is defined %}
+                        {{ form_row(new_form.teacher) }}
+                    {% endif %}
+                    {% if new_form.testDate is defined %}
+                        {{ form_row(new_form.testDate) }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="test-create-section">
+                <h3 class="test-create-section-title">Commentaire</h3>
+                {% if new_form.comment is defined %}
+                    {{ form_row(new_form.comment) }}
+                {% endif %}
+            </div>
+
+            {{ form_rest(new_form) }}
+            {{ form_end(new_form, { render_rest: false }) }}
+        </section>
+    </div>
+{% endblock %}
