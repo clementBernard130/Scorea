@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Sections;
+use App\Entity\Tests;
 use App\Entity\Users;
+use App\Repository\GradesRepository;
 use App\Repository\TestsRepository;
 use App\Repository\UsersRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,7 +18,8 @@ class ClassController extends AbstractController
 {
     public function __construct(
         private UsersRepository $usersRepository,
-        private TestsRepository $testsRepository
+        private TestsRepository $testsRepository,
+        private GradesRepository $gradesRepository
     ) {
     }
 
@@ -36,6 +40,44 @@ class ClassController extends AbstractController
             'section' => $section,
             'students' => $students,
             'tests' => $tests,
+        ]);
+    }
+
+    #[Route('/tests/{id}', name: 'app_test_show', requirements: ['id' => '\\d+'])]
+    public function showTest(Request $request, Tests $test): Response
+    {
+        $teacher = $this->getTeacherUser();
+
+        if ($test->getTeacher()?->getId() !== $teacher->getId()) {
+            throw new AccessDeniedException('Vous n\'avez pas accès à ce test.');
+        }
+
+        $section = null;
+        $allowedStudentIds = $this->usersRepository->findStudentIdsForTeacher($teacher);
+
+        $sectionId = $request->query->getInt('section');
+        if ($sectionId > 0) {
+            $section = $teacher->getSections()->findFirst(
+                static fn (int $_, Sections $teacherSection): bool => $teacherSection->getId() === $sectionId
+            );
+
+            if (!$section instanceof Sections) {
+                throw new AccessDeniedException('Vous n\'avez pas accès à cette classe.');
+            }
+
+            $allowedStudentIds = array_values(array_filter(array_map(
+                static fn (Users $student): ?int => $student->getId(),
+                $this->usersRepository->findStudentsBySection($section)
+            )));
+        }
+
+        $grades = $this->gradesRepository->findForTestAndAllowedStudents($test, $allowedStudentIds);
+
+        return $this->render('tests/show.html.twig', [
+            'user' => $teacher,
+            'test' => $test,
+            'section' => $section,
+            'grades' => $grades,
         ]);
     }
 

@@ -31,6 +31,9 @@
                                 <p class="mt-1 text-sm text-gray-600">{{ test.comment ?: 'Aucun commentaire' }}</p>
                             </div>
                             <div class="flex flex-wrap items-center gap-3">
+                                <a href="{{ path('app_test_show', { id: test.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+                                    Voir les notes
+                                </a>
                                 <a href="{{ path('teacher_portal_test_edit', { id: test.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                                     Modifier
                                 </a>
