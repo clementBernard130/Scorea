@@ -59,33 +59,39 @@
 
                             {% for skill in unit.skills %}
                                 {% set skillGrade = page.skillGrades[skill.id] ?? null %}
-                                <tr class="bg-slate-50/40">
-                                    <td class="border-b border-slate-200 px-4 py-3 pl-8 font-semibold text-slate-800">
+                                {% set isSkillFailing = skillGrade and skillGrade.average is not null and skillGrade.average < 10 %}
+                                
+                                <tr class="{{ isSkillFailing ? 'bg-red-50/80' : 'bg-slate-50/40' }}">
+                                    <td class="border-b border-slate-200 px-4 py-3 pl-8 font-semibold {{ isSkillFailing ? 'text-red-800' : 'text-slate-800' }}">
                                         {{ skill.name }}
                                     </td>
                                     <td class="border-b border-slate-200 px-4 py-3 text-center text-slate-500 border-l"></td>
-                                    <td class="border-b border-slate-200 px-4 py-3 text-center font-bold text-slate-900 border-l">
+                                    <td class="border-b border-slate-200 px-4 py-3 text-center font-bold border-l {{ isSkillFailing ? 'text-red-700' : 'text-slate-900' }}">
                                         {{ skillGrade and skillGrade.average is not null ? skillGrade.average|number_format(2, ',', '') : '' }}
                                     </td>
                                 </tr>
 
                                 {% if skillGrade and skillGrade.subjects is not empty %}
                                     {% for subjectGrade in skillGrade.subjects %}
-                                        <tr class="bg-white hover:bg-slate-50/80 transition-colors">
-                                            <td class="border-b border-slate-200 px-4 py-3 pl-12 text-slate-700">
+                                        {% set isSubjectFailing = subjectGrade.average is not null and subjectGrade.average < 10 %}
+                                        
+                                        <tr class="{{ isSubjectFailing ? 'bg-red-50/40 hover:bg-red-100/50' : 'bg-white hover:bg-slate-50/80' }} transition-colors">
+                                            <td class="border-b border-slate-200 px-4 py-3 pl-12 {{ isSubjectFailing ? 'text-red-800' : 'text-slate-700' }}">
                                                 {{ subjectGrade.name }}
                                             </td>
                                             <td class="border-b border-slate-200 px-4 py-3 border-l">
                                                 <div class="mx-auto flex max-w-xs flex-col gap-2">
                                                     {% for grade in subjectGrade.grades %}
-                                                        <a href="{{ path('grade_details', {id: grade.id}) }}" data-turbo-frame="modal_content" data-action="click->dialog#open" class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 hover:bg-sky-100 hover:border-sky-300 transition-all cursor-pointer group">
-                                                            <span class="font-medium text-slate-500 group-hover:text-sky-600">Note {{ loop.index }}</span>
-                                                            <span class="font-bold text-slate-900 group-hover:text-sky-700">{{ grade.value|number_format(2, ',', '') }}/20</span>
+                                                        {% set isGradeFailing = grade.value < 10 %}
+                                                        
+                                                        <a href="{{ path('grade_details', {id: grade.id}) }}" data-turbo-frame="modal_content" data-action="click->dialog#open" class="flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition-all cursor-pointer group {{ isGradeFailing ? 'border-red-300 bg-red-50 text-red-900 hover:bg-red-100' : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-sky-100 hover:border-sky-300' }}">
+                                                            <span class="font-medium {{ isGradeFailing ? 'text-red-500 group-hover:text-red-700' : 'text-slate-500 group-hover:text-sky-600' }}">Note {{ loop.index }}</span>
+                                                            <span class="font-bold {{ isGradeFailing ? 'text-red-700 group-hover:text-red-800' : 'text-slate-900 group-hover:text-sky-700' }}">{{ grade.value|number_format(2, ',', '') }}/20</span>
                                                         </a>
                                                     {% endfor %}
                                                 </div>
                                             </td>
-                                            <td class="border-b border-slate-200 px-4 py-3 text-center font-semibold text-slate-800 border-l">
+                                            <td class="border-b border-slate-200 px-4 py-3 text-center font-semibold border-l {{ isSubjectFailing ? 'text-red-700' : 'text-slate-800' }}">
                                                 {{ subjectGrade.average|number_format(2, ',', '') }}
                                             </td>
                                         </tr>
@@ -105,7 +111,6 @@
             </div>
         {% endif %}
 
-        <div data-dialog-target="backdrop" class="fixed inset-0 z-40 flex items-center justify-center bg-black/30 hidden"></div>
         <dialog data-dialog-target="modal" data-action="click->dialog#clickOutside" class="fixed inset-0 m-auto w-full max-w-md rounded-[24px] border border-slate-200 bg-white/95 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.15)] backdrop-blur backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm">
             <div class="mb-2 flex justify-end">
                 <button data-action="click->dialog#close" class="text-slate-400 transition-colors hover:text-slate-600">
