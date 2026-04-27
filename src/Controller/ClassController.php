@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Sections;
+use App\Entity\Grades;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\GradesRepository;
@@ -73,11 +74,25 @@ class ClassController extends AbstractController
 
         $grades = $this->gradesRepository->findForTestAndAllowedStudents($test, $allowedStudentIds);
 
+        $gradeValues = array_values(array_filter(array_map(
+            static fn (Grades $grade): ?float => $grade->getGrade(),
+            $grades
+        ), static fn (?float $value): bool => $value !== null));
+
+        $gradeCount = count($gradeValues);
+        $averageGrade = $gradeCount > 0 ? array_sum($gradeValues) / $gradeCount : null;
+        $minGrade = $gradeCount > 0 ? min($gradeValues) : null;
+        $maxGrade = $gradeCount > 0 ? max($gradeValues) : null;
+
         return $this->render('tests/show.html.twig', [
             'user' => $teacher,
             'test' => $test,
             'section' => $section,
             'grades' => $grades,
+            'gradeCount' => $gradeCount,
+            'averageGrade' => $averageGrade,
+            'minGrade' => $minGrade,
+            'maxGrade' => $maxGrade,
         ]);
     }
 
