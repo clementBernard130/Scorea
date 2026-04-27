@@ -256,7 +256,7 @@
                 -
                 {{ entity.instance.testDate ? entity.instance.testDate|date('d/m/Y') : 'Date inconnue' }}
             </h2>
-            <p class="test-detail-subtitle">Vue détaillée du test et des notes associées.</p>
+            <p class="test-detail-subtitle">Vue détaillée du test et des notes.</p>
         </section>
 
         <div class="test-detail-grid">
@@ -305,14 +305,12 @@
             </section>
         </div>
 
+        {% if entity.instance.comment is not empty %}
         <section class="test-detail-card">
             <h3>Commentaire</h3>
-            {% if entity.instance.comment is not empty %}
-                <p class="test-comment">{{ entity.instance.comment }}</p>
-            {% else %}
-                <p class="test-muted">Aucun commentaire.</p>
-            {% endif %}
+            <p class="test-comment">{{ entity.instance.comment }}</p>
         </section>
+        {% endif %}
 
         <section class="test-detail-card">
             <h3>Notes attribuées</h3>
