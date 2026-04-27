@@ -18,11 +18,7 @@ class GradesRepository extends ServiceEntityRepository
         parent::__construct($registry, Grades::class);
     }
 
-    /**
-     * @param int[] $allowedStudentIds
-     *
-     * @return Grades[]
-     */
+    
     public function findForTestAndAllowedStudents(Tests $test, array $allowedStudentIds): array
     {
         if ($allowedStudentIds === []) {
@@ -78,29 +74,18 @@ class GradesRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
+  
+    public function findStudentIdsWithGradesInSubject(Subjects $subject): array
+    {
+        $results = $this->createQueryBuilder('g')
+            ->select('IDENTITY(g.student) AS student_id')
+            ->join('g.test', 't')
+            ->where('t.subject = :subject')
+            ->setParameter('subject', $subject)
+            ->distinct()
+            ->getQuery()
+            ->getScalarResult();
 
-    //    /**
-    //     * @return Grades[] Returns an array of Grades objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Grades
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return array_column($results, 'student_id');
+    }
 }

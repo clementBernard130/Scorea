@@ -430,18 +430,21 @@ class AppFixtures extends Fixture
         $tests = [
             [
                 'subject' => $pythonSubject,
+                'section' => $manager->getRepository(Sections::class)->findOneBy(['name' => 'DSNS1-2026']),
                 'teacher' => $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher1']),
                 'comment' => 'Test de Python',
                 'testDate' => new DateTime('2026-01-15')
             ],
             [
                 'subject' => $frameworkSubject,
+                'section' => $manager->getRepository(Sections::class)->findOneBy(['name' => 'DSNS1-2026']),
                 'teacher' => $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher1']),
                 'comment' => 'Test de Framework PHP',
                 'testDate' => new DateTime('2026-02-20')
             ],
             [
                 'subject' => $bddSubject,
+                'section' => $manager->getRepository(Sections::class)->findOneBy(['name' => 'DSNS1-2026']),
                 'teacher' => $manager->getRepository(Users::class)->findOneBy(['username' => 'teacher2']),
                 'comment' => 'Test de Base de données',
                 'testDate' => new DateTime('2026-03-10')
@@ -451,6 +454,7 @@ class AppFixtures extends Fixture
         foreach ($tests as $testData) {
             $test = new Tests();
             $test->setSubject($testData['subject']);
+            $test->setSection($testData['section']);
             $test->setTeacher($testData['teacher']);
             $test->setComment($testData['comment']);
             $test->setTestDate($testData['testDate']);

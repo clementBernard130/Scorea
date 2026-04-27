@@ -46,6 +46,7 @@ class TeacherTestsCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             AssociationField::new('subject', 'Matière')
+                ->setCrudController(SubjectCrudController::class)
                 ->setFormTypeOption('choice_label', 'name'),
             AssociationField::new('teacher', 'Enseignant')
                 ->hideOnForm()

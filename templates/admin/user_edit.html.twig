@@ -1,0 +1,430 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --surface: #fff;
+            --text: #2b2f3a;
+            --muted: #6b7385;
+            --border: #e8ecf5;
+            --back-btn-bg: #f0f3fb;
+            --back-btn-bg-hover: #e9eefb;
+        }
+
+        .user-edit-page.theme-admin {
+            --primary: #c53929;
+            --secondary: #7f1d16;
+            --surface: #fff6f5;
+            --text: #351d1a;
+            --muted: #7a5c57;
+            --border: #f1d6d1;
+            --back-btn-bg: #fde9e6;
+            --back-btn-bg-hover: #fbded9;
+        }
+
+        .user-edit-page.theme-teacher {
+            --primary: #c87b18;
+            --secondary: #8a4f00;
+            --surface: #fffbf5;
+            --text: #3b2914;
+            --muted: #7d6548;
+            --border: #f1e3cd;
+            --back-btn-bg: #fff1dc;
+            --back-btn-bg-hover: #ffe8c8;
+        }
+
+        .user-edit-page.theme-student {
+            --primary: #1f6feb;
+            --secondary: #12439b;
+            --surface: #f8fbff;
+            --text: #1c2e4a;
+            --muted: #5f7293;
+            --border: #d9e6fb;
+            --back-btn-bg: #eaf2ff;
+            --back-btn-bg-hover: #dce9ff;
+        }
+
+        .user-edit-page.theme-assistant {
+            --primary: #7b4db3;
+            --secondary: #512f79;
+            --surface: #fbf8ff;
+            --text: #2f2540;
+            --muted: #6a5c82;
+            --border: #e6dbf6;
+            --back-btn-bg: #f0eaff;
+            --back-btn-bg-hover: #e6dbff;
+        }
+
+        .user-edit-page {
+            max-width: 980px;
+            margin: auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .user-edit-toolbar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .user-edit-toolbar .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .btn-scorea-back {
+            color: var(--text);
+            background: var(--back-btn-bg);
+            border: 1px solid var(--border);
+        }
+
+        .btn-scorea-back:hover,
+        .btn-scorea-back:focus,
+        .btn-scorea-back:active,
+        .btn-scorea-back:focus-visible {
+            color: var(--text) !important;
+            background-color: var(--back-btn-bg-hover) !important;
+            border-color: var(--border) !important;
+        }
+
+        .user-edit-hero {
+            position: relative;
+            padding: 1.5rem;
+            border-radius: 16px;
+            color: #fff;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .user-edit-hero::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            top: -60px;
+            right: -60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+
+        .user-edit-hero-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            background: #fff;
+            color: var(--primary);
+        }
+
+        .user-name {
+            margin: 0;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .user-username {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .user-edit-form-card {
+            padding: 1.1rem;
+            border-radius: 16px;
+            background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 86%, #ffffff), var(--surface));
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 26px color-mix(in srgb, var(--primary) 10%, rgba(15, 23, 42, 0.08));
+        }
+
+        .user-edit-form-section {
+            position: relative;
+            border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
+            border-radius: 14px;
+            background: color-mix(in srgb, var(--surface) 92%, #ffffff);
+            padding: 0.95rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .user-edit-form-section + .user-edit-form-section {
+            margin-top: 0.9rem;
+        }
+
+        .user-edit-form-section:hover {
+            border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+            box-shadow: 0 6px 16px color-mix(in srgb, var(--primary) 11%, rgba(15, 23, 42, 0.04));
+        }
+
+        .user-edit-form-title {
+            margin: 0 0 0.75rem;
+            font-weight: 700;
+            font-size: 0.96rem;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text);
+        }
+
+        .user-edit-form-title::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+        }
+
+        .user-edit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+
+        .user-edit-grid .form-group {
+            margin: 0;
+        }
+
+        .user-edit-form-card .form-group {
+            margin-bottom: 0.65rem;
+        }
+
+        .user-edit-form-card .form-label,
+        .user-edit-form-card label {
+            color: color-mix(in srgb, var(--text) 88%, #1f2937);
+            font-weight: 650;
+            letter-spacing: 0.01em;
+            margin-bottom: 0.35rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+            background: #ffffff;
+            color: var(--text);
+            min-height: 42px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        textarea.form-control {
+            min-height: 96px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--primary) 22%, transparent);
+        }
+
+        .user-edit-form-card .form-text,
+        .user-edit-form-card .ea-form-help,
+        .user-edit-form-card .invalid-feedback {
+            font-size: 0.82rem;
+            margin-top: 0.25rem;
+        }
+
+        .user-edit-form-card .form-check {
+            margin-bottom: 0.35rem;
+            padding: 0.42rem 0.6rem 0.42rem 2rem;
+            border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .user-edit-form-card .form-check-input {
+            margin-top: 0.15rem;
+            border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+        }
+
+        .user-edit-form-card .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .user-edit-form-card .form-check-label {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .user-edit-form-section.roles-section {
+            background: linear-gradient(
+                165deg,
+                color-mix(in srgb, var(--surface) 86%, #ffffff),
+                color-mix(in srgb, var(--primary) 6%, var(--surface))
+            );
+        }
+
+        .user-edit-form-section.roles-section .user-edit-form-title {
+            margin-bottom: 0.9rem;
+        }
+
+        .user-edit-form-section.roles-section .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-radius: 999px;
+            padding: 0.5rem 0.9rem;
+            margin-bottom: 0.55rem;
+            border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+            background: color-mix(in srgb, #ffffff 78%, var(--surface));
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .user-edit-form-section.roles-section .form-check:hover {
+            transform: translateY(-1px);
+            border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+            box-shadow: 0 8px 16px color-mix(in srgb, var(--primary) 12%, transparent);
+        }
+
+        .user-edit-form-section.roles-section .form-check-input {
+            width: 1.05rem;
+            height: 1.05rem;
+            margin-top: 0;
+            border-width: 2px;
+        }
+
+        .user-edit-form-section.roles-section .form-check-label {
+            margin: 0;
+            font-weight: 700;
+            font-size: 0.88rem;
+            letter-spacing: 0.01em;
+            text-transform: uppercase;
+            color: color-mix(in srgb, var(--text) 90%, #111827);
+        }
+
+        .user-edit-form-section.roles-section .form-check-input:checked + .form-check-label {
+            color: color-mix(in srgb, var(--primary) 74%, #111827);
+        }
+
+        .user-edit-form-card .ea-form-actions,
+        .user-edit-form-card .form-actions {
+            border-top: 1px dashed color-mix(in srgb, var(--primary) 14%, var(--border));
+            margin-top: 0.9rem;
+            padding-top: 0.9rem;
+        }
+
+        .btn-primary {
+            border: none !important;
+            color: #fff !important;
+            background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+            border-radius: 10px !important;
+            padding: 0.55rem 1rem !important;
+            box-shadow: 0 8px 16px color-mix(in srgb, var(--primary) 24%, transparent);
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:focus-visible {
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px color-mix(in srgb, var(--primary) 28%, transparent);
+        }
+
+        @media (max-width: 640px) {
+            .user-edit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-avatar {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}Modifier un utilisateur{% endblock %}
+
+{% block main %}
+    {% set roles = entity.instance.roles|default([]) %}
+    {% set themeClass = 'theme-student' %}
+    {% if 'ROLE_ADMIN' in roles %}
+        {% set themeClass = 'theme-admin' %}
+    {% elseif 'ROLE_TEACHER' in roles %}
+        {% set themeClass = 'theme-teacher' %}
+    {% elseif 'ROLE_ASSISTANT' in roles %}
+        {% set themeClass = 'theme-assistant' %}
+    {% endif %}
+
+    {% set firstName = entity.instance.firstName|default('') %}
+    {% set lastName = entity.instance.lastName|default('') %}
+    {% set initials = (firstName|slice(0, 1) ~ lastName|slice(0, 1))|upper %}
+
+    <div class="user-edit-page {{ themeClass }}">
+        <div class="user-edit-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="btn btn-scorea-back">
+                <i class="fa fa-arrow-left"></i> Retour a la liste
+            </a>
+        </div>
+
+        <section class="user-edit-hero">
+            <div class="user-edit-hero-content">
+                <div class="user-avatar">{{ initials ?: 'U' }}</div>
+                <div>
+                    <h2 class="user-name">{{ lastName|upper }} {{ firstName }}</h2>
+                    <p class="user-username">{{ entity.instance.username }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="user-edit-form-card">
+            {{ form_start(edit_form) }}
+
+            <div class="user-edit-form-section">
+                <h3 class="user-edit-form-title">Identite</h3>
+                <div class="user-edit-grid">
+                    {% if edit_form.last_name is defined %}
+                        {{ form_row(edit_form.last_name) }}
+                    {% endif %}
+                    {% if edit_form.first_name is defined %}
+                        {{ form_row(edit_form.first_name) }}
+                    {% endif %}
+                    {% if edit_form.email is defined %}
+                        {{ form_row(edit_form.email) }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="user-edit-form-section">
+                <h3 class="user-edit-form-title">Securite</h3>
+                {% if edit_form.password is defined %}
+                    {{ form_row(edit_form.password) }}
+                {% endif %}
+            </div>
+
+            <div class="user-edit-form-section">
+                <h3 class="user-edit-form-title">Sections</h3>
+                {% if edit_form.sections is defined %}
+                    {{ form_row(edit_form.sections) }}
+                {% endif %}
+            </div>
+
+            {{ form_rest(edit_form) }}
+            {{ form_end(edit_form, { render_rest: false }) }}
+        </section>
+    </div>
+
+{% endblock %}
