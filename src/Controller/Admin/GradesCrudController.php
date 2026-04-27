@@ -26,9 +26,9 @@ class GradesCrudController extends AbstractCrudController
         return Grades::class;
     }
 
-    public function persistEntity(\Doctrine\ORM\EntityManagerInterface $entityManager, mixed $entityInstance): void
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if ($entityInstance instanceof Grades) {
+        if ($entityInstance instanceof Grades && !$entityInstance->getCreatedAt()) {
             $now = new \DateTimeImmutable();
             $entityInstance->setCreatedAt($now);
             $entityInstance->setUpdatedAt($now);
@@ -53,17 +53,6 @@ class GradesCrudController extends AbstractCrudController
             AssociationField::new('gradeType', 'Type de note')
                 ->setFormTypeOption('choice_label', fn(GradeTypeNames $gradeType) => $this->formatGradeTypeLabel($gradeType)),
         ];
-    }
-
-    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
-    {
-        if ($entityInstance instanceof Grades && !$entityInstance->getCreatedAt()) {
-            $now = new \DateTimeImmutable();
-            $entityInstance->setCreatedAt($now);
-            $entityInstance->setUpdatedAt($now);
-        }
-
-        parent::persistEntity($entityManager, $entityInstance);
     }
 
     public function formatUserLabel(Users $user): string
