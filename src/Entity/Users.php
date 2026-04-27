@@ -40,6 +40,9 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $last_name = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
@@ -79,8 +82,14 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ApprenticeMentors::class, mappedBy: 'mentor')]
     private Collection $mentor;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $email = null;
+    /**
+     * @var Collection<int, Subjects>
+     */
+    #[ORM\ManyToMany(targetEntity: Subjects::class, inversedBy: 'teachers')]
+    #[ORM\JoinTable(name: 'users_subjects')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'subject_id', referencedColumnName: 'id')]
+    private Collection $subjects;
 
     /**
      * @var Collection<int, Alerts>
@@ -96,6 +105,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $this->apprentice = new ArrayCollection();
         $this->mentor = new ArrayCollection();
         $this->alerts = new ArrayCollection();
+        $this->subjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,6 +213,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->created_at;
@@ -259,6 +281,33 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeSection(Sections $section): static
     {
         $this->sections->removeElement($section);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subjects>
+     */
+    public function getSubjects(): Collection
+    {
+        return $this->subjects;
+    }
+
+    public function addSubject(Subjects $subject): static
+    {
+        if (!$this->subjects->contains($subject)) {
+            $this->subjects->add($subject);
+            $subject->addTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubject(Subjects $subject): static
+    {
+        if ($this->subjects->removeElement($subject)) {
+            $subject->removeTeacher($this);
+        }
 
         return $this;
     }
@@ -423,18 +472,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(?string $email): static
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Alerts>
      */
@@ -456,7 +493,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeAlert(Alerts $alert): static
     {
         if ($this->alerts->removeElement($alert)) {
-            // set the owning side to null (unless already changed)
             if ($alert->getUsers() === $this) {
                 $alert->setUsers(null);
             }
@@ -464,6 +500,5 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
 }
 

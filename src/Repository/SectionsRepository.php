@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Sections;
+use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +15,22 @@ class SectionsRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Sections::class);
+    }
+
+    /**
+     * @return Sections[]
+     */
+    public function findForTeacher(Users $teacher): array
+    {
+        return $this->createQueryBuilder('section')
+            ->distinct()
+            ->innerJoin('section.users', 'teacher')
+            ->andWhere('teacher = :teacher')
+            ->setParameter('teacher', $teacher)
+            ->orderBy('section.start_date', 'DESC')
+            ->addOrderBy('section.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**
