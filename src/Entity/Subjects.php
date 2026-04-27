@@ -184,6 +184,7 @@ class Subjects
         return $this;
     }
 
+
     /**
      * @return Collection<int, Alerts>
      */
@@ -212,5 +213,9 @@ class Subjects
         }
 
         return $this;
+      
+    public function __toString(): string
+    {
+        return $this->name ?? sprintf('Matiere #%d', $this->id ?? 0);
     }
 }
