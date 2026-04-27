@@ -7,6 +7,7 @@ use App\Entity\GradeTypeNames;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use App\Service\AlertService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -16,12 +17,28 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 class GradesCrudController extends AbstractCrudController
 {
     public function __construct(
-        private UsersRepository $usersRepository
+        private UsersRepository $usersRepository,
+        private AlertService $alertService,
     ) {}
 
     public static function getEntityFqcn(): string
     {
         return Grades::class;
+    }
+
+    public function persistEntity(\Doctrine\ORM\EntityManagerInterface $entityManager, mixed $entityInstance): void
+    {
+        if ($entityInstance instanceof Grades) {
+            $now = new \DateTimeImmutable();
+            $entityInstance->setCreatedAt($now);
+            $entityInstance->setUpdatedAt($now);
+        }
+
+        parent::persistEntity($entityManager, $entityInstance);
+
+        if ($entityInstance instanceof Grades) {
+            $this->alertService->handleGradeCreated($entityInstance);
+        }
     }
 
     public function configureFields(string $pageName): iterable

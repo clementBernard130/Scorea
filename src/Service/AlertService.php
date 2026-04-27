@@ -8,6 +8,7 @@ use App\Entity\Sections;
 use App\Entity\Subjects;
 use App\Entity\Users;
 use App\Repository\AlertsRepository;
+use App\Repository\GradesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class AlertService
@@ -15,38 +16,61 @@ class AlertService
     public function __construct(
         private EntityManagerInterface $em,
         private AlertsRepository $alertsRepository,
+        private GradesRepository $gradesRepository,
     ) {}
 
     /**
-     * À appeler lors de la création ou modification d'une note.
-     * Crée une alerte 'lower_average' si la note est inférieure à 10.
+     * À appeler lors de la création d'une note dans GradesCrudController::persistEntity().
+     *
+     * - Supprime l'alerte 'missing_grade' pour l'élève noté (il a maintenant une note).
+     * - Crée une alerte 'lower_average' si la note est inférieure à 10.
+     * - Crée des alertes 'missing_grade' pour les autres élèves de la même section
+     *   uniquement si au moins 1 élève a désormais une note dans la matière.
      */
     public function handleGradeCreated(Grades $grade): void
     {
+        $subject = $grade->getTest()->getSubject();
+        $student = $grade->getStudent();
+
+        $this->alertsRepository->removeByTypeSubjectAndStudent('missing_grade', $subject, $student);
+
         if ($grade->getGrade() < 10) {
             $this->createLowerAverageAlert($grade);
         }
+
+        foreach ($student->getSections() as $section) {
+            $this->createMissingGradeAlertsForSection($subject, $section);
+        }
+
+        $this->em->flush();
     }
 
     /**
-     * À appeler pour vérifier les notes manquantes dans une matière pour une classe.
-     * Compare tous les élèves de la section avec ceux ayant au moins une note dans la matière.
+     * Peut être appelé manuellement (action admin, commande) pour vérifier
+     * les notes manquantes dans une matière pour une section donnée.
      */
     public function handleMissingGrades(Subjects $subject, Sections $section): void
     {
+        $this->createMissingGradeAlertsForSection($subject, $section);
+        $this->em->flush();
+    }
+
+    private function createMissingGradeAlertsForSection(Subjects $subject, Sections $section): void
+    {
+        // Requête DQL directe pour éviter le cache des collections Doctrine
+        $studentIdsWithGrades = $this->gradesRepository->findStudentIdsWithGradesInSubject($subject);
+
+        // Condition : aucune alerte si personne n'a encore de note dans la matière
+        if (empty($studentIdsWithGrades)) {
+            return;
+        }
+
         $students = $section->getUsers()->filter(
             fn(Users $u) => in_array('ROLE_STUDENT', $u->getRoles(), true)
         );
 
-        $studentsWithGrades = [];
-        foreach ($subject->getTests() as $test) {
-            foreach ($test->getGrades() as $grade) {
-                $studentsWithGrades[$grade->getStudent()->getId()] = true;
-            }
-        }
-
         foreach ($students as $student) {
-            if (isset($studentsWithGrades[$student->getId()])) {
+            if (in_array($student->getId(), $studentIdsWithGrades, true)) {
                 continue;
             }
 
@@ -62,8 +86,6 @@ class AlertService
                 $student
             );
         }
-
-        $this->em->flush();
     }
 
     private function createLowerAverageAlert(Grades $grade): void
@@ -82,8 +104,6 @@ class AlertService
             $subject,
             $student
         );
-
-        $this->em->flush();
     }
 
     private function createAlert(string $type, string $name, string $description, Subjects $subject, Users $student): void

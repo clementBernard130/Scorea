@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Alerts;
+use App\Entity\Subjects;
+use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +18,29 @@ class AlertsRepository extends ServiceEntityRepository
         parent::__construct($registry, Alerts::class);
     }
 
-    //    /**
-    //     * @return Alerts[] Returns an array of Alerts objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function existsByTypeSubjectAndStudent(string $type, Subjects $subject, Users $student): bool
+    {
+        $alerts = $this->findBy(['subject' => $subject, 'users' => $student]);
 
-    //    public function findOneBySomeField($value): ?Alerts
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        foreach ($alerts as $alert) {
+            if (in_array($type, $alert->getType() ?? [], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function removeByTypeSubjectAndStudent(string $type, Subjects $subject, Users $student): void
+    {
+        $alerts = $this->findBy(['subject' => $subject, 'users' => $student]);
+
+        foreach ($alerts as $alert) {
+            if (in_array($type, $alert->getType() ?? [], true)) {
+                $this->getEntityManager()->remove($alert);
+            }
+        }
+
+        $this->getEntityManager()->flush();
+    }
 }
