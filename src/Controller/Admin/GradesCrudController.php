@@ -7,6 +7,7 @@ use App\Entity\GradeTypeNames;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use App\Service\AlertService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -20,12 +21,28 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 class GradesCrudController extends AbstractCrudController
 {
     public function __construct(
-        private UsersRepository $usersRepository
+        private UsersRepository $usersRepository,
+        private AlertService $alertService,
     ) {}
 
     public static function getEntityFqcn(): string
     {
         return Grades::class;
+    }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof Grades && !$entityInstance->getCreatedAt()) {
+            $now = new \DateTimeImmutable();
+            $entityInstance->setCreatedAt($now);
+            $entityInstance->setUpdatedAt($now);
+        }
+
+        parent::persistEntity($entityManager, $entityInstance);
+
+        if ($entityInstance instanceof Grades) {
+            $this->alertService->handleGradeCreated($entityInstance);
+        }
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -86,17 +103,6 @@ class GradesCrudController extends AbstractCrudController
             AssociationField::new('gradeType', 'Type de note')
                 ->setFormTypeOption('choice_label', fn(GradeTypeNames $gradeType) => $this->formatGradeTypeLabel($gradeType)),
         ];
-    }
-
-    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
-    {
-        if ($entityInstance instanceof Grades && !$entityInstance->getCreatedAt()) {
-            $now = new \DateTimeImmutable();
-            $entityInstance->setCreatedAt($now);
-            $entityInstance->setUpdatedAt($now);
-        }
-
-        parent::persistEntity($entityManager, $entityInstance);
     }
 
     public function formatUserLabel(Users $user): string

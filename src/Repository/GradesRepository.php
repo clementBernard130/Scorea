@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Grades;
+use App\Entity\Subjects;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,23 @@ class GradesRepository extends ServiceEntityRepository
         parent::__construct($registry, Grades::class);
     }
 
-    //    /**
-    //     * @return Grades[] Returns an array of Grades objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Retourne les IDs des élèves ayant au moins une note dans la matière.
+     * Utilise une requête DQL directe pour éviter les problèmes de cache Doctrine.
+     *
+     * @return int[]
+     */
+    public function findStudentIdsWithGradesInSubject(Subjects $subject): array
+    {
+        $results = $this->createQueryBuilder('g')
+            ->select('IDENTITY(g.student) AS student_id')
+            ->join('g.test', 't')
+            ->where('t.subject = :subject')
+            ->setParameter('subject', $subject)
+            ->distinct()
+            ->getQuery()
+            ->getScalarResult();
 
-    //    public function findOneBySomeField($value): ?Grades
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return array_column($results, 'student_id');
+    }
 }

@@ -26,6 +26,12 @@ class Alerts
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\ManyToOne(inversedBy: 'alerts')]
+    private ?Subjects $subject = null;
+
+    #[ORM\ManyToOne(inversedBy: 'alerts')]
+    private ?Users $users = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +81,30 @@ class Alerts
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getSubject(): ?Subjects
+    {
+        return $this->subject;
+    }
+
+    public function setSubject(?Subjects $subject): static
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    public function getUsers(): ?Users
+    {
+        return $this->users;
+    }
+
+    public function setUsers(?Users $users): static
+    {
+        $this->users = $users;
 
         return $this;
     }
