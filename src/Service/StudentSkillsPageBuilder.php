@@ -38,13 +38,16 @@ final class StudentSkillsPageBuilder
             }
         }
 
+        $units = $this->skillsUnitRepository->findByTrainingIds(array_values($trainingIds));
+
         return new StudentSkillsPage(
-            units: $this->skillsUnitRepository->findByTrainingIds(array_values($trainingIds)),
+            units: $units,
             skillGrades: $this->studentSkillGradeResolver->resolve($student),
             sectionNames: array_values($sectionNames),
             trainingNames: array_values($trainingNames),
             globalAverage: $this->studentSkillGradeResolver->resolveGlobalAverage($student),
             latestEvaluatedSubject: $this->studentSkillGradeResolver->resolveLatestEvaluatedSubject($student),
+            unitAverages: $this->studentSkillGradeResolver->resolveUnitAverages($student, $units),
         );
     }
 }
