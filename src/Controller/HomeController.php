@@ -30,7 +30,8 @@ class HomeController extends AbstractController
                 'page' => $studentSkillsPageBuilder->build($user),
                 'user' => $user,
             ]);
-
+        }
+        
         $teacherSections = [];
         $teacherTestsCount = 0;
 
