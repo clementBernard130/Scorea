@@ -41,6 +41,7 @@ class ClassController extends AbstractController
         )));
 
         $canAddGradeByTestId = [];
+        $ungradedStudentCountByTestId = [];
         foreach ($tests as $test) {
             $testId = $test->getId();
             if ($testId === null) {
@@ -50,6 +51,7 @@ class ClassController extends AbstractController
             $gradedStudentIds = $this->gradesRepository->findStudentIdsForTest($test);
             $remainingStudentIds = array_diff($sectionStudentIds, $gradedStudentIds);
             $canAddGradeByTestId[$testId] = count($remainingStudentIds) > 0;
+            $ungradedStudentCountByTestId[$testId] = count($remainingStudentIds);
         }
 
         return $this->render('class/show.html.twig', [
@@ -58,6 +60,7 @@ class ClassController extends AbstractController
             'students' => $students,
             'tests' => $tests,
             'canAddGradeByTestId' => $canAddGradeByTestId,
+            'ungradedStudentCountByTestId' => $ungradedStudentCountByTestId,
         ]);
     }
 
