@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des evaluations{% endblock %}
+
+{% block body %}
+<div class="min-h-screen overflow-hidden bg-gradient-to-b from-sky-50 via-white to-slate-100 px-4 py-10 relative">
+    <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.16),transparent_30%)]"></div>
+
+    <div class="mx-auto max-w-6xl relative z-10" data-controller="dialog">
+        <header class="mb-6 flex flex-col gap-4 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur md:flex-row md:items-center md:justify-between md:p-8">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Espace apprenti</p>
+                <h1 class="mt-1 text-3xl font-black tracking-tight text-slate-900 md:text-4xl">Historique des evaluations</h1>
+            </div>
+            <a href="{{ path('app_home') }}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                Retour a mon espace
+            </a>
+        </header>
+
+        <section class="mb-6 grid gap-4 sm:grid-cols-2">
+            <article class="rounded-[24px] border border-white/70 bg-white/90 px-5 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+                <p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Evaluations affichees</p>
+                <p class="mt-2 text-2xl font-black text-slate-900">{{ stats.count }}</p>
+            </article>
+            <article class="rounded-[24px] border border-white/70 bg-white/90 px-5 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+                <p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Moyenne globale</p>
+                <p class="mt-2 text-2xl font-black text-slate-900">
+                    {{ stats.globalAverage is not null ? stats.globalAverage|number_format(2, ',', '') ~ '/20' : '-' }}
+                </p>
+            </article>
+        </section>
+
+        <section class="mb-6 rounded-[24px] border border-white/70 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+            <p class="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Filtrer</p>
+            <form method="get" class="flex flex-wrap items-end gap-3">
+                <div class="flex-1 min-w-48">
+                    <label for="subject-select" class="mb-1 block text-sm font-semibold text-slate-700">Matiere</label>
+                    <div class="relative">
+                        <select id="subject-select" name="subject" class="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-8 text-sm font-medium text-slate-800 shadow-sm transition focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200">
+                            <option value="">Toutes les matieres</option>
+                            {% for subject in subjectOptions %}
+                                <option value="{{ subject.id }}" {{ filters.subject == subject.id ? 'selected' : '' }}>{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-slate-400">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </span>
+                    </div>
+                </div>
+
+                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 active:scale-95">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
+                    Filtrer
+                </button>
+            </form>
+        </section>
+
+        {% if cards is empty %}
+            <section class="rounded-[28px] border border-dashed border-sky-200 bg-white/90 px-6 py-12 text-center text-slate-600 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+                Aucune evaluation trouvee pour ces filtres.
+            </section>
+        {% else %}
+            <section class="relative">
+                <div class="absolute left-5 top-0 bottom-0 w-px bg-slate-300/70"></div>
+
+                <div class="space-y-4">
+                    {% for card in cards %}
+                        <article class="relative ml-10 rounded-[24px] border border-white/70 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+                            <span class="absolute -left-[2.875rem] top-6 inline-flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-sky-500 shadow-sm"></span>
+
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{{ card.dateLabel }}</p>
+                                    <h2 class="mt-1 text-xl font-bold text-slate-900">{{ card.subjectName }}</h2>
+
+                                    <div class="mt-2 flex flex-wrap gap-2">
+                                        <span class="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-800">
+                                            {{ card.subjectName }}
+                                        </span>
+                                        {% for skillName in card.skills %}
+                                            <span class="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">
+                                                {{ skillName }}
+                                            </span>
+                                        {% endfor %}
+                                        {% if card.gradeTypeLabel %}
+                                            <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                                                {{ card.gradeTypeLabel }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="min-w-[170px] rounded-xl border border-slate-200 bg-slate-50/80 p-3">
+                                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Resultat</p>
+                                    <p class="mt-1 text-2xl font-black text-slate-900">{{ card.formattedGrade }}</p>
+                                    <div class="mt-2 flex items-center gap-2 text-xs font-semibold">
+                                        <span class="inline-flex items-center gap-1 rounded-full border px-2 py-1 {{ card.trendClass }}">
+                                            <span>{{ card.trendArrow }}</span>
+                                            <span>{{ card.trendLabel }}</span>
+                                        </span>
+                                        {% if card.trendDelta is not null and card.trendLabel != 'Stable' %}
+                                            <span class="text-slate-600">{{ card.trendDelta > 0 ? '+' : '' }}{{ card.trendDelta|number_format(2, ',', '') }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="mt-3 rounded-lg border border-slate-200 bg-slate-50/80 px-3 py-2 text-sm text-slate-700">
+                                {{ card.comment }}
+                            </p>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
