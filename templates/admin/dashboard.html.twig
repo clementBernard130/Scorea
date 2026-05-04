@@ -94,20 +94,12 @@
         {% if recentAlerts is not empty %}
             <ul class="alerts-list">
                 {% for alert in recentAlerts %}
-                    {% set typeClass = alert.type == 'warning' ? 'is-warning' : (alert.type == 'error' ? 'is-error' : 'is-info') %}
-                    <li class="alert-item {{ typeClass }}">
+                    <li class="alert-item">
                         <div class="alert-icon">
-                            {% if alert.type == 'warning' %}
-                                <i class="fas fa-exclamation-triangle"></i>
-                            {% elseif alert.type == 'error' %}
-                                <i class="fas fa-times-circle"></i>
-                            {% else %}
-                                <i class="fas fa-info-circle"></i>
-                            {% endif %}
+                            <i class="fas fa-info-circle"></i>
                         </div>
                         <div class="alert-content">
-                            <p class="alert-message">{{ alert.message }}</p>
-                            <p class="alert-date">{{ alert.createdAt|date('d M Y H:i') }}</p>
+                            <p class="alert-message">{{ alert.description }}</p>
                         </div>
                     </li>
                 {% endfor %}

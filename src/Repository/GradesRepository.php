@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Grades;
 use App\Entity\Tests;
 use App\Entity\Users;
+use App\Entity\Subjects;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
