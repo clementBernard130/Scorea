@@ -1,0 +1,16 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Erreur{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1">{{ status_code }}</h1>
+            <h2 class="mb-4">{{ status_text }}</h2>
+            <p class="lead text-muted mb-4">Une erreur s'est produite lors du traitement de votre demande.</p>
+            <a href="{{ path('home') }}" class="btn btn-primary btn-lg">Retour à l'accueil</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
