@@ -84,6 +84,7 @@ class TeacherPortalController extends AbstractController
             ->add('subject', EntityType::class, [
                 'class' => \App\Entity\Subjects::class,
                 'choice_label' => 'name',
+                'choices' => $teacher->getSubjects()->toArray(),
                 'label' => 'Matière',
             ])
             ->add('testDate', DateType::class, [
@@ -98,6 +99,10 @@ class TeacherPortalController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($section !== null) {
+                $test->setSection($section);
+            }
+            
             $this->entityManager->persist($test);
             $this->entityManager->flush();
 
@@ -131,6 +136,7 @@ class TeacherPortalController extends AbstractController
             ->add('subject', EntityType::class, [
                 'class' => \App\Entity\Subjects::class,
                 'choice_label' => 'name',
+                'choices' => $teacher->getSubjects()->toArray(),
                 'label' => 'Matière',
             ])
             ->add('testDate', DateType::class, [
@@ -145,6 +151,10 @@ class TeacherPortalController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($section !== null) {
+                $test->setSection($section);
+            }
+            
             $this->entityManager->flush();
 
             if ($section !== null) {
@@ -177,78 +187,73 @@ class TeacherPortalController extends AbstractController
             : $this->getTeacherStudents($teacher);
         $availableStudents = $this->filterStudentsNotYetGradedForTest($test, $students);
 
-        $grade = new Grades();
-        $grade->setTest($test);
-
-        $form = $this->createFormBuilder($grade)
-            ->add('student', EntityType::class, [
-                'class' => Users::class,
-                'choices' => $availableStudents,
-                'choice_label' => static function (Users $user): string {
-                    $fullName = trim(sprintf('%s %s', $user->getFirstName(), $user->getLastName()));
-
-                    return $fullName !== '' ? $fullName : (string) $user->getUsername();
-                },
-                'label' => 'Élève',
-            ])
-            ->add('gradeType', EntityType::class, [
-                'class' => \App\Entity\GradeTypeNames::class,
-                'choice_label' => 'name',
-                'choices' => $this->gradeTypeNamesRepository->findBy([], ['name' => 'ASC']),
-                'label' => 'Type de note',
-            ])
-            ->add('grade', NumberType::class, [
-                'label' => 'Note',
-                'scale' => 2,
-                'attr' => [
-                    'min' => 0,
-                    'max' => 20,
-                    'step' => '0.01',
-                ],
-                'constraints' => [
-                    new Range([
-                        'min' => 0,
-                        'max' => 20,
-                        'notInRangeMessage' => 'La note doit être comprise entre 0 et 20.',
-                    ]),
-                ],
-            ])
-            ->add('comment', TextareaType::class, [
-                'required' => false,
-                'label' => 'Commentaire',
-            ])
-            ->getForm();
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $selectedStudent = $grade->getStudent();
-            if ($selectedStudent instanceof Users && $this->gradesRepository->studentAlreadyGradedForTest($test, $selectedStudent)) {
-                $form->get('student')->addError(new FormError('Cet étudiant a déjà une note pour ce test.'));
-            }
-        }
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        // Handle POST request for bulk grade submission
+        if ($request->isMethod('POST')) {
+            $gradesData = $request->request->all();
             $now = new \DateTimeImmutable();
-            $grade->setCreatedAt($now);
-            $grade->setUpdatedAt($now);
+            $successCount = 0;
 
-            $this->entityManager->persist($grade);
-            $this->entityManager->flush();
+            foreach ($gradesData as $key => $data) {
+                if (!str_starts_with($key, 'grade_') || empty($data['student_id']) || empty($data['grade_type_id'])) {
+                    continue;
+                }
 
-            if ($section !== null) {
-                return $this->redirectToRoute('app_class_show', ['id' => $section->getId()]);
+                $studentId = (int) $data['student_id'];
+                $gradeTypeId = (int) $data['grade_type_id'];
+                $gradeValue = $data['grade'] ?? null;
+                $comment = $data['comment'] ?? null;
+
+                if ($gradeValue === null || $gradeValue === '' || !is_numeric($gradeValue)) {
+                    continue;
+                }
+
+                $student = $this->usersRepository->find($studentId);
+                if (!$student) {
+                    continue;
+                }
+
+                // Check if student is in the available list
+                if (!in_array($student, $availableStudents, true)) {
+                    continue;
+                }
+
+                $gradeType = $this->gradeTypeNamesRepository->find($gradeTypeId);
+                if (!$gradeType) {
+                    continue;
+                }
+
+                $grade = new Grades();
+                $grade->setTest($test);
+                $grade->setStudent($student);
+                $grade->setGradeType($gradeType);
+                $grade->setGrade((float) $gradeValue);
+                $grade->setComment($comment ?: null);
+                $grade->setCreatedAt($now);
+                $grade->setUpdatedAt($now);
+
+                $this->entityManager->persist($grade);
+                $successCount++;
             }
 
-            return $this->redirectToRoute('app_home');
+            if ($successCount > 0) {
+                $this->entityManager->flush();
+
+                if ($section !== null) {
+                    return $this->redirectToRoute('app_class_show', ['id' => $section->getId()]);
+                }
+
+                return $this->redirectToRoute('app_home');
+            }
         }
 
-        return $this->render('teacher/grade_form.html.twig', [
-            'form' => $form->createView(),
+        $gradeTypes = $this->gradeTypeNamesRepository->findBy([], ['name' => 'ASC']);
+
+        return $this->render('teacher/grades_grid.html.twig', [
             'section' => $section,
             'test' => $test,
-            'pageTitle' => 'Saisir une note',
-            'submitLabel' => 'Enregistrer la note',
-            'formAction' => $this->generateUrl('teacher_portal_grade_new', $section ? ['id' => $test->getId(), 'section' => $section->getId()] : ['id' => $test->getId()]),
+            'students' => $availableStudents,
+            'gradeTypes' => $gradeTypes,
+            'pageTitle' => 'Saisir les notes',
         ]);
     }
 
@@ -295,8 +300,9 @@ class TeacherPortalController extends AbstractController
                 'constraints' => [
                     new Range([
                         'min' => 0,
+                        'minMessage' => 'La note minimale est 0.',
                         'max' => 20,
-                        'notInRangeMessage' => 'La note doit être comprise entre 0 et 20.',
+                        'maxMessage' => 'La note maximale est 20.',
                     ]),
                 ],
             ])
