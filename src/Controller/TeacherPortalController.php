@@ -84,6 +84,7 @@ class TeacherPortalController extends AbstractController
             ->add('subject', EntityType::class, [
                 'class' => \App\Entity\Subjects::class,
                 'choice_label' => 'name',
+                'choices' => $teacher->getSubjects()->toArray(),
                 'label' => 'Matière',
             ])
             ->add('testDate', DateType::class, [
@@ -135,6 +136,7 @@ class TeacherPortalController extends AbstractController
             ->add('subject', EntityType::class, [
                 'class' => \App\Entity\Subjects::class,
                 'choice_label' => 'name',
+                'choices' => $teacher->getSubjects()->toArray(),
                 'label' => 'Matière',
             ])
             ->add('testDate', DateType::class, [
