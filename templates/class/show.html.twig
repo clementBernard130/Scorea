@@ -97,9 +97,17 @@
                             </div>
                             <div class="flex flex-wrap items-center gap-3">
                                 {% set canAddGrade = canAddGradeByTestId[test.id] ?? true %}
+                                {% set ungradedCount = ungradedStudentCountByTestId[test.id] ?? 0 %}
                                 <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">
                                     {{ test.teacher }}
                                 </div>
+                                {% if ungradedCount > 0 %}
+                                    <div class="relative">
+                                        <div class="inline-flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+                                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">{{ ungradedCount }}</span>
+                                        </div>
+                                    </div>
+                                {% endif %}
                                 <a href="{{ path('app_test_show', { id: test.id, section: section.id }) }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                                     Voir les notes
                                 </a>

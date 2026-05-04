@@ -8,6 +8,7 @@ use App\Service\StudentSkillsPageBuilder;
 use App\Entity\Sections;
 use App\Repository\SectionsRepository;
 use App\Repository\TestsRepository;
+use App\Repository\GradesRepository;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,8 @@ class HomeController extends AbstractController
 {
     public function __construct(
         private SectionsRepository $sectionsRepository,
-        private TestsRepository $testsRepository
+        private TestsRepository $testsRepository,
+        private GradesRepository $gradesRepository
     ) {
     }
 
@@ -38,15 +40,31 @@ class HomeController extends AbstractController
         if ($user instanceof Users && in_array('ROLE_TEACHER', $user->getRoles(), true)) {
             $sections = $this->sectionsRepository->findForTeacher($user);
             $teacherSections = array_map(
-                static function (Sections $section): array {
+                function (Sections $section): array {
                     $students = array_filter(
                         $section->getUsers()->toArray(),
                         static fn (Users $sectionUser): bool => in_array('ROLE_STUDENT', $sectionUser->getRoles(), true)
                     );
 
+                    // Calculate ungraded students count
+                    $sectionStudentIds = array_values(array_filter(array_map(
+                        static fn (Users $student): ?int => $student->getId(),
+                        $students
+                    )));
+
+                    $tests = $section->getTests();
+                    $totalUngradedCount = 0;
+
+                    foreach ($tests as $test) {
+                        $gradedStudentIds = $this->gradesRepository->findStudentIdsForTest($test);
+                        $ungradedCount = count(array_diff($sectionStudentIds, $gradedStudentIds));
+                        $totalUngradedCount += $ungradedCount;
+                    }
+
                     return [
                         'section' => $section,
                         'studentCount' => count($students),
+                        'ungradedStudentCount' => $totalUngradedCount,
                     ];
                 },
                 $sections
