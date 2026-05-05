@@ -12,8 +12,11 @@
                 <h1 class="text-4xl font-black tracking-tight text-slate-900 md:text-5xl">Mon espace</h1>
             </div>
             <div class="flex flex-wrap items-center gap-3">
+                <a href="{{ path('student_profile') }}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                    Mon profil
+                </a>
                 <a href="{{ path('app_logout') }}" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 transition hover:-translate-y-0.5 hover:shadow-red-300">
-                    Deconnexion
+                    Déconnexion
                 </a>
             </div>
         </header>
@@ -34,7 +37,7 @@
                             {% endif %}
                         </div>
                         <a href="{{ path('student_evaluation_history') }}" class="inline-flex shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
-                            Historique des evaluations
+                            Historique des évaluations
                         </a>
                     </div>
                 </div>

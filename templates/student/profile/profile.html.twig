@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+<div class="min-h-screen overflow-hidden bg-gradient-to-b from-sky-50 via-white to-slate-100 px-4 py-10 relative">
+	<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.16),transparent_30%)]"></div>
+
+	<div class="mx-auto max-w-6xl relative z-10">
+		<header class="mb-6 flex flex-col gap-4 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur md:flex-row md:items-center md:justify-between md:p-8">
+			<div>
+				<p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Espace étudiant</p>
+				<h1 class="mt-1 text-3xl font-black tracking-tight text-slate-900 md:text-4xl">Mon profil</h1>
+			</div>
+
+			<div class="flex flex-wrap items-center gap-3">
+				<a href="{{ path('app_home') }}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+					Mon espace
+				</a>
+				<a href="{{ path('student_evaluation_history') }}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+					Historique des évaluations
+				</a>
+			</div>
+		</header>
+
+		<section class="mb-6 grid gap-4">
+			<article class="rounded-[24px] border border-white/70 bg-white/90 px-5 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+				<p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Nom complet</p>
+				<p class="mt-2 text-lg font-black text-slate-900">{{ student.lastName|upper }} {{ student.firstName }}</p>
+			</article>
+
+			<div class="grid gap-4 sm:grid-cols-2">
+				<article class="rounded-[24px] border border-white/70 bg-white/90 px-5 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+					<p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Classe</p>
+					<p class="mt-2 text-lg font-black text-slate-900">{{ primarySection ?: 'Non renseignée' }}</p>
+				</article>
+
+				<article class="rounded-[24px] border border-white/70 bg-white/90 px-5 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+					<p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Année</p>
+					<p class="mt-2 text-lg font-black text-slate-900">{{ primaryAcademicYear ?: 'Non renseignée' }}</p>
+				</article>
+			</div>
+		</section>
+
+		<section class="grid gap-4 lg:grid-cols-2">
+			<article class="rounded-[24px] border border-white/70 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+				<p class="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Identité</p>
+				<dl class="grid gap-3">
+					<div class="grid gap-1 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+						<dt class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Nom d'utilisateur</dt>
+						<dd class="text-sm font-semibold text-slate-900">{{ student.username }}</dd>
+					</div>
+					<div class="grid gap-1 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+						<dt class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Nom</dt>
+						<dd class="text-sm font-semibold text-slate-900">{{ student.lastName }}</dd>
+					</div>
+					<div class="grid gap-1 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+						<dt class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Prénom</dt>
+						<dd class="text-sm font-semibold text-slate-900">{{ student.firstName }}</dd>
+					</div>
+					<div class="grid gap-1 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+						<dt class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Email</dt>
+						<dd class="text-sm font-semibold text-slate-900">{{ student.email ?: 'Non renseigné' }}</dd>
+					</div>
+				</dl>
+			</article>
+		</section>
+
+		<section class="mt-4 rounded-[24px] border border-white/70 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+			<div class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+				<div>
+					<p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Scolarité</p>
+					<h2 class="mt-1 text-xl font-bold text-slate-900">Classes et formations</h2>
+				</div>
+				<p class="text-sm text-slate-500">{{ meta.sectionCount }} section(s) associée(s)</p>
+			</div>
+
+			{% if sections is empty %}
+				<div class="rounded-2xl border border-dashed border-sky-200 bg-slate-50/70 p-6 text-slate-600">
+					Aucune section n'est associée à votre compte.
+				</div>
+			{% else %}
+				<div class="grid gap-3 md:grid-cols-2">
+					{% for section in sections %}
+						<article class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+							<p class="text-sm font-bold text-slate-900">{{ section.name ?: 'Section inconnue' }}</p>
+							<p class="mt-1 text-sm text-slate-600">Formation: {{ section.training ?: 'Non renseignée' }}</p>
+							<p class="mt-1 text-sm text-slate-600">Année: {{ section.academicYear ?: 'Non renseignée' }}</p>
+						</article>
+					{% endfor %}
+				</div>
+			{% endif %}
+		</section>
+
+		<p class="pb-2 text-center text-m italic mt-4 text-slate-500">
+			Pour modifier votre profil, merci de contacter un administrateur.
+		</p>
+	</div>
+</div>
+{% endblock %}
