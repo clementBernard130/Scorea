@@ -269,9 +269,9 @@
 
             <section class="grade-detail-card">
                 <h3>Type de note</h3>
-                {% if entity.instance.gradeType is not null %}
+                {% if entity.instance.test is not null and entity.instance.test.gradeType is not null %}
                     <span class="grade-chip">
-                        <i class="fa fa-tag"></i> {{ entity.instance.gradeType.name|default(entity.instance.gradeType) }}
+                        <i class="fa fa-tag"></i> {{ entity.instance.test.gradeType.name|default(entity.instance.test.gradeType) }}
                     </span>
                 {% else %}
                     <p class="grade-muted">Aucun type de note renseigné.</p>

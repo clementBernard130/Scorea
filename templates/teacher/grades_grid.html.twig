@@ -31,7 +31,6 @@
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Élève</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Type de note</th>
                                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Note (/20)</th>
                                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Commentaire</th>
                                 </tr>
@@ -43,14 +42,6 @@
                                             {% set fullName = (student.firstName|trim ~ ' ' ~ student.lastName|trim)|trim %}
                                             {{ fullName ?: student.username }}
                                             <input type="hidden" name="grade_{{ loop.index }}[student_id]" value="{{ student.id }}">
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-700">
-                                            <select name="grade_{{ loop.index }}[grade_type_id]" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                                                <option value="">-- Sélectionner --</option>
-                                                {% for gradeType in gradeTypes %}
-                                                    <option value="{{ gradeType.id }}">{{ gradeType.name }}</option>
-                                                {% endfor %}
-                                            </select>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-700">
                                             <input type="number" 
@@ -88,7 +79,7 @@
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     const form = document.querySelector('form');
-                    const inputs = form.querySelectorAll('input[type="number"], select[name*="[grade_type_id]"]');
+                    const inputs = form.querySelectorAll('input[type="number"]');
 
                     // Add real-time validation
                     inputs.forEach(input => {
@@ -99,15 +90,11 @@
                     function validateRow() {
                         const rows = form.querySelectorAll('tbody tr');
                         rows.forEach(row => {
-                            const gradeSelect = row.querySelector('select');
                             const gradeInput = row.querySelector('input[type="number"]');
-                            
-                            if (gradeInput.value && !gradeSelect.value) {
-                                gradeSelect.classList.add('border-red-500', 'bg-red-50');
-                            } else if (gradeSelect.value && !gradeInput.value) {
+
+                            if (gradeInput.value && (Number(gradeInput.value) < 0 || Number(gradeInput.value) > 20)) {
                                 gradeInput.classList.add('border-red-500', 'bg-red-50');
                             } else {
-                                gradeSelect.classList.remove('border-red-500', 'bg-red-50');
                                 gradeInput.classList.remove('border-red-500', 'bg-red-50');
                             }
                         });
@@ -120,29 +107,21 @@
                         let hasInvalidEntry = false;
 
                         rows.forEach(row => {
-                            const gradeSelect = row.querySelector('select');
                             const gradeInput = row.querySelector('input[type="number"]');
-                            const hasGradeType = gradeSelect.value.trim() !== '';
                             const hasGrade = gradeInput.value.trim() !== '';
+                            const numericGrade = Number(gradeInput.value);
 
-                            if (hasGradeType && hasGrade) {
-                                // Both filled - valid
+                            if (hasGrade && !Number.isNaN(numericGrade) && numericGrade >= 0 && numericGrade <= 20) {
                                 hasValidEntry = true;
-                            } else if (hasGradeType || hasGrade) {
-                                // Only one filled - invalid
+                            } else if (hasGrade) {
                                 hasInvalidEntry = true;
-                                if (!hasGradeType) {
-                                    gradeSelect.classList.add('border-red-500', 'bg-red-50');
-                                }
-                                if (!hasGrade) {
-                                    gradeInput.classList.add('border-red-500', 'bg-red-50');
-                                }
+                                gradeInput.classList.add('border-red-500', 'bg-red-50');
                             }
                         });
 
                         if (hasInvalidEntry) {
                             e.preventDefault();
-                            alert('Veuillez remplir à la fois le type de note et la note pour chaque entrée.');
+                            alert('Veuillez saisir des notes valides entre 0 et 20.');
                             return false;
                         }
 
