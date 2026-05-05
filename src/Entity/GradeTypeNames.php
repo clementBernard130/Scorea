@@ -18,9 +18,6 @@ class GradeTypeNames
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column]
-    private ?bool $isCertificative = null;
-
 
     /**
      * @var Collection<int, GradeTypes>
@@ -29,15 +26,15 @@ class GradeTypeNames
     private Collection $gradeTypes;
 
     /**
-     * @var Collection<int, Grades>
+     * @var Collection<int, Tests>
      */
-    #[ORM\OneToMany(targetEntity: Grades::class, mappedBy: 'gradeType')]
-    private Collection $grades;
+    #[ORM\OneToMany(targetEntity: Tests::class, mappedBy: 'gradeType')]
+    private Collection $tests;
 
     public function __construct()
     {
         $this->gradeTypes = new ArrayCollection();
-        $this->grades = new ArrayCollection();
+        $this->tests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -53,18 +50,6 @@ class GradeTypeNames
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function isCertificative(): ?bool
-    {
-        return $this->isCertificative;
-    }
-
-    public function setIsCertificative(bool $isCertificative): static
-    {
-        $this->isCertificative = $isCertificative;
 
         return $this;
     }
@@ -100,29 +85,28 @@ class GradeTypeNames
     }
 
     /**
-     * @return Collection<int, Grades>
+     * @return Collection<int, Tests>
      */
-    public function getGrades(): Collection
+    public function getTests(): Collection
     {
-        return $this->grades;
+        return $this->tests;
     }
 
-    public function addGrade(Grades $grade): static
+    public function addTest(Tests $test): static
     {
-        if (!$this->grades->contains($grade)) {
-            $this->grades->add($grade);
-            $grade->setGradeType($this);
+        if (!$this->tests->contains($test)) {
+            $this->tests->add($test);
+            $test->setGradeType($this);
         }
 
         return $this;
     }
 
-    public function removeGrade(Grades $grade): static
+    public function removeTest(Tests $test): static
     {
-        if ($this->grades->removeElement($grade)) {
-            // set the owning side to null (unless already changed)
-            if ($grade->getGradeType() === $this) {
-                $grade->setGradeType(null);
+        if ($this->tests->removeElement($test)) {
+            if ($test->getGradeType() === $this) {
+                $test->setGradeType(null);
             }
         }
 

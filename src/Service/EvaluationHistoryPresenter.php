@@ -51,7 +51,7 @@ final class EvaluationHistoryPresenter
                 'dateLabel' => $this->resolveRelativeDateLabel($test?->getTestDate()),
                 'subjectName' => $subject?->getName() ?? 'Evaluation',
                 'skills' => $skillNames,
-                'gradeTypeLabel' => $grade->getGradeType()?->getName(),
+                'gradeTypeLabel' => $test?->getGradeType()?->getName(),
                 'formattedGrade' => $grade->getGrade() !== null
                     ? number_format($grade->getGrade(), 2, ',', '') . '/20'
                     : '-',

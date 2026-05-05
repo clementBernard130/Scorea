@@ -21,11 +21,7 @@ class Grades
     #[ORM\JoinColumn(nullable: false)]
     private ?Tests $test = null;
 
-    #[ORM\ManyToOne(inversedBy: 'grades')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?GradeTypeNames $gradeType = null;
-
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?float $grade = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -66,24 +62,12 @@ class Grades
         return $this;
     }
 
-    public function getGradeType(): ?GradeTypeNames
-    {
-        return $this->gradeType;
-    }
-
-    public function setGradeType(?GradeTypeNames $gradeType): static
-    {
-        $this->gradeType = $gradeType;
-
-        return $this;
-    }
-
     public function getGrade(): ?float
     {
         return $this->grade;
     }
 
-    public function setGrade(float $grade): static
+    public function setGrade(?float $grade): static
     {
         $this->grade = $grade;
 

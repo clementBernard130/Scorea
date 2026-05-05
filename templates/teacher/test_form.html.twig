@@ -29,6 +29,16 @@
                         {{ form_errors(form.testDate) }}
                     </div>
                     <div>
+                        {{ form_label(form.gradeType, null, {'label_attr': {'class': 'mb-2 block text-sm font-semibold text-gray-800'}}) }}
+                        {{ form_widget(form.gradeType, {'attr': {'class': 'w-full rounded-md border border-gray-300 bg-white px-3 py-2'}}) }}
+                        {{ form_errors(form.gradeType) }}
+                    </div>
+                    <div class="flex items-center gap-2">
+                        {{ form_widget(form.isCertificative, {'attr': {'class': 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'}}) }}
+                        {{ form_label(form.isCertificative, null, {'label_attr': {'class': 'text-sm font-semibold text-gray-800'}}) }}
+                        {{ form_errors(form.isCertificative) }}
+                    </div>
+                    <div>
                         {{ form_label(form.comment, null, {'label_attr': {'class': 'mb-2 block text-sm font-semibold text-gray-800'}}) }}
                         {{ form_widget(form.comment, {'attr': {'class': 'min-h-32 w-full rounded-md border border-gray-300 bg-white px-3 py-2'}}) }}
                         {{ form_errors(form.comment) }}

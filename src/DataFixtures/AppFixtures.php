@@ -1003,6 +1003,14 @@ class AppFixtures extends Fixture
             ['code' => 'crypto_m2cyber_cc1', 'subject' => $manager->getRepository(Subjects::class)->findOneBy(['name' => 'Cryptographie']), 'section' => 'M2-CYBER-2026', 'teacher' => 'teacher3', 'comment' => 'Cryptanalyse appliquee', 'testDate' => new DateTime('2026-05-19'), 'gradingMode' => 'full', 'coverage' => 1.0],
         ];
 
+        $gradeType = $manager->getRepository(GradeTypeNames::class)->findOneBy(['name' => 'Contrôle continu']);
+        if ($gradeType === null) {
+            $gradeType = new GradeTypeNames();
+            $gradeType->setName('Contrôle continu');
+            $manager->persist($gradeType);
+            $manager->flush();
+        }
+
         $testsByCode = [];
         $testsMetadata = [];
         foreach ($tests as $testData) {
@@ -1015,6 +1023,8 @@ class AppFixtures extends Fixture
             $test->setTeacher($teacher);
             $test->setComment($testData['comment']);
             $test->setTestDate($testData['testDate']);
+            $test->setGradeType($gradeType);
+            $test->setIsCertificative($testData['gradingMode'] !== 'none');
             $manager->persist($test);
             $testsByCode[$testData['code']] = $test;
             $testsMetadata[$testData['code']] = [
@@ -1027,14 +1037,6 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         // === Grades ===
-        $gradeType = $manager->getRepository(GradeTypeNames::class)->findOneBy(['name' => 'Contrôle continu']);
-        if ($gradeType === null) {
-            $gradeType = new GradeTypeNames();
-            $gradeType->setName('Contrôle continu');
-            $gradeType->setIsCertificative(false);
-            $manager->persist($gradeType);
-            $manager->flush();
-        }
 
         $studentsBySection = [];
         foreach (['SIO1-2026', 'SIO2-2026', 'DSNS1-2026', 'CYBER1-2026', 'CYBER2-2026', 'M1-DSNS-2026', 'M2-DSNS-2026', 'M1-CYBER-2026', 'M2-CYBER-2026'] as $sectionName) {
@@ -1078,7 +1080,6 @@ class AppFixtures extends Fixture
                 $grade = new Grades();
                 $grade->setStudent($student);
                 $grade->setTest($test);
-                $grade->setGradeType($gradeType);
                 $grade->setGrade($computedGrade);
                 if ($computedGrade >= 15.0) {
                     $grade->setComment('Tres bon niveau sur cette evaluation');

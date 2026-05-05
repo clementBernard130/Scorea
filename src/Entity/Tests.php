@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TestsRepository;
+use App\Entity\GradeTypeNames;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -32,6 +33,13 @@ class Tests
 
     #[ORM\Column]
     private ?\DateTime $testDate = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tests')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?GradeTypeNames $gradeType = null;
+
+    #[ORM\Column]
+    private bool $isCertificative = false;
 
     /**
      * @var Collection<int, Grades>
@@ -105,6 +113,30 @@ class Tests
     public function setTestDate(\DateTime $testDate): static
     {
         $this->testDate = $testDate;
+
+        return $this;
+    }
+
+    public function getGradeType(): ?GradeTypeNames
+    {
+        return $this->gradeType;
+    }
+
+    public function setGradeType(?GradeTypeNames $gradeType): static
+    {
+        $this->gradeType = $gradeType;
+
+        return $this;
+    }
+
+    public function isIsCertificative(): bool
+    {
+        return $this->isCertificative;
+    }
+
+    public function setIsCertificative(bool $isCertificative): static
+    {
+        $this->isCertificative = $isCertificative;
 
         return $this;
     }
