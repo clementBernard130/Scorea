@@ -26,7 +26,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
             return new RedirectResponse($this->urlGenerator->generate('admin'));
         }
 
-        // Redirect ROLE_TEACHER, ROLE_STUDENT, and ROLE_USER to homepage
+        // Redirect ROLE_TEACHER, ROLE_STUDENT, and ROLE_USER to /home
         return new RedirectResponse($this->urlGenerator->generate('app_home'));
     }
 }

@@ -13,6 +13,7 @@ use App\Repository\GradesRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class HomeController extends AbstractController
 {
@@ -23,8 +24,21 @@ class HomeController extends AbstractController
     ) {
     }
 
-    #[Route('/', name: 'app_home')]
-    public function index(StudentSkillsPageBuilder $studentSkillsPageBuilder): Response
+    #[Route('/', name: 'app_root')]
+    public function index(): Response
+    {
+        // If user is authenticated, redirect to /home
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        // If not authenticated, redirect to login
+        return $this->redirectToRoute('app_login');
+    }
+
+    #[Route('/home', name: 'app_home')]
+    #[IsGranted('IS_AUTHENTICATED')]
+    public function home(StudentSkillsPageBuilder $studentSkillsPageBuilder): Response
     {
         $user = $this->getUser();
         if ($this->isGranted('ROLE_STUDENT') && $user instanceof Users) {
