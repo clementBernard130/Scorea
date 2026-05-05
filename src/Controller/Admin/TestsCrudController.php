@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\GradeTypeNames;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
@@ -11,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
@@ -51,6 +53,8 @@ class TestsCrudController extends AbstractCrudController
             ->add('subject')
             ->add('section')
             ->add('teacher')
+            ->add('gradeType')
+            ->add('isCertificative')
             ->add('testDate');
     }
 
@@ -82,6 +86,9 @@ class TestsCrudController extends AbstractCrudController
             AssociationField::new('teacher', 'Enseignant')
                 ->setFormTypeOption('choices', $this->getUsersByRole('ROLE_TEACHER'))
                 ->setFormTypeOption('choice_label', fn(Users $user) => $this->formatUserLabel($user)),
+            AssociationField::new('gradeType', 'Type de test')
+                ->setFormTypeOption('choice_label', fn(GradeTypeNames $gradeType) => $gradeType->getName() ?? 'Type inconnu'),
+            BooleanField::new('isCertificative', 'Test certifiant'),
             TextEditorField::new('comment')->setLabel('Commentaire'),
             DateField::new('testDate')->setLabel('Date du test'),
         ];

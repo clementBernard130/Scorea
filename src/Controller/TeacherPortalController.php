@@ -3,10 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Grades;
+use App\Entity\GradeTypeNames;
 use App\Entity\Sections;
 use App\Entity\Tests;
 use App\Entity\Users;
-use App\Repository\GradeTypeNamesRepository;
 use App\Repository\GradesRepository;
 use App\Repository\SectionsRepository;
 use App\Repository\TestsRepository;
@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -28,7 +29,6 @@ class TeacherPortalController extends AbstractController
 {
     public function __construct(
         private UsersRepository $usersRepository,
-        private GradeTypeNamesRepository $gradeTypeNamesRepository,
         private GradesRepository $gradesRepository,
         private SectionsRepository $sectionsRepository,
         private TestsRepository $testsRepository,
@@ -91,6 +91,15 @@ class TeacherPortalController extends AbstractController
                 'widget' => 'single_text',
                 'label' => 'Date du test',
             ])
+            ->add('gradeType', EntityType::class, [
+                'class' => GradeTypeNames::class,
+                'choice_label' => 'name',
+                'label' => 'Type de test',
+            ])
+            ->add('isCertificative', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Test certifiant',
+            ])
             ->add('comment', TextareaType::class, [
                 'required' => false,
                 'label' => 'Commentaire',
@@ -143,6 +152,15 @@ class TeacherPortalController extends AbstractController
                 'widget' => 'single_text',
                 'label' => 'Date du test',
             ])
+            ->add('gradeType', EntityType::class, [
+                'class' => GradeTypeNames::class,
+                'choice_label' => 'name',
+                'label' => 'Type de test',
+            ])
+            ->add('isCertificative', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Test certifiant',
+            ])
             ->add('comment', TextareaType::class, [
                 'required' => false,
                 'label' => 'Commentaire',
@@ -194,12 +212,11 @@ class TeacherPortalController extends AbstractController
             $successCount = 0;
 
             foreach ($gradesData as $key => $data) {
-                if (!str_starts_with($key, 'grade_') || empty($data['student_id']) || empty($data['grade_type_id'])) {
+                if (!str_starts_with($key, 'grade_') || empty($data['student_id'])) {
                     continue;
                 }
 
                 $studentId = (int) $data['student_id'];
-                $gradeTypeId = (int) $data['grade_type_id'];
                 $gradeValue = $data['grade'] ?? null;
                 $comment = $data['comment'] ?? null;
 
@@ -217,15 +234,9 @@ class TeacherPortalController extends AbstractController
                     continue;
                 }
 
-                $gradeType = $this->gradeTypeNamesRepository->find($gradeTypeId);
-                if (!$gradeType) {
-                    continue;
-                }
-
                 $grade = new Grades();
                 $grade->setTest($test);
                 $grade->setStudent($student);
-                $grade->setGradeType($gradeType);
                 $grade->setGrade((float) $gradeValue);
                 $grade->setComment($comment ?: null);
                 $grade->setCreatedAt($now);
@@ -246,13 +257,10 @@ class TeacherPortalController extends AbstractController
             }
         }
 
-        $gradeTypes = $this->gradeTypeNamesRepository->findBy([], ['name' => 'ASC']);
-
         return $this->render('teacher/grades_grid.html.twig', [
             'section' => $section,
             'test' => $test,
             'students' => $availableStudents,
-            'gradeTypes' => $gradeTypes,
             'pageTitle' => 'Saisir les notes',
         ]);
     }
@@ -282,12 +290,6 @@ class TeacherPortalController extends AbstractController
                     return $fullName !== '' ? $fullName : (string) $user->getUsername();
                 },
                 'label' => 'Élève',
-            ])
-            ->add('gradeType', EntityType::class, [
-                'class' => \App\Entity\GradeTypeNames::class,
-                'choice_label' => 'name',
-                'choices' => $this->gradeTypeNamesRepository->findBy([], ['name' => 'ASC']),
-                'label' => 'Type de note',
             ])
             ->add('grade', NumberType::class, [
                 'label' => 'Note',
