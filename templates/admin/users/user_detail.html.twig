@@ -158,7 +158,7 @@
             color: var(--primary);
         }
 
-        .user-name {
+        .user-name-detail {
             margin: 0;
             font-size: 1.4rem;
             color: #fff;
@@ -343,7 +343,7 @@
                 height: 50px;
             }
 
-            .user-name {
+            .user-name-detail {
                 font-size: 1.2rem;
             }
         }
@@ -383,7 +383,7 @@
             <div class="user-hero-content">
                 <div class="user-avatar">{{ initials ?: 'U' }}</div>
                 <div>
-                    <h2 class="user-name">{{ lastName|upper }} {{ firstName }}</h2>
+                    <h2 class="user-name-detail">{{ lastName|upper }} {{ firstName }}</h2>
                     <p class="user-username">{{ entity.instance.username }}</p>
                 </div>
             </div>
