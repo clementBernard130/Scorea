@@ -96,35 +96,6 @@
                         <p class="mt-2">Si c'est une erreur, vérifiez l'association enseignant / section dans l'administration.</p>
                     </section>
                 {% endif %}
-            {% elseif user %}
-                <div class="rounded-md bg-white p-8 text-gray-900 shadow-md">
-                    <h2 class="text-2xl font-semibold text-gray-900">Tableau de bord</h2>
-
-                    <div class="mt-6 grid gap-4 md:grid-cols-3">
-                        {% if is_granted('ROLE_STUDENT') %}
-                            <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-                                <strong class="mb-2 block text-gray-900">Espace Étudiant</strong>
-                                <p class="text-gray-700">Vous avez accès aux fonctionnalités étudiant.</p>
-                            </div>
-                        {% endif %}
-
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-                                <strong class="mb-2 block text-gray-900">Espace Administrateur</strong>
-                                <p class="text-gray-700">Vous avez accès à toutes les fonctionnalités d'administration.</p>
-                            </div>
-                        {% endif %}
-
-                        <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-                            <strong class="mb-2 block text-gray-900">Rôles</strong>
-                            <ul class="list-disc space-y-1 pl-5 text-gray-700">
-                                {% for role in user.roles %}
-                                    <li>{{ role }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
             {% else %}
                 <div class="rounded-md bg-white px-8 py-16 text-center text-gray-900 shadow-md">
                     <p class="text-sm uppercase tracking-wide text-gray-500">Bienvenue sur Scorea</p>
