@@ -13,6 +13,9 @@
     <php>
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
+        <ini name="session.gc_maxlifetime" value="1800" />
+        <ini name="session.cookie_lifetime" value="1800" />
+        <ini name="session.use_strict_mode" value="1" />
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
     </php>

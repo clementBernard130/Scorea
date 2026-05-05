@@ -8,6 +8,7 @@ framework:
         save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
         cookie_secure: auto
         cookie_samesite: lax
+        cookie_lifetime: 1800  # 30 minutes, matches PHP gc_maxlifetime
 
     #esi: true
     #fragments: true
