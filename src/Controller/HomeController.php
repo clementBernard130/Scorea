@@ -42,9 +42,17 @@ class HomeController extends AbstractController
     {
         $user = $this->getUser();
         if ($this->isGranted('ROLE_STUDENT') && $user instanceof Users) {
+            $primarySection = null;
+            $sections = $user->getSections();
+            if (!$sections->isEmpty()) {
+                $primarySection = $sections->first()->getName();
+            }
+            
             return $this->render('student/skills/index.html.twig', [
                 'page' => $studentSkillsPageBuilder->build($user),
                 'user' => $user,
+                'student' => $user,
+                'primarySection' => $primarySection,
             ]);
         }
         
