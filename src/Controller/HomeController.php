@@ -41,6 +41,11 @@ class HomeController extends AbstractController
     public function home(StudentSkillsPageBuilder $studentSkillsPageBuilder): Response
     {
         $user = $this->getUser();
+        
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('admin');
+        }
+        
         if ($this->isGranted('ROLE_STUDENT') && $user instanceof Users) {
             $primarySection = null;
             $sections = $user->getSections();
