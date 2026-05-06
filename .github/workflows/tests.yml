@@ -19,7 +19,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: scorea_test
+          MYSQL_DATABASE: scorea
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -59,17 +59,17 @@ jobs:
     - name: Create test database
       run: php bin/console doctrine:database:create --env=test --if-not-exists
       env:
-        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea
 
     - name: Run migrations
       run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
       env:
-        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea
 
     - name: Run PHPUnit tests
       run: php bin/phpunit --coverage-text
       env:
-        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea
 
   frontend-build:
     runs-on: ubuntu-latest
