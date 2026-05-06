@@ -468,6 +468,20 @@
             </section>
         {% endif %}
 
+        {% set userSubjects = entity.instance.subjects|default([]) %}
+        {% if userSubjects|length > 0 %}
+            <section class="user-card">
+                <h3 class="user-card-title">Matières</h3>
+                <div class="chip-wrap">
+                    {% for subject in userSubjects %}
+                        <a class="chip section-chip section-link">
+                            {{ subject.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
         <section class="user-card danger-zone">
             <div class="danger-zone-header">
                 <div>
