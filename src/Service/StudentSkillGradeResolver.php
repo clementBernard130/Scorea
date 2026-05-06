@@ -7,8 +7,10 @@ use App\Entity\Users;
 
 final class StudentSkillGradeResolver
 {
+
     /**
-     * Construit la table de pondération gradeTypeNameId → weight pour une compétence.
+     * Construit la table de pondération gradeTypeNameId → pourcentage (0-100) pour une compétence.
+     * La somme des pourcentages doit valoir 100 (ex : DS=100 ou Oral Projet=60 + CC=40).
      *
      * @return array<int, int>
      */
@@ -27,10 +29,15 @@ final class StudentSkillGradeResolver
 
     /**
      * Calcule la moyenne pondérée par type d'éval à partir de notes groupées par typeId.
-     * Si aucune pondération n'est configurée, retourne la moyenne simple.
+     * Les poids sont des pourcentages dont la somme vaut 100 :
+     *   ex. Oral Projet=60 % + Contrôle Continu=40 % → diviseur = 60+40 = 100
+     *   ex. DS=100 %                                 → diviseur = 100
+     * Si un type n'a pas encore été évalué, le diviseur est la somme des types présents
+     * (normalisation sur les types disponibles).
+     * Si aucune pondération n'est configurée, retourne la moyenne arithmétique simple.
      *
      * @param array<int|string, list<float>> $gradesByType  typeId (ou 'none') → valeurs
-     * @param array<int, int>                $typeWeights   typeId → poids
+     * @param array<int, int>                $typeWeights   typeId → pourcentage (0-100)
      */
     private function computeTypeWeightedAverage(array $gradesByType, array $typeWeights): float
     {
