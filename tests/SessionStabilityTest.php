@@ -1,4 +1,7 @@
 <?php
+/**
+ * @group needs-fixtures
+ */
 
 namespace App\Tests\Functional;
 

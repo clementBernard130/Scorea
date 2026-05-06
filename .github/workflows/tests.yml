@@ -72,7 +72,7 @@ jobs:
         DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
 
     - name: Run PHPUnit tests (empty DB)
-      run: php bin/phpunit --coverage-text
+      run: php bin/phpunit --exclude-group needs-fixtures --coverage-text
       env:
         DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
 
