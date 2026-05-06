@@ -154,6 +154,17 @@ class TeacherCrudController extends AbstractCrudController
                 'by_reference' => false,
             ])
             ->onlyOnForms();
+        yield IntegerField::new('id', 'Nombre de matières enseignées')
+            ->onlyOnIndex()
+            ->setSortable(false)
+            ->formatValue(static fn ($value, Users $user): string => (string) $user->getSubjects()->count());
+
+        yield AssociationField::new('subjects', 'Matières')
+            ->autocomplete()
+            ->setFormTypeOptions([
+                'by_reference' => false,
+            ])
+            ->onlyOnForms();
     }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void

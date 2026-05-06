@@ -479,6 +479,13 @@
                 {% endif %}
             </div>
 
+            <div class="user-edit-form-section">
+                <h3 class="user-edit-form-title">Matières</h3>
+                {% if edit_form.subjects is defined %}
+                    {{ form_row(edit_form.subjects) }}
+                {% endif %}
+            </div>
+
             {{ form_rest(edit_form) }}
             {{ form_end(edit_form, { render_rest: false }) }}
         </section>
