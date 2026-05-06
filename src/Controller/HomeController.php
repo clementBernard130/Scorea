@@ -6,6 +6,7 @@ use App\Entity\Users;
 use App\Service\StudentSkillsPageBuilder;
 
 use App\Entity\Sections;
+use App\Entity\Tests;
 use App\Repository\SectionsRepository;
 use App\Repository\TestsRepository;
 use App\Repository\GradesRepository;
@@ -54,7 +55,7 @@ class HomeController extends AbstractController
         if ($user instanceof Users && in_array('ROLE_TEACHER', $user->getRoles(), true)) {
             $sections = $this->sectionsRepository->findForTeacher($user);
             $teacherSections = array_map(
-                function (Sections $section): array {
+                function (Sections $section) use ($user): array {
                     $students = array_filter(
                         $section->getUsers()->toArray(),
                         static fn (Users $sectionUser): bool => in_array('ROLE_STUDENT', $sectionUser->getRoles(), true)
@@ -66,7 +67,10 @@ class HomeController extends AbstractController
                         $students
                     )));
 
-                    $tests = $section->getTests();
+                    $tests = array_filter(
+                        $section->getTests()->toArray(),
+                        static fn (Tests $test): bool => $test->getTeacher()?->getId() === $user->getId()
+                    );
                     $totalUngradedCount = 0;
 
                     foreach ($tests as $test) {
