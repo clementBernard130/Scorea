@@ -1,0 +1,90 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['8.2', '8.3']
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: scorea_test
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: ctype, iconv, mysql, pdo_mysql
+        coverage: pcov
+        ini-values: post_max_size=256M
+
+    - name: Get Composer cache directory
+      id: composer-cache
+      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache Composer packages
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Create test database
+      run: php bin/console doctrine:database:create --env=test --if-not-exists
+      env:
+        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+
+    - name: Run migrations
+      run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
+      env:
+        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+
+    - name: Run PHPUnit tests
+      run: php bin/phpunit --coverage-text
+      env:
+        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+
+  frontend-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build assets
+      run: npm run build
