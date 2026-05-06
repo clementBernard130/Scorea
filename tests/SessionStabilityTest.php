@@ -1,8 +1,8 @@
 <?php
 namespace App\Tests\Functional;
 
-use App\Entity\Users;
 use App\Repository\UsersRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SessionStabilityTest extends WebTestCase
@@ -14,9 +14,7 @@ class SessionStabilityTest extends WebTestCase
         $this->client = static::createClient();
     }
 
-    /**
-     * @group needs-fixtures
-     */
+    #[Group('needs-fixtures')]
     public function testRepeatedClassNavigationMaintainsSession(): void
     {
         // Get a teacher user from fixtures
@@ -50,9 +48,6 @@ class SessionStabilityTest extends WebTestCase
         }
     }
 
-    /**
-     * @group needs-fixtures
-     */
     public function testSessionConfigurationIsCorrect(): void
     {
         // Check PHP session settings
