@@ -36,7 +36,7 @@ class Skills
     /**
      * @var Collection<int, GradeTypes>
      */
-    #[ORM\OneToMany(targetEntity: GradeTypes::class, mappedBy: 'skill', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: GradeTypes::class, mappedBy: 'skill', orphanRemoval: true, cascade: ['persist'])]
     private Collection $gradeTypes;
 
     public function __construct()
