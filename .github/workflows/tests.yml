@@ -2,7 +2,7 @@ name: CI Tests
 
 on:
   push:
-    branches: [ main, develop, 23-fix-correction-pipeline-ci ]
+    branches: [ main, develop, 123-fix-correction-pipeline-ci ]
   pull_request:
     branches: [ main, develop ]
 
