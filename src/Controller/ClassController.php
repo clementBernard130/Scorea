@@ -34,7 +34,7 @@ class ClassController extends AbstractController
         }
 
         $students = $this->usersRepository->findStudentsBySection($section);
-        $tests = $this->testsRepository->findByTeacher($teacher);
+        $tests = $this->testsRepository->findByTeacherAndSection($teacher, $section);
         $sectionStudentIds = array_values(array_filter(array_map(
             static fn (Users $student): ?int => $student->getId(),
             $students
