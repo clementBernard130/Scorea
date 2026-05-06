@@ -50,7 +50,9 @@ class SessionStabilityTest extends WebTestCase
         }
     }
 
-    
+    /**
+     * @group needs-fixtures
+     */
     public function testSessionConfigurationIsCorrect(): void
     {
         // Check PHP session settings
