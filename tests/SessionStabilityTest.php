@@ -1,8 +1,4 @@
 <?php
-/**
- * @group needs-fixtures
- */
-
 namespace App\Tests\Functional;
 
 use App\Entity\Users;
@@ -18,6 +14,9 @@ class SessionStabilityTest extends WebTestCase
         $this->client = static::createClient();
     }
 
+    /**
+     * @group needs-fixtures
+     */
     public function testRepeatedClassNavigationMaintainsSession(): void
     {
         // Get a teacher user from fixtures
