@@ -201,6 +201,21 @@
             gap: 0.8rem;
         }
 
+        .user-edit-duo {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+            margin-top: 0.9rem;
+        }
+
+        .user-edit-duo.user-edit-duo--single {
+            grid-template-columns: 1fr;
+        }
+
+        .user-edit-duo .user-edit-form-section + .user-edit-form-section {
+            margin-top: 0;
+        }
+
         .user-edit-grid .form-group {
             margin: 0;
         }
@@ -353,6 +368,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .user-edit-duo {
+                grid-template-columns: 1fr;
+            }
+
             .user-avatar {
                 width: 50px;
                 height: 50px;
@@ -377,6 +396,7 @@
     {% set firstName = entity.instance.firstName|default('') %}
     {% set lastName = entity.instance.lastName|default('') %}
     {% set initials = (firstName|slice(0, 1) ~ lastName|slice(0, 1))|upper %}
+    {% set hasSubjects = edit_form.subjects is defined %}
 
     <div class="user-edit-page {{ themeClass }}">
         <div class="user-edit-toolbar">
@@ -472,17 +492,19 @@
                 {% endif %}
             </div>
 
-            <div class="user-edit-form-section">
-                <h3 class="user-edit-form-title">Sections</h3>
-                {% if edit_form.sections is defined %}
-                    {{ form_row(edit_form.sections) }}
-                {% endif %}
-            </div>
+            <div class="user-edit-duo{% if not hasSubjects %} user-edit-duo--single{% endif %}">
+                <div class="user-edit-form-section">
+                    <h3 class="user-edit-form-title">Sections</h3>
+                    {% if edit_form.sections is defined %}
+                        {{ form_row(edit_form.sections) }}
+                    {% endif %}
+                </div>
 
-            <div class="user-edit-form-section">
-                <h3 class="user-edit-form-title">Matières</h3>
-                {% if edit_form.subjects is defined %}
-                    {{ form_row(edit_form.subjects) }}
+                {% if hasSubjects %}
+                    <div class="user-edit-form-section">
+                        <h3 class="user-edit-form-title">Matières</h3>
+                        {{ form_row(edit_form.subjects) }}
+                    </div>
                 {% endif %}
             </div>
 
