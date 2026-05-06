@@ -192,15 +192,15 @@
 {% block main %}
     <div class="skill-create-page">
         <div class="skill-create-toolbar">
-            <a href="{{ app.request.query.get('trainingId') ? ea_url().setAction('index').set('trainingId', app.request.query.get('trainingId')) : ea_url().setAction('index') }}" class="skill-create-back">
+            <a href="{{ app.request.query.get('skillUnitId') ? ea_url().setAction('index').set('skillUnitId', app.request.query.get('skillUnitId')) : ea_url().setAction('index') }}" class="skill-create-back">
                 <i class="fa fa-arrow-left"></i> Retour
             </a>
-            <span class="skill-create-pill"><i class="fa fa-cube"></i> Nouveau bloc</span>
+            <span class="skill-create-pill"><i class="fa fa-cube"></i> Nouvelle compétence</span>
         </div>
 
         <section class="skill-create-hero">
-            <h2 class="skill-create-title">Créer un bloc de compétences</h2>
-            <p class="skill-create-subtitle">Renseignez les informations du bloc puis ajoutez ses compétences.</p>
+            <h2 class="skill-create-title">Créer une compétence</h2>
+            <p class="skill-create-subtitle">Renseignez les informations de la compétence.</p>
         </section>
 
         <section class="skill-create-form-card">
@@ -211,18 +211,14 @@
                 {% if new_form.name is defined %}
                     {{ form_row(new_form.name) }}
                 {% endif %}
-                {% if new_form.trainings is defined %}
-                    {{ form_row(new_form.trainings) }}
+                {% if new_form.skillUnit is defined %}
+                    {{ form_row(new_form.skillUnit) }}
                 {% endif %}
                 {% if new_form.description is defined %}
                     {{ form_row(new_form.description) }}
                 {% endif %}
-            </div>
-
-            <div class="skill-create-section">
-                <h3 class="skill-create-section-title">Compétences</h3>
-                {% if new_form.skills is defined %}
-                    {{ form_row(new_form.skills) }}
+                {% if new_form.subjects is defined %}
+                    {{ form_row(new_form.subjects) }}
                 {% endif %}
             </div>
 

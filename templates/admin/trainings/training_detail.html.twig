@@ -281,8 +281,8 @@
 {% block main %}
     <div class="training-detail-page">
         <div class="training-detail-toolbar">
-            <a href="{{ ea_url().setAction('index') }}" class="btn btn-training-back">
-                <i class="fa fa-arrow-left"></i> Retour a la liste
+            <a href="{{ app.request.headers.get('referer')|default(ea_url().setAction('index')) }}" class="btn btn-training-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                <i class="fa fa-arrow-left"></i> Retour
             </a>
             <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-training-edit">
                 <i class="fa fa-pen"></i> Modifier

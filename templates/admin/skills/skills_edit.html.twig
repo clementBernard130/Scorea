@@ -192,15 +192,15 @@
 {% block main %}
     <div class="skill-edit-page">
         <div class="skill-edit-toolbar">
-            <a href="{{ app.request.query.get('trainingId') ? ea_url().setAction('index').set('trainingId', app.request.query.get('trainingId')) : ea_url().setAction('index') }}" class="skill-edit-back">
+            <a href="{{ app.request.query.get('skillUnitId') ? ea_url().setAction('index').set('skillUnitId', app.request.query.get('skillUnitId')) : ea_url().setAction('index') }}" class="skill-edit-back">
                 <i class="fa fa-arrow-left"></i> Retour
             </a>
             <span class="skill-edit-pill"><i class="fa fa-pen"></i> Edition</span>
         </div>
 
         <section class="skill-edit-hero">
-            <h2 class="skill-edit-title">Modifier le bloc de compétences</h2>
-            <p class="skill-edit-subtitle">Mettez a jour le bloc et ses compétences associées.</p>
+            <h2 class="skill-edit-title">Modifier la compétence</h2>
+            <p class="skill-edit-subtitle">Mettez a jour la compétence.</p>
         </section>
 
         <section class="skill-edit-form-card">
@@ -211,18 +211,14 @@
                 {% if edit_form.name is defined %}
                     {{ form_row(edit_form.name) }}
                 {% endif %}
-                {% if edit_form.trainings is defined %}
-                    {{ form_row(edit_form.trainings) }}
+                {% if edit_form.skillUnit is defined %}
+                    {{ form_row(edit_form.skillUnit) }}
                 {% endif %}
                 {% if edit_form.description is defined %}
                     {{ form_row(edit_form.description) }}
                 {% endif %}
-            </div>
-
-            <div class="skill-edit-section">
-                <h3 class="skill-edit-section-title">Compétences</h3>
-                {% if edit_form.skills is defined %}
-                    {{ form_row(edit_form.skills) }}
+                {% if edit_form.subjects is defined %}
+                    {{ form_row(edit_form.subjects) }}
                 {% endif %}
             </div>
 

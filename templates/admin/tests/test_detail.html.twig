@@ -242,8 +242,8 @@
 {% block main %}
     <div class="test-detail-page">
         <div class="test-detail-toolbar">
-            <a href="{{ ea_url().setAction('index') }}" class="btn btn-test-back">
-                <i class="fa fa-arrow-left"></i> Retour à la liste
+            <a href="{{ app.request.headers.get('referer')|default(ea_url().setAction('index')) }}" class="btn btn-test-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                <i class="fa fa-arrow-left"></i> Retour
             </a>
             <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-test-edit">
                 <i class="fa fa-pen"></i> Modifier

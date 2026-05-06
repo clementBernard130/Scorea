@@ -244,8 +244,8 @@
 {% block main %}
     <div class="grade-detail-page">
         <div class="grade-detail-toolbar">
-            <a href="{{ ea_url().setAction('index') }}" class="btn btn-grade-back">
-                <i class="fa fa-arrow-left"></i> Retour à la liste
+            <a href="{{ app.request.headers.get('referer')|default(ea_url().setAction('index')) }}" class="btn btn-grade-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                <i class="fa fa-arrow-left"></i> Retour
             </a>
             <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-grade-edit">
                 <i class="fa fa-pen"></i> Modifier
