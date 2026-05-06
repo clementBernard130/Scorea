@@ -61,8 +61,8 @@ jobs:
       env:
         DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
 
-    - name: Run migrations
-      run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
+    - name: Create test database schema
+      run: php bin/console doctrine:schema:create --env=test
       env:
         DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
 
