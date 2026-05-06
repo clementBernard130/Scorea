@@ -3,6 +3,6 @@
 @source not "../../public";
 
 
-body {
+body.app-body {
     background-color: lightgray;
 }

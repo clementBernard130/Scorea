@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ColorScheme;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
@@ -76,6 +77,12 @@ class DashboardController extends AbstractDashboardController
             ->setTitle('Scorea - Administration')
             ->disableDarkMode()
             ->setDefaultColorScheme(ColorScheme::LIGHT);
+    }
+
+    public function configureAssets(): Assets
+    {
+        return Assets::new()
+            ->addWebpackEncoreEntry('app');
     }
 
     public function configureMenuItems(): iterable
