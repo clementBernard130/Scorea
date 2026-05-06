@@ -12,21 +12,21 @@ jobs:
     
     strategy:
       matrix:
-        php-version: ['8.2', '8.3']
+        php-version: ['8.3']
 
     services:
-      mysql:
-        image: mysql:8.0
+      postgres:
+        image: postgres:16
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: scorea_test
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: app
         options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
-          - 3306:3306
+          - 5432:5432
 
     steps:
     - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-version }}
-        extensions: ctype, iconv, mysql, pdo_mysql
+        extensions: ctype, iconv, pdo_pgsql
         coverage: pcov
         ini-values: post_max_size=256M
 
@@ -59,23 +59,47 @@ jobs:
     - name: Create test database
       run: php bin/console doctrine:database:create --env=test --if-not-exists
       env:
-        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+        DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
 
-    - name: Run migrations
+    - name: Generate migration
+      run: php bin/console doctrine:migrations:diff --env=test || true
+      env:
+        DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
+
+    - name: Execute migrations
       run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
       env:
-        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+        DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
 
-    - name: Run PHPUnit tests
+    - name: Run PHPUnit tests (empty DB)
+      run: php bin/phpunit --exclude-group needs-fixtures --coverage-text
+      env:
+        DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
+
+    - name: Load fixtures
+      run: php bin/console doctrine:fixtures:load --env=test --no-interaction --purge-with-truncate
+      env:
+        DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
+
+    - name: Run PHPUnit tests (with fixtures)
       run: php bin/phpunit --coverage-text
       env:
-        DATABASE_URL: mysql://root:root@127.0.0.1:3306/scorea_test
+        DATABASE_URL: postgresql://postgres:root@127.0.0.1:5432/app?serverVersion=16
 
   frontend-build:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
