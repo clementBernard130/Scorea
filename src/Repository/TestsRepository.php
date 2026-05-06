@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Tests;
+use App\Entity\Sections;
 use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -25,6 +26,22 @@ class TestsRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('test')
             ->andWhere('test.teacher = :teacher')
             ->setParameter('teacher', $teacher)
+            ->orderBy('test.testDate', 'DESC')
+            ->addOrderBy('test.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Tests[]
+     */
+    public function findByTeacherAndSection(Users $teacher, Sections $section): array
+    {
+        return $this->createQueryBuilder('test')
+            ->andWhere('test.teacher = :teacher')
+            ->andWhere('test.section = :section')
+            ->setParameter('teacher', $teacher)
+            ->setParameter('section', $section)
             ->orderBy('test.testDate', 'DESC')
             ->addOrderBy('test.id', 'DESC')
             ->getQuery()
