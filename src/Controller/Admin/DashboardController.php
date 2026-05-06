@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\GradeTypeNames;
 use App\Entity\Users;
 use App\Entity\Sections;
 use App\Entity\Trainings;
@@ -95,6 +96,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Formations', 'fa fa-graduation-cap');
         yield MenuItem::linkToCrud('Sections', 'fa fa-chalkboard', Sections::class);
         yield MenuItem::linkToCrud('Formations', 'fa fa-school', Trainings::class);
+        yield MenuItem::linkToCrud('Types de note', 'fa fa-tags', GradeTypeNames::class);
 
         // Section Synchronisation
         yield MenuItem::section('Synchronisation', 'fa fa-file-arrow-up');
