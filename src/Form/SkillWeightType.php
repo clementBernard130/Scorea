@@ -16,7 +16,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 
 class SkillWeightType extends AbstractType
-{    public function buildForm(FormBuilderInterface $builder, array $options): void
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('type', EntityType::class, [
