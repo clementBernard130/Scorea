@@ -130,10 +130,11 @@ final class StudentSkillGradeResolverTest extends TestCase
         $this->assertEqualsWithDelta(10.0, $result[20]['subjects'][0]['average'], 0.01);
     }
 
-    public function testWhenOnlyOneEvalTypeIsPresent_NormalizesToAvailablePercentage(): void
+    public function testWhenOnlyOneEvalTypeIsPresent_ContributesOnlyItsPercentage(): void
     {
-        // Seul Oral Projet (60 %) a été évalué, CC (40 %) absent encore
-        // → normalise sur 60 : (14×60)/60 = 14
+        // Seul Oral Projet (60 %) a été évalué, CC (40 %) absent
+        // → avg oral = (12+16)/2 = 14
+        // → résultat = 14 × 60% = 8,4  (CC absent contribue 0)
         $gtOral  = $this->makeGradeType($this->typeOral, 60);
         $gtCC    = $this->makeGradeType($this->typeCC,   40);
         $skill   = $this->makeSkill(10, 'C1', [$gtOral, $gtCC]);
@@ -151,7 +152,8 @@ final class StudentSkillGradeResolverTest extends TestCase
 
         $result = $this->resolver->resolve($student);
 
-        $this->assertEqualsWithDelta(14.0, $result[10]['subjects'][0]['average'], 0.01);
+        // 14 × 60 / 100 = 8.4
+        $this->assertEqualsWithDelta(8.4, $result[10]['subjects'][0]['average'], 0.01);
     }
 
     // =========================================================================
