@@ -28,13 +28,7 @@ final class StudentSkillGradeResolver
     }
 
     /**
-     * Calcule la moyenne pondérée par type d'éval à partir de notes groupées par typeId.
-     * Les poids sont des pourcentages dont la somme vaut 100 :
-     *   ex. Oral Projet=60 % + Contrôle Continu=40 % → diviseur = 60+40 = 100
-     *   ex. DS=100 %                                 → diviseur = 100
-     * Si un type n'a pas encore été évalué, le diviseur est la somme des types présents
-     * (normalisation sur les types disponibles).
-     * Si aucune pondération n'est configurée, retourne la moyenne arithmétique simple.
+
      *
      * @param array<int|string, list<float>> $gradesByType  typeId (ou 'none') → valeurs
      * @param array<int, int>                $typeWeights   typeId → pourcentage (0-100)
@@ -56,7 +50,8 @@ final class StudentSkillGradeResolver
         }
 
         if ($typeWeightSum > 0) {
-            return $typeWeightedSum / $typeWeightSum;
+            $totalConfiguredWeight = array_sum($typeWeights) ?: $typeWeightSum;
+            return $typeWeightedSum / $totalConfiguredWeight;
         }
 
         // Repli sur la moyenne arithmétique si aucune pondération définie
@@ -159,6 +154,7 @@ final class StudentSkillGradeResolver
                     : null,
                 'subjects' => $subjects,
             ];
+
         }
 
         return $result;
