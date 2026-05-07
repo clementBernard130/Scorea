@@ -93,7 +93,9 @@ class TeacherPortalController extends AbstractController
             ])
             ->add('gradeType', EntityType::class, [
                 'class' => GradeTypeNames::class,
-                'choice_label' => 'name',
+                'choice_label' => function (GradeTypeNames $gradeTypeName) use ($test): string {
+                    return $this->gradeTypeChoiceLabel($gradeTypeName, $test->getSubject());
+                },
                 'label' => 'Type de test',
             ])
             ->add('isCertificative', CheckboxType::class, [
@@ -128,6 +130,7 @@ class TeacherPortalController extends AbstractController
             'pageTitle' => 'Créer une évaluation',
             'submitLabel' => 'Créer le test',
             'formAction' => $this->generateUrl('teacher_portal_test_new', $section ? ['section' => $section->getId()] : []),
+            'gradeTypeWeightsBySubject' => $this->buildGradeTypeWeightsBySubject($teacher->getSubjects()->toArray()),
         ]);
     }
 
@@ -154,7 +157,9 @@ class TeacherPortalController extends AbstractController
             ])
             ->add('gradeType', EntityType::class, [
                 'class' => GradeTypeNames::class,
-                'choice_label' => 'name',
+                'choice_label' => function (GradeTypeNames $gradeTypeName) use ($test): string {
+                    return $this->gradeTypeChoiceLabel($gradeTypeName, $test->getSubject());
+                },
                 'label' => 'Type de test',
             ])
             ->add('isCertificative', CheckboxType::class, [
@@ -188,6 +193,7 @@ class TeacherPortalController extends AbstractController
             'pageTitle' => 'Modifier une évaluation',
             'submitLabel' => 'Enregistrer',
             'formAction' => $this->generateUrl('teacher_portal_test_edit', $section ? ['id' => $test->getId(), 'section' => $section->getId()] : ['id' => $test->getId()]),
+            'gradeTypeWeightsBySubject' => $this->buildGradeTypeWeightsBySubject($teacher->getSubjects()->toArray()),
         ]);
     }
 
@@ -470,6 +476,66 @@ class TeacherPortalController extends AbstractController
         }
 
         return $section;
+    }
+
+    private function gradeTypeChoiceLabel(GradeTypeNames $gradeTypeName, ?\App\Entity\Subjects $subject): string
+    {
+        if ($subject === null) {
+            return (string) $gradeTypeName->getName();
+        }
+
+        // Filtrer les GradeTypes dont la compétence est liée à ce sujet
+        $matching = $gradeTypeName->getGradeTypes()->filter(
+            fn (\App\Entity\GradeTypes $gt) => $subject->getSkills()->contains($gt->getSkill())
+        );
+
+        if ($matching->isEmpty()) {
+            return (string) $gradeTypeName->getName();
+        }
+
+        // Tous les poids identiques → affichage simple
+        $weights = $matching->map(fn (\App\Entity\GradeTypes $gt) => $gt->getWeight())->toArray();
+        $unique = array_unique($weights);
+
+        if (count($unique) === 1) {
+            return sprintf('%s - %d %%', $gradeTypeName->getName(), reset($unique));
+        }
+
+        // Poids différents selon la compétence → détailler par compétence
+        $parts = [];
+        foreach ($matching as $gt) {
+            $parts[] = sprintf('%s : %d %%', $gt->getSkill()?->getName() ?? '?', $gt->getWeight());
+        }
+
+        return sprintf('%s (%s)', $gradeTypeName->getName(), implode(' / ', $parts));
+    }
+
+    /**
+     * Construit la map subjectId → gradeTypeNameId → label
+     * pour permettre au JS de mettre à jour les options sans appel réseau.
+     *
+     * @param \App\Entity\Subjects[] $subjects
+     * @return array<int, array<int, string>>
+     */
+    private function buildGradeTypeWeightsBySubject(array $subjects): array
+    {
+        $gradeTypeNames = $this->entityManager->getRepository(GradeTypeNames::class)->findAll();
+        $result = [];
+
+        foreach ($subjects as $subject) {
+            $subjectId = $subject->getId();
+            if ($subjectId === null) {
+                continue;
+            }
+            foreach ($gradeTypeNames as $gradeTypeName) {
+                $typeId = $gradeTypeName->getId();
+                if ($typeId !== null) {
+                    $result[$subjectId][$typeId] = $this->gradeTypeChoiceLabel($gradeTypeName, $subject);
+                }
+            }
+        }
+
+        return $result;
     }
 
     private function getTeacherUser(): Users
