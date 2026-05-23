@@ -225,6 +225,16 @@ final class StudentSkillGradeResolver
                 $typeWeights = [];
                 foreach ($subject->getSkills() as $skill) {
                     foreach ($this->buildTypeWeightMap($skill) as $typeId => $weight) {
+                        if (isset($typeWeights[$typeId]) && $typeWeights[$typeId] !== $weight) {
+                            throw new \LogicException(sprintf(
+                                'Conflit de pondération pour le type d\'éval id=%d sur la matière "%s" (id=%d) : poids %d sur une compétence, %d sur une autre.',
+                                $typeId,
+                                $subject->getName() ?? 'inconnue',
+                                $subjectId,
+                                $typeWeights[$typeId],
+                                $weight
+                            ));
+                        }
                         $typeWeights[$typeId] = $weight;
                     }
                 }

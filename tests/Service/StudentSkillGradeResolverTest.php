@@ -266,6 +266,30 @@ final class StudentSkillGradeResolverTest extends TestCase
         $this->assertNull($this->resolver->resolveGlobalAverage($this->makeStudent([])));
     }
 
+    public function testGlobalAverageThrowsOnConflictingTypeWeightsForSameSubject(): void
+    {
+        $typeOral = $this->makeGradeTypeName(1, 'Oral Projet');
+
+        $gtA = $this->makeGradeType($typeOral, 60);
+        $gtB = $this->makeGradeType($typeOral, 70); // conflit : 60 ≠ 70
+
+        $skillA = $this->makeSkill(10, 'C1', [$gtA]);
+        $skillB = $this->makeSkill(20, 'C2', [$gtB]);
+        $gtA->setSkill($skillA);
+        $gtB->setSkill($skillB);
+
+        // Les deux compétences sont liées à la même matière
+        $subject = $this->makeSubject(100, 'M1', 2.0, [$skillA, $skillB]);
+        $test    = $this->makeTest($subject, $typeOral);
+
+        $student = $this->makeStudent([
+            $this->makeGrade(1, $test, 14.0),
+        ]);
+
+        $this->expectException(\LogicException::class);
+        $this->resolver->resolveGlobalAverage($student);
+    }
+
     // =========================================================================
     // Helpers
     // =========================================================================
