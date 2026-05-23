@@ -16,6 +16,23 @@ class GradeTypeNamesRepository extends ServiceEntityRepository
         parent::__construct($registry, GradeTypeNames::class);
     }
 
+    /**
+     * Charge tous les GradeTypeNames avec leurs GradeTypes et les Skills associés en une seule requête,
+     * évitant les N+1 lors de l'accès à getGradeTypes() ou getSkill() dans les callbacks de formulaire.
+     *
+     * @return GradeTypeNames[]
+     */
+    public function findAllWithGradeTypesAndSkills(): array
+    {
+        return $this->createQueryBuilder('gtn')
+            ->leftJoin('gtn.gradeTypes', 'gt')
+            ->addSelect('gt')
+            ->leftJoin('gt.skill', 's')
+            ->addSelect('s')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return GradeTypeNames[] Returns an array of GradeTypeNames objects
     //     */

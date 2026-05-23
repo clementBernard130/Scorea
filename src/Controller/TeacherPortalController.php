@@ -7,6 +7,7 @@ use App\Entity\GradeTypeNames;
 use App\Entity\Sections;
 use App\Entity\Tests;
 use App\Entity\Users;
+use App\Repository\GradeTypeNamesRepository;
 use App\Repository\GradesRepository;
 use App\Repository\SectionsRepository;
 use App\Repository\TestsRepository;
@@ -32,7 +33,8 @@ class TeacherPortalController extends AbstractController
         private GradesRepository $gradesRepository,
         private SectionsRepository $sectionsRepository,
         private TestsRepository $testsRepository,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private GradeTypeNamesRepository $gradeTypeNamesRepository
     ) {
     }
 
@@ -80,6 +82,8 @@ class TeacherPortalController extends AbstractController
         $test->setTeacher($teacher);
         $test->setTestDate(new \DateTime());
 
+        $gradeTypeNames = $this->gradeTypeNamesRepository->findAllWithGradeTypesAndSkills();
+
         $form = $this->createFormBuilder($test)
             ->add('subject', EntityType::class, [
                 'class' => \App\Entity\Subjects::class,
@@ -93,6 +97,7 @@ class TeacherPortalController extends AbstractController
             ])
             ->add('gradeType', EntityType::class, [
                 'class' => GradeTypeNames::class,
+                'choices' => $gradeTypeNames,
                 'choice_label' => function (GradeTypeNames $gradeTypeName) use ($test): string {
                     return $this->gradeTypeChoiceLabel($gradeTypeName, $test->getSubject());
                 },
@@ -130,7 +135,7 @@ class TeacherPortalController extends AbstractController
             'pageTitle' => 'Créer une évaluation',
             'submitLabel' => 'Créer le test',
             'formAction' => $this->generateUrl('teacher_portal_test_new', $section ? ['section' => $section->getId()] : []),
-            'gradeTypeWeightsBySubject' => $this->buildGradeTypeWeightsBySubject($teacher->getSubjects()->toArray()),
+            'gradeTypeWeightsBySubject' => $this->buildGradeTypeWeightsBySubject($teacher->getSubjects()->toArray(), $gradeTypeNames),
         ]);
     }
 
@@ -143,6 +148,8 @@ class TeacherPortalController extends AbstractController
         }
 
         $section = $this->resolveSectionFromRequest($request, $teacher);
+
+        $gradeTypeNames = $this->gradeTypeNamesRepository->findAllWithGradeTypesAndSkills();
 
         $form = $this->createFormBuilder($test)
             ->add('subject', EntityType::class, [
@@ -157,6 +164,7 @@ class TeacherPortalController extends AbstractController
             ])
             ->add('gradeType', EntityType::class, [
                 'class' => GradeTypeNames::class,
+                'choices' => $gradeTypeNames,
                 'choice_label' => function (GradeTypeNames $gradeTypeName) use ($test): string {
                     return $this->gradeTypeChoiceLabel($gradeTypeName, $test->getSubject());
                 },
@@ -193,7 +201,7 @@ class TeacherPortalController extends AbstractController
             'pageTitle' => 'Modifier une évaluation',
             'submitLabel' => 'Enregistrer',
             'formAction' => $this->generateUrl('teacher_portal_test_edit', $section ? ['id' => $test->getId(), 'section' => $section->getId()] : ['id' => $test->getId()]),
-            'gradeTypeWeightsBySubject' => $this->buildGradeTypeWeightsBySubject($teacher->getSubjects()->toArray()),
+            'gradeTypeWeightsBySubject' => $this->buildGradeTypeWeightsBySubject($teacher->getSubjects()->toArray(), $gradeTypeNames),
         ]);
     }
 
@@ -515,11 +523,11 @@ class TeacherPortalController extends AbstractController
      * pour permettre au JS de mettre à jour les options sans appel réseau.
      *
      * @param \App\Entity\Subjects[] $subjects
+     * @param \App\Entity\GradeTypeNames[] $gradeTypeNames Liste pré-chargée (avec gradeTypes et skills) pour éviter les N+1
      * @return array<int, array<int, string>>
      */
-    private function buildGradeTypeWeightsBySubject(array $subjects): array
+    private function buildGradeTypeWeightsBySubject(array $subjects, array $gradeTypeNames): array
     {
-        $gradeTypeNames = $this->entityManager->getRepository(GradeTypeNames::class)->findAll();
         $result = [];
 
         foreach ($subjects as $subject) {
