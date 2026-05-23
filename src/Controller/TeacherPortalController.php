@@ -9,6 +9,7 @@ use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\GradeTypeNamesRepository;
 use App\Repository\GradesRepository;
+use App\Repository\GradeTypesRepository;
 use App\Repository\SectionsRepository;
 use App\Repository\TestsRepository;
 use App\Repository\UsersRepository;
@@ -34,7 +35,8 @@ class TeacherPortalController extends AbstractController
         private SectionsRepository $sectionsRepository,
         private TestsRepository $testsRepository,
         private EntityManagerInterface $entityManager,
-        private GradeTypeNamesRepository $gradeTypeNamesRepository
+        private GradeTypeNamesRepository $gradeTypeNamesRepository,
+        private GradeTypesRepository $gradeTypesRepository
     ) {
     }
 
@@ -519,26 +521,55 @@ class TeacherPortalController extends AbstractController
     }
 
     /**
-     * Construit la map subjectId → gradeTypeNameId → label
-     * pour permettre au JS de mettre à jour les options sans appel réseau.
+     * Construit la map subjectId → gradeTypeNameId → label en une seule requête scalaire.
+     * Aucune association lazy n'est traversée : les données sont indexées en PHP pur
+     * à partir des lignes retournées par findWeightRowsBySubjectIds().
      *
-     * @param \App\Entity\Subjects[] $subjects
-     * @param \App\Entity\GradeTypeNames[] $gradeTypeNames Liste pré-chargée (avec gradeTypes et skills) pour éviter les N+1
+     * @param \App\Entity\Subjects[]    $subjects
+     * @param \App\Entity\GradeTypeNames[] $gradeTypeNames Liste pré-chargée pour les labels de fallback
      * @return array<int, array<int, string>>
      */
     private function buildGradeTypeWeightsBySubject(array $subjects, array $gradeTypeNames): array
     {
-        $result = [];
+        $subjectIds = array_values(array_filter(
+            array_map(static fn(\App\Entity\Subjects $s): ?int => $s->getId(), $subjects)
+        ));
 
+        // Index des poids : [subjectId][typeId] → ['weights' => int[], 'skillNames' => string[]]
+        $weightIndex = [];
+        foreach ($this->gradeTypesRepository->findWeightRowsBySubjectIds($subjectIds) as $row) {
+            $weightIndex[$row['subjectId']][$row['typeId']]['weights'][]    = (int) $row['weight'];
+            $weightIndex[$row['subjectId']][$row['typeId']]['skillNames'][] = (string) $row['skillName'];
+        }
+
+        $result = [];
         foreach ($subjects as $subject) {
             $subjectId = $subject->getId();
             if ($subjectId === null) {
                 continue;
             }
-            foreach ($gradeTypeNames as $gradeTypeName) {
-                $typeId = $gradeTypeName->getId();
-                if ($typeId !== null) {
-                    $result[$subjectId][$typeId] = $this->gradeTypeChoiceLabel($gradeTypeName, $subject);
+            foreach ($gradeTypeNames as $gtn) {
+                $typeId   = $gtn->getId();
+                $typeName = (string) $gtn->getName();
+                if ($typeId === null) {
+                    continue;
+                }
+
+                $data = $weightIndex[$subjectId][$typeId] ?? null;
+                if ($data === null) {
+                    $result[$subjectId][$typeId] = $typeName;
+                    continue;
+                }
+
+                $unique = array_unique($data['weights']);
+                if (count($unique) === 1) {
+                    $result[$subjectId][$typeId] = sprintf('%s - %d %%', $typeName, reset($unique));
+                } else {
+                    $parts = [];
+                    foreach (array_keys($data['weights']) as $i) {
+                        $parts[] = sprintf('%s : %d %%', $data['skillNames'][$i], $data['weights'][$i]);
+                    }
+                    $result[$subjectId][$typeId] = sprintf('%s (%s)', $typeName, implode(' / ', $parts));
                 }
             }
         }
