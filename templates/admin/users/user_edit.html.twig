@@ -201,6 +201,21 @@
             gap: 0.8rem;
         }
 
+        .user-edit-duo {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+            margin-top: 0.9rem;
+        }
+
+        .user-edit-duo.user-edit-duo--single {
+            grid-template-columns: 1fr;
+        }
+
+        .user-edit-duo .user-edit-form-section + .user-edit-form-section {
+            margin-top: 0;
+        }
+
         .user-edit-grid .form-group {
             margin: 0;
         }
@@ -343,8 +358,17 @@
             box-shadow: 0 12px 20px color-mix(in srgb, var(--primary) 28%, transparent);
         }
 
+        .user-edit-form-help {
+            font-style: italic;
+            color: var(--muted);
+        }
+
         @media (max-width: 640px) {
             .user-edit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-edit-duo {
                 grid-template-columns: 1fr;
             }
 
@@ -372,11 +396,12 @@
     {% set firstName = entity.instance.firstName|default('') %}
     {% set lastName = entity.instance.lastName|default('') %}
     {% set initials = (firstName|slice(0, 1) ~ lastName|slice(0, 1))|upper %}
+    {% set hasSubjects = edit_form.subjects is defined %}
 
     <div class="user-edit-page {{ themeClass }}">
         <div class="user-edit-toolbar">
             <a href="{{ ea_url().setAction('index') }}" class="btn btn-scorea-back">
-                <i class="fa fa-arrow-left"></i> Retour a la liste
+                <i class="fa fa-arrow-left"></i> Retour
             </a>
         </div>
 
@@ -411,14 +436,75 @@
             <div class="user-edit-form-section">
                 <h3 class="user-edit-form-title">Securite</h3>
                 {% if edit_form.password is defined %}
-                    {{ form_row(edit_form.password) }}
+                    {{- form_label(edit_form.password) -}}
+
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+                        <div style="position: relative; flex: 1;">
+                            {{- form_widget(edit_form.password, {
+                                attr: {
+                                    id: 'pwd-main-field',
+                                    autocomplete: 'new-password',
+                                    style: 'padding-right: 2.8rem; font-family: monospace; letter-spacing: 0.06em;'
+                                }
+                            }) -}}
+                            <button
+                                type="button"
+                                id="pwd-toggle-btn"
+                                onclick="togglePwdVisibility()"
+                                title="Afficher / masquer"
+                                style="
+                                    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+                                    background: none; border: none; cursor: pointer; padding: 0;
+                                    color: var(--muted); font-size: 1rem; line-height: 1;
+                                "
+                            >
+                                <i id="pwd-toggle-icon" class="fa fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <button type="button" class="btn btn-outline-secondary" onclick="generatePassword()" title="Generer un mot de passe securise">
+                            <i class="fa fa-key"></i> Generer
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="copyPassword()" title="Copier">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+
+                    {{- form_errors(edit_form.password) -}}
+                    <p class="user-edit-form-help">Laissez le champ mot de passe vide pour conserver le mot de passe actuel.</p>
+
+                    <div style="height: 4px; border-radius: 2px; background: #e0e0e0; margin-bottom: 4px; overflow: hidden;">
+                        <div id="pwd-strength-bar" style="height: 100%; width: 0; border-radius: 2px; transition: width .3s, background .3s;"></div>
+                    </div>
+                    <small id="pwd-strength-label" style="color: #666; display: block; margin-bottom: 6px;">-</small>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; margin-bottom: 4px;">
+                        <small><span id="r-len" class="pwd-rule-dot">●</span> 12 caracteres min.</small>
+                        <small><span id="r-upper" class="pwd-rule-dot">●</span> Majuscule</small>
+                        <small><span id="r-lower" class="pwd-rule-dot">●</span> Minuscule</small>
+                        <small><span id="r-digit" class="pwd-rule-dot">●</span> Chiffre</small>
+                        <small><span id="r-spec" class="pwd-rule-dot">●</span> Caractere special</small>
+                        <small><span id="r-entropy" class="pwd-rule-dot">●</span> Entropie >= 80 bits</small>
+                    </div>
+                    <small id="pwd-copied-msg" style="color: green; opacity: 0; transition: opacity .3s;">
+                        Copie dans le presse-papiers
+                    </small>
                 {% endif %}
             </div>
 
-            <div class="user-edit-form-section">
-                <h3 class="user-edit-form-title">Sections</h3>
-                {% if edit_form.sections is defined %}
-                    {{ form_row(edit_form.sections) }}
+            <div class="user-edit-duo{% if not hasSubjects %} user-edit-duo--single{% endif %}">
+                <div class="user-edit-form-section">
+                    <h3 class="user-edit-form-title">Sections</h3>
+                    {% if edit_form.sections is defined %}
+                        {{ form_row(edit_form.sections) }}
+                    {% endif %}
+                </div>
+
+                {% if hasSubjects %}
+                    <div class="user-edit-form-section">
+                        <h3 class="user-edit-form-title">Matières</h3>
+                        {{ form_row(edit_form.subjects) }}
+                    </div>
                 {% endif %}
             </div>
 
@@ -427,4 +513,13 @@
         </section>
     </div>
 
+{% endblock %}
+
+{% block configured_javascripts %}
+    {{ parent() }}
+    <style>
+        .pwd-rule-dot { color: #ccc; transition: color .2s; }
+        .pwd-rule-dot.ok { color: #3B6D11; }
+    </style>
+    <script src="{{ asset('assets/admin/password-generator.js') }}"></script>
 {% endblock %}

@@ -4,8 +4,6 @@ namespace App\Controller\Admin;
 
 use App\Entity\Users;
 use App\Entity\Sections;
-use App\Entity\Grades;
-use App\Entity\Tests;
 use App\Entity\Trainings;
 use App\Repository\AlertsRepository;
 use App\Repository\UsersRepository;

@@ -73,7 +73,7 @@
                             {% for grade in grades %}
                                 <tr>
                                     <td class="px-4 py-3 text-sm text-gray-900">{{ grade.student.firstName }} {{ grade.student.lastName }}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-700">{{ grade.gradeType.name }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ grade.test and grade.test.gradeType ? grade.test.gradeType.name : 'Type non défini' }}</td>
                                     <td class="px-4 py-3 text-sm font-semibold text-gray-900">{{ grade.grade|number_format(2, ',', ' ') }}</td>
                                     <td class="px-4 py-3 text-sm text-gray-700">{{ grade.comment ?: 'Aucun commentaire' }}</td>
                                     <td class="px-4 py-3 text-right">

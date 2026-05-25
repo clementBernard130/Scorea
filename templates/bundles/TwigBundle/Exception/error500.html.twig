@@ -1,0 +1,16 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Erreur serveur{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1">500</h1>
+            <h2 class="mb-4">Erreur interne du serveur</h2>
+            <p class="lead text-muted mb-4">Une erreur s'est produite de notre côté. Veuillez réessayer plus tard.</p>
+            <a href="{{ path('app_home') }}" class="btn btn-primary btn-lg">Retour à l'accueil</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

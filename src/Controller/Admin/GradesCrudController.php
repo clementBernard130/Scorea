@@ -3,7 +3,6 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Grades;
-use App\Entity\GradeTypeNames;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
@@ -69,7 +68,6 @@ class GradesCrudController extends AbstractCrudController
         return $filters
             ->add('student')
             ->add('test')
-            ->add('gradeType')
             ->add('createdAt')
             ->add('updatedAt');
     }
@@ -100,8 +98,6 @@ class GradesCrudController extends AbstractCrudController
                 ->setFormTypeOption('choice_label', fn(Users $u) => $this->formatUserLabel($u)),
             AssociationField::new('test', 'Test')
                 ->setFormTypeOption('choice_label', fn(Tests $test) => $this->formatTestLabel($test)),
-            AssociationField::new('gradeType', 'Type de note')
-                ->setFormTypeOption('choice_label', fn(GradeTypeNames $gradeType) => $this->formatGradeTypeLabel($gradeType)),
         ];
     }
 
@@ -121,11 +117,6 @@ class GradesCrudController extends AbstractCrudController
         $testDate = $test->getTestDate()?->format('d/m/Y') ?? 'Date inconnue';
 
         return sprintf('%s - %s - %s', $subjectName, $teacherName, $testDate);
-    }
-
-    public function formatGradeTypeLabel(GradeTypeNames $gradeType): string
-    {
-        return $gradeType->getName() ?? 'Type inconnu';
     }
 
     /**

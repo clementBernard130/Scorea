@@ -31,11 +31,6 @@
                         {% endif %}
                     </div>
                     <div>
-                        {{ form_label(form.gradeType, null, {'label_attr': {'class': 'mb-2 block text-sm font-semibold text-gray-800'}}) }}
-                        {{ form_widget(form.gradeType, {'attr': {'class': 'w-full rounded-md border border-gray-300 bg-white px-3 py-2'}}) }}
-                        {{ form_errors(form.gradeType) }}
-                    </div>
-                    <div>
                         {{ form_label(form.grade, null, {'label_attr': {'class': 'mb-2 block text-sm font-semibold text-gray-800'}}) }}
                         {{ form_widget(form.grade, {'attr': {'class': 'w-full rounded-md border border-gray-300 bg-white px-3 py-2', 'inputmode': 'decimal', 'min': 0, 'max': 20, 'step': '0.01', 'data-grade-input': 'true'}}) }}
                         {{ form_errors(form.grade) }}

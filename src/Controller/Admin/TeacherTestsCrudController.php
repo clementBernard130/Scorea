@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\GradeTypeNames;
 use App\Entity\Tests;
 use App\Entity\Users;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -53,6 +55,9 @@ class TeacherTestsCrudController extends AbstractCrudController
                 ->formatValue(function ($value, Tests $test): string {
                     return (string) $test->getTeacher();
                 }),
+            AssociationField::new('gradeType', 'Type de test')
+                ->setFormTypeOption('choice_label', fn(GradeTypeNames $gradeType) => $gradeType->getName() ?? 'Type inconnu'),
+            BooleanField::new('isCertificative', 'Test certifiant'),
             TextEditorField::new('comment', 'Commentaire'),
             DateField::new('testDate', 'Date du test'),
         ];

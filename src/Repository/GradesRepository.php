@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Grades;
+use App\Entity\Subjects;
 use App\Entity\Tests;
 use App\Entity\Users;
 use App\Entity\Subjects;
@@ -29,7 +30,9 @@ class GradesRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('grade')
             ->innerJoin('grade.student', 'student')
             ->addSelect('student')
-            ->innerJoin('grade.gradeType', 'gradeType')
+            ->innerJoin('grade.test', 'test')
+            ->addSelect('test')
+            ->innerJoin('test.gradeType', 'gradeType')
             ->addSelect('gradeType')
             ->andWhere('grade.test = :test')
             ->andWhere('student.id IN (:allowedStudentIds)')
@@ -74,6 +77,86 @@ class GradesRepository extends ServiceEntityRepository
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    /**
+     * @return Grades[]
+     */
+    public function findHistoryForStudent(
+        Users $student,
+        ?int $subjectId = null,
+        ?\DateTimeInterface $from = null,
+        ?\DateTimeInterface $to = null,
+        int $limit = 150
+    ): array {
+        $qb = $this->createQueryBuilder('grade')
+            ->innerJoin('grade.test', 'test')
+            ->addSelect('test')
+            ->innerJoin('test.subject', 'subject')
+            ->addSelect('subject')
+            ->innerJoin('test.teacher', 'teacher')
+            ->addSelect('teacher')
+            ->innerJoin('test.gradeType', 'gradeType')
+            ->addSelect('gradeType')
+            ->andWhere('grade.student = :student')
+            ->setParameter('student', $student)
+            ->orderBy('test.testDate', 'DESC')
+            ->addOrderBy('grade.id', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($subjectId !== null) {
+            $qb
+                ->andWhere('subject.id = :subjectId')
+                ->setParameter('subjectId', $subjectId);
+        }
+
+        if ($from !== null) {
+            $qb
+                ->andWhere('test.testDate >= :from')
+                ->setParameter('from', $from);
+        }
+
+        if ($to !== null) {
+            $qb
+                ->andWhere('test.testDate <= :to')
+                ->setParameter('to', $to);
+        }
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return list<array{id: int, name: string}>
+     */
+    public function findEvaluatedSubjectsForStudent(Users $student): array
+    {
+        $rows = $this->createQueryBuilder('grade')
+            ->select('DISTINCT subject.id AS id, subject.name AS name')
+            ->innerJoin('grade.test', 'test')
+            ->innerJoin('test.subject', 'subject')
+            ->andWhere('grade.student = :student')
+            ->setParameter('student', $student)
+            ->orderBy('subject.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_values(array_filter(array_map(
+            static function (array $row): ?array {
+                $id = isset($row['id']) ? (int) $row['id'] : null;
+                $name = isset($row['name']) ? (string) $row['name'] : null;
+                if ($id === null || $name === null || $name === '') {
+                    return null;
+                }
+
+                return [
+                    'id' => $id,
+                    'name' => $name,
+                ];
+            },
+            $rows
+        )));
     }
   
     public function findMostRecentByStudentAndSubject(Users $student, Subjects $subject): ?Grades

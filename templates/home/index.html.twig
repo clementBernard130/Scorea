@@ -15,6 +15,11 @@
                     <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-2">
                         <p class="text-gray-900">Connecté en tant que <span class="font-medium">{{ user.firstName }} {{ user.lastName }}</span></p>
                     </div>
+                    {% if is_granted('ROLE_TEACHER') %}
+                        <a href="{{ path('teacher_profile') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
+                            Mon profil
+                        </a>
+                    {% endif %}
                     {% if is_granted('ROLE_ADMIN') %}
                         <a href="{{ path('admin') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
                             Administration
@@ -46,7 +51,9 @@
                                 <p class="text-2xl font-semibold text-gray-900">{{ teacherSections|length }} <span class="text-xs uppercase tracking-wide text-gray-500">Classes</span></p>
                             </div>
                             <div class="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-center">
-                                <p class="text-2xl font-semibold text-gray-900">{{ teacherTestsCount }} <span class="text-xs uppercase tracking-wide text-gray-500">Évaluations</span></p>
+                                <a href="{{ path('teacher_portal_tests_index') }}" class="block text-2xl font-semibold text-gray-900 transition hover:text-blue-700">
+                                    {{ teacherTestsCount }} <span class="text-xs uppercase tracking-wide text-gray-500">Évaluations</span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -118,35 +125,6 @@
                         <p class="mt-2">Si c'est une erreur, vérifiez l'association enseignant / section dans l'administration.</p>
                     </section>
                 {% endif %}
-            {% elseif user %}
-                <div class="rounded-md bg-white p-8 text-gray-900 shadow-md">
-                    <h2 class="text-2xl font-semibold text-gray-900">Tableau de bord</h2>
-
-                    <div class="mt-6 grid gap-4 md:grid-cols-3">
-                        {% if is_granted('ROLE_STUDENT') %}
-                            <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-                                <strong class="mb-2 block text-gray-900">Espace Étudiant</strong>
-                                <p class="text-gray-700">Vous avez accès aux fonctionnalités étudiant.</p>
-                            </div>
-                        {% endif %}
-
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-                                <strong class="mb-2 block text-gray-900">Espace Administrateur</strong>
-                                <p class="text-gray-700">Vous avez accès à toutes les fonctionnalités d'administration.</p>
-                            </div>
-                        {% endif %}
-
-                        <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-                            <strong class="mb-2 block text-gray-900">Rôles</strong>
-                            <ul class="list-disc space-y-1 pl-5 text-gray-700">
-                                {% for role in user.roles %}
-                                    <li>{{ role }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
             {% else %}
                 <div class="rounded-md bg-white px-8 py-16 text-center text-gray-900 shadow-md">
                     <p class="text-sm uppercase tracking-wide text-gray-500">Bienvenue sur Scorea</p>

@@ -234,8 +234,8 @@
     {% set trainingId = app.request.query.get('trainingId') %}
     <div class="skill-detail-page">
         <div class="skill-detail-toolbar">
-            <a href="{{ trainingId ? ea_url().setAction('index').set('trainingId', trainingId) : ea_url().setAction('index') }}" class="btn btn-skill-back">
-                <i class="fa fa-arrow-left"></i> Retour a la liste
+            <a href="{{ app.request.headers.get('referer')|default(trainingId ? ea_url().setAction('index').set('trainingId', trainingId) : ea_url().setAction('index')) }}" class="btn btn-skill-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                <i class="fa fa-arrow-left"></i> Retour
             </a>
             <a href="{{ trainingId ? ea_url().setAction('edit').setEntityId(entity.primaryKeyValue).set('trainingId', trainingId) : ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-skill-edit">
                 <i class="fa fa-pen"></i> Modifier
@@ -274,7 +274,7 @@
             {% if entity.instance.skills|length > 0 %}
                 <div class="skill-chip-wrap">
                     {% for skill in entity.instance.skills %}
-                        <span class="skill-chip"><i class="fa fa-check"></i> {{ skill.name|default(skill) }}</span>
+                        <a href="/admin/skills/{{ skill.id }}" class="skill-chip skill-link"><i class="fa fa-check"></i> {{ skill.name|default(skill) }}</a>
                     {% endfor %}
                 </div>
             {% else %}

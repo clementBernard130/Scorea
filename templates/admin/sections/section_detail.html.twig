@@ -250,8 +250,8 @@
 {% block main %}
     <div class="section-detail-page">
         <div class="section-detail-toolbar">
-            <a href="{{ ea_url().setAction('index') }}" class="btn btn-section-back">
-                <i class="fa fa-arrow-left"></i> Retour à la liste
+            <a href="{{ app.request.headers.get('referer')|default(ea_url().setAction('index')) }}" class="btn btn-section-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                <i class="fa fa-arrow-left"></i> Retour
             </a>
             <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-section-edit">
                 <i class="fa fa-pen"></i> Modifier

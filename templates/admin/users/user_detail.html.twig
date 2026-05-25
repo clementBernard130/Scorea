@@ -158,7 +158,7 @@
             color: var(--primary);
         }
 
-        .user-name {
+        .user-name-detail {
             margin: 0;
             font-size: 1.4rem;
             color: #fff;
@@ -343,7 +343,7 @@
                 height: 50px;
             }
 
-            .user-name {
+            .user-name-detail {
                 font-size: 1.2rem;
             }
         }
@@ -369,9 +369,9 @@
 
     <div class="user-detail-page {{ themeClass }}">
         <div class="user-toolbar">
-            <a href="{{ ea_url().setAction('index') }}" class="btn btn-scorea-back">
+            <a href="{{ app.request.headers.get('referer')|default(ea_url().setAction('index')) }}" class="btn btn-scorea-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
                 <span class="btn-icon"><i class="fa fa-arrow-left"></i></span>
-                <span class="btn-label">Retour a la liste</span>
+                <span class="btn-label">Retour</span>
             </a>
             <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-scorea-edit">
                 <span class="btn-icon"><i class="fa fa-edit"></i></span>
@@ -383,7 +383,7 @@
             <div class="user-hero-content">
                 <div class="user-avatar">{{ initials ?: 'U' }}</div>
                 <div>
-                    <h2 class="user-name">{{ lastName|upper }} {{ firstName }}</h2>
+                    <h2 class="user-name-detail">{{ lastName|upper }} {{ firstName }}</h2>
                     <p class="user-username">{{ entity.instance.username }}</p>
                 </div>
             </div>
@@ -462,6 +462,20 @@
                     {% for section in userSections %}
                         <a href="{{ ea_url().setController('App\\Controller\\Admin\\SectionsCrudController').setAction('detail').setEntityId(section.id) }}" class="chip section-chip section-link">
                             {{ section.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% set userSubjects = entity.instance.subjects|default([]) %}
+        {% if userSubjects|length > 0 %}
+            <section class="user-card">
+                <h3 class="user-card-title">Matières</h3>
+                <div class="chip-wrap">
+                    {% for subject in userSubjects %}
+                        <a class="chip section-chip section-link">
+                            {{ subject.name }}
                         </a>
                     {% endfor %}
                 </div>
