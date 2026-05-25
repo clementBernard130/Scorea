@@ -316,9 +316,8 @@ class TeacherPortalController extends AbstractController
                 'constraints' => [
                     new Range([
                         'min' => 0,
-                        'minMessage' => 'La note minimale est 0.',
                         'max' => 20,
-                        'maxMessage' => 'La note maximale est 20.',
+                        'notInRangeMessage' => 'La note doit être comprise entre 0 et 20.',
                     ]),
                 ],
             ])
@@ -339,6 +338,8 @@ class TeacherPortalController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $grade->setUpdatedAt(new \DateTimeImmutable());
             $this->entityManager->flush();
+
+            $this->alertService->handleGradeUpdated($grade);
 
             if ($section !== null) {
                 return $this->redirectToRoute('app_class_show', ['id' => $section->getId()]);

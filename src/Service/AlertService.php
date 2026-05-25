@@ -47,6 +47,25 @@ class AlertService
     }
 
     /**
+     * À appeler lors de la modification d'une note.
+     *
+     * - Supprime l'alerte 'lower_average' existante pour l'élève/matière.
+     * - Recrée une alerte 'lower_average' si la nouvelle note est inférieure à 10.
+     */
+    public function handleGradeUpdated(Grades $grade): void
+    {
+        $subject = $grade->getTest()->getSubject();
+        $student = $grade->getStudent();
+
+        $this->alertsRepository->removeByTypeSubjectAndStudent('lower_average', $subject, $student);
+
+        if ($grade->getGrade() < 10) {
+            $this->createLowerAverageAlert($grade);
+            $this->em->flush();
+        }
+    }
+
+    /**
      * Peut être appelé manuellement (action admin, commande) pour vérifier
      * les notes manquantes dans une matière pour une section donnée.
      */
