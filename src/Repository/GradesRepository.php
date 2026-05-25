@@ -76,6 +76,21 @@ class GradesRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
   
+    public function findMostRecentByStudentAndSubject(Users $student, Subjects $subject): ?Grades
+    {
+        return $this->createQueryBuilder('g')
+            ->join('g.test', 't')
+            ->addSelect('t')
+            ->andWhere('g.student = :student')
+            ->andWhere('t.subject = :subject')
+            ->setParameter('student', $student)
+            ->setParameter('subject', $subject)
+            ->orderBy('t.testDate', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function findStudentIdsWithGradesInSubject(Subjects $subject): array
     {
         $results = $this->createQueryBuilder('g')

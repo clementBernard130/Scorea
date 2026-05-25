@@ -189,6 +189,14 @@ class TeacherPortalController extends AbstractController
             : $this->getTeacherStudents($teacher);
         $availableStudents = $this->filterStudentsNotYetGradedForTest($test, $students);
 
+        $studentId = $request->query->getInt('student');
+        if ($studentId > 0) {
+            $availableStudents = array_filter(
+                $availableStudents,
+                static fn (Users $s): bool => $s->getId() === $studentId
+            );
+        }
+
         // Handle POST request for bulk grade submission
         if ($request->isMethod('POST')) {
             $gradesData = $request->request->all();
