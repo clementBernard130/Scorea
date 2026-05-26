@@ -36,7 +36,7 @@ class TeacherPortalController extends AbstractController
         private SectionsRepository $sectionsRepository,
         private TestsRepository $testsRepository,
         private EntityManagerInterface $entityManager,
-        private AlertService $alertService,,
+        private AlertService $alertService,
         private GradeTypeNamesRepository $gradeTypeNamesRepository,
         private GradeTypesRepository $gradeTypesRepository
     ) {
