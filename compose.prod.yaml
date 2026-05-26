@@ -1,12 +1,15 @@
+# Usage :
+#   1. Copier .env.dist en .env.prod.local et remplir APP_SECRET + POSTGRES_PASSWORD
+#   2. docker compose -f compose.prod.yaml --env-file .env.prod.local up --build
+
 services:
   database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
-    ports:
-      - "5432:5432"
+    image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-app}
       POSTGRES_USER: ${POSTGRES_USER:-app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD requis}
     healthcheck:
       test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
       interval: 10s
@@ -20,21 +23,19 @@ services:
     build:
       context: .
       args:
-        APP_ENV: dev
+        APP_ENV: prod
+    restart: unless-stopped
     ports:
       - "8000:80"
-    volumes:
-      - .:/var/www/html
-      - vendor_data:/var/www/html/vendor
     environment:
-      APP_ENV: dev
-      APP_DEBUG: "1"
-      APP_SECRET: ${APP_SECRET:-8687f6d708666cfe329341ad469de3f31e242d1934f854ab798c546e4bd1dfca}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-app}?serverVersion=16&charset=utf8
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: ${APP_SECRET:?APP_SECRET requis}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL requis}
+      MAILER_DSN: ${MAILER_DSN:-null://null}
     depends_on:
       database:
         condition: service_healthy
 
 volumes:
   database_data:
-  vendor_data:
