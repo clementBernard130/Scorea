@@ -32,6 +32,12 @@ class Alerts
     #[ORM\ManyToOne(inversedBy: 'alerts')]
     private ?Users $users = null;
 
+    #[ORM\ManyToOne]
+    private ?Tests $test = null;
+
+    #[ORM\ManyToOne]
+    private ?Sections $section = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +111,30 @@ class Alerts
     public function setUsers(?Users $users): static
     {
         $this->users = $users;
+
+        return $this;
+    }
+
+    public function getTest(): ?Tests
+    {
+        return $this->test;
+    }
+
+    public function setTest(?Tests $test): static
+    {
+        $this->test = $test;
+
+        return $this;
+    }
+
+    public function getSection(): ?Sections
+    {
+        return $this->section;
+    }
+
+    public function setSection(?Sections $section): static
+    {
+        $this->section = $section;
 
         return $this;
     }

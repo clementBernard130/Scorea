@@ -13,6 +13,7 @@ use App\Repository\GradeTypesRepository;
 use App\Repository\SectionsRepository;
 use App\Repository\TestsRepository;
 use App\Repository\UsersRepository;
+use App\Service\AlertService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -35,6 +36,7 @@ class TeacherPortalController extends AbstractController
         private SectionsRepository $sectionsRepository,
         private TestsRepository $testsRepository,
         private EntityManagerInterface $entityManager,
+        private AlertService $alertService,
         private GradeTypeNamesRepository $gradeTypeNamesRepository,
         private GradeTypesRepository $gradeTypesRepository
     ) {
@@ -221,11 +223,19 @@ class TeacherPortalController extends AbstractController
             : $this->getTeacherStudents($teacher);
         $availableStudents = $this->filterStudentsNotYetGradedForTest($test, $students);
 
+        $studentId = $request->query->getInt('student');
+        if ($studentId > 0) {
+            $availableStudents = array_filter(
+                $availableStudents,
+                static fn (Users $s): bool => $s->getId() === $studentId
+            );
+        }
+
         // Handle POST request for bulk grade submission
         if ($request->isMethod('POST')) {
             $gradesData = $request->request->all();
             $now = new \DateTimeImmutable();
-            $successCount = 0;
+            $createdGrades = [];
 
             foreach ($gradesData as $key => $data) {
                 if (!str_starts_with($key, 'grade_') || empty($data['student_id'])) {
@@ -259,11 +269,15 @@ class TeacherPortalController extends AbstractController
                 $grade->setUpdatedAt($now);
 
                 $this->entityManager->persist($grade);
-                $successCount++;
+                $createdGrades[] = $grade;
             }
 
-            if ($successCount > 0) {
+            if ($createdGrades !== []) {
                 $this->entityManager->flush();
+
+                foreach ($createdGrades as $grade) {
+                    $this->alertService->handleGradeCreated($grade);
+                }
 
                 if ($section !== null) {
                     return $this->redirectToRoute('app_class_show', ['id' => $section->getId()]);
@@ -318,9 +332,8 @@ class TeacherPortalController extends AbstractController
                 'constraints' => [
                     new Range([
                         'min' => 0,
-                        'minMessage' => 'La note minimale est 0.',
                         'max' => 20,
-                        'maxMessage' => 'La note maximale est 20.',
+                        'notInRangeMessage' => 'La note doit être comprise entre 0 et 20.',
                     ]),
                 ],
             ])
@@ -341,6 +354,8 @@ class TeacherPortalController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $grade->setUpdatedAt(new \DateTimeImmutable());
             $this->entityManager->flush();
+
+            $this->alertService->handleGradeUpdated($grade);
 
             if ($section !== null) {
                 return $this->redirectToRoute('app_class_show', ['id' => $section->getId()]);

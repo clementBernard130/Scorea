@@ -7,6 +7,7 @@ use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\TestsRepository;
 use App\Repository\UsersRepository;
+use App\Service\AlertService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -30,7 +31,8 @@ class TeacherGradesCrudController extends AbstractCrudController
 {
     public function __construct(
         private UsersRepository $usersRepository,
-        private TestsRepository $testsRepository
+        private TestsRepository $testsRepository,
+        private AlertService $alertService,
     ) {}
 
     public static function getEntityFqcn(): string
@@ -70,7 +72,7 @@ class TeacherGradesCrudController extends AbstractCrudController
 
                     return $fullName !== '' ? $fullName : (string) $user->getUsername();
                 })
-                ->formatValue(function ($value, Grades $grade): string {
+                ->formatValue(function (mixed $_, Grades $grade): string {
                     return (string) $grade->getStudent();
                 }),
             AssociationField::new('gradeType', 'Type de note')
@@ -133,6 +135,8 @@ class TeacherGradesCrudController extends AbstractCrudController
         $entityInstance->setUpdatedAt(new \DateTimeImmutable());
 
         parent::updateEntity($entityManager, $entityInstance);
+
+        $this->alertService->handleGradeUpdated($entityInstance);
     }
 
     public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void

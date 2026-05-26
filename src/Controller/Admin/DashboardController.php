@@ -6,6 +6,7 @@ use App\Entity\GradeTypeNames;
 use App\Entity\Users;
 use App\Entity\Sections;
 use App\Entity\Trainings;
+use App\Repository\AlertsRepository;
 use App\Repository\UsersRepository;
 use App\Repository\SectionsRepository;
 use App\Repository\TrainingsRepository;
@@ -22,7 +23,8 @@ class DashboardController extends AbstractDashboardController
     public function __construct(
         private UsersRepository $userRepository,
         private SectionsRepository $sectionsRepository,
-        private TrainingsRepository $trainingsRepository
+        private TrainingsRepository $trainingsRepository,
+        private AlertsRepository $alertsRepository
     ) {}
 
     public function index(): Response 
@@ -44,7 +46,7 @@ class DashboardController extends AbstractDashboardController
         $trainings = $this->trainingsRepository->findAll();
         $trainingCount = count($trainings);
 
-        $alerts = $this->generateAlerts($studentCount, $teacherCount, $classCount, $allUsers, $classes);
+        $alerts = $this->alertsRepository->findAll();
 
         $formatter = new \IntlDateFormatter('fr_FR', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE);
         $formattedDate = $formatter->format(new \DateTime());
@@ -60,15 +62,6 @@ class DashboardController extends AbstractDashboardController
             'formattedDate' => $formattedDate,
             'recentAlerts' => $alerts,
         ]);
-    }
-
-    private function generateAlerts(int $studentCount, int $teacherCount, int $classCount, array $allUsers, array $classes): array
-    {
-        $alerts = [];
-
-        // A récupérer de la BDD
-
-        return $alerts;
     }
 
     public function configureDashboard(): Dashboard

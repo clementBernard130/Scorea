@@ -6,6 +6,7 @@ use App\Entity\Alerts;
 use App\Entity\Grades;
 use App\Entity\Sections;
 use App\Entity\Subjects;
+use App\Entity\Tests;
 use App\Entity\Users;
 use App\Repository\AlertsRepository;
 use App\Repository\GradesRepository;
@@ -39,23 +40,42 @@ class AlertService
         }
 
         foreach ($student->getSections() as $section) {
-            $this->createMissingGradeAlertsForSection($subject, $section);
+            $this->createMissingGradeAlertsForSection($subject, $section, $grade->getTest());
         }
 
         $this->em->flush();
     }
 
     /**
+     * À appeler lors de la modification d'une note.
+     *
+     * - Supprime l'alerte 'lower_average' existante pour l'élève/matière.
+     * - Recrée une alerte 'lower_average' si la nouvelle note est inférieure à 10.
+     */
+    public function handleGradeUpdated(Grades $grade): void
+    {
+        $subject = $grade->getTest()->getSubject();
+        $student = $grade->getStudent();
+
+        $this->alertsRepository->removeByTypeSubjectAndStudent('lower_average', $subject, $student);
+
+        if ($grade->getGrade() < 10) {
+            $this->createLowerAverageAlert($grade);
+            $this->em->flush();
+        }
+    }
+
+    /**
      * Peut être appelé manuellement (action admin, commande) pour vérifier
      * les notes manquantes dans une matière pour une section donnée.
      */
-    public function handleMissingGrades(Subjects $subject, Sections $section): void
+    public function handleMissingGrades(Subjects $subject, Sections $section, Tests $triggeringTest): void
     {
-        $this->createMissingGradeAlertsForSection($subject, $section);
+        $this->createMissingGradeAlertsForSection($subject, $section, $triggeringTest);
         $this->em->flush();
     }
 
-    private function createMissingGradeAlertsForSection(Subjects $subject, Sections $section): void
+    private function createMissingGradeAlertsForSection(Subjects $subject, Sections $section, Tests $triggeringTest): void
     {
         // Requête DQL directe pour éviter le cache des collections Doctrine
         $studentIdsWithGrades = $this->gradesRepository->findStudentIdsWithGradesInSubject($subject);
@@ -83,7 +103,9 @@ class AlertService
                 'Note manquante',
                 sprintf('Aucune note pour %s en %s', $student, $subject->getName()),
                 $subject,
-                $student
+                $student,
+                $triggeringTest,
+                $section
             );
         }
     }
@@ -102,11 +124,13 @@ class AlertService
             'Note inférieure à la moyenne',
             sprintf('%s a obtenu %.2f/20 en %s', $student, $grade->getGrade(), $subject->getName()),
             $subject,
-            $student
+            $student,
+            $grade->getTest(),
+            $grade->getTest()->getSection()
         );
     }
 
-    private function createAlert(string $type, string $name, string $description, Subjects $subject, Users $student): void
+    private function createAlert(string $type, string $name, string $description, Subjects $subject, Users $student, Tests $test, ?Sections $section = null): void
     {
         $alert = new Alerts();
         $alert->setType([$type]);
@@ -115,6 +139,8 @@ class AlertService
         $alert->setDescription($description);
         $alert->setSubject($subject);
         $alert->setUsers($student);
+        $alert->setTest($test);
+        $alert->setSection($section);
 
         $this->em->persist($alert);
     }

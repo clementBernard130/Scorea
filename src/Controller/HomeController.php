@@ -9,6 +9,7 @@ use App\Entity\Sections;
 use App\Entity\Tests;
 use App\Repository\SectionsRepository;
 use App\Repository\TestsRepository;
+use App\Repository\AlertsRepository;
 use App\Repository\GradesRepository;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +22,8 @@ class HomeController extends AbstractController
     public function __construct(
         private SectionsRepository $sectionsRepository,
         private TestsRepository $testsRepository,
-        private GradesRepository $gradesRepository
+        private GradesRepository $gradesRepository,
+        private AlertsRepository $alertsRepository,
     ) {
     }
 
@@ -64,6 +66,7 @@ class HomeController extends AbstractController
         
         $teacherSections = [];
         $teacherTestsCount = 0;
+        $teacherAlerts = [];
 
         if ($user instanceof Users && in_array('ROLE_TEACHER', $user->getRoles(), true)) {
             $sections = $this->sectionsRepository->findForTeacher($user);
@@ -101,15 +104,59 @@ class HomeController extends AbstractController
                 $sections
             );
 
-            $teacherTestsCount = count($this->testsRepository->findByTeacher($user));
+            $teacherTests = $this->testsRepository->findByTeacher($user);
+            $teacherTestsCount = count($teacherTests);
 
+            // Build lookup [subjectId][sectionId] => most recent test (tests are already sorted DESC)
+            $testBySubjectAndSection = [];
+            foreach ($teacherTests as $test) {
+                $subjectId = $test->getSubject()?->getId();
+                $sectionId = $test->getSection()?->getId();
+                if ($subjectId === null || $sectionId === null) {
+                    continue;
+                }
+                if (!isset($testBySubjectAndSection[$subjectId][$sectionId])) {
+                    $testBySubjectAndSection[$subjectId][$sectionId] = $test;
+                }
+            }
+
+            $subjectsById = [];
+            foreach ($teacherTests as $test) {
+                $subject = $test->getSubject();
+                if ($subject !== null) {
+                    $subjectsById[$subject->getId()] = $subject;
+                }
+            }
+            $teacherSubjects = array_values($subjectsById);
+            $rawAlerts = $teacherSubjects !== [] ? $this->alertsRepository->findBySubjects($teacherSubjects) : [];
+
+            $teacherAlerts = [];
+            foreach ($rawAlerts as $alert) {
+                $test = $alert->getTest();
+                $sectionId = $alert->getSection()?->getId();
+
+                if ($test === null) {
+                    continue;
+                }
+
+                if (in_array('missing_grade', $alert->getType() ?? [], true) && $sectionId === null) {
+                    continue;
+                }
+
+                $teacherAlerts[] = [
+                    'alert' => $alert,
+                    'testId' => $test->getId(),
+                    'sectionId' => $sectionId,
+                    'studentId' => $alert->getUsers()?->getId(),
+                ];
+            }
         }
 
         return $this->render('home/index.html.twig', [
             'user' => $user,
-
             'teacherSections' => $teacherSections,
             'teacherTestsCount' => $teacherTestsCount,
+            'teacherAlerts' => $teacherAlerts,
         ]);
     }
 }

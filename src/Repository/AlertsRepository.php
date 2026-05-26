@@ -18,6 +18,26 @@ class AlertsRepository extends ServiceEntityRepository
         parent::__construct($registry, Alerts::class);
     }
 
+    /**
+     * @param Subjects[] $subjects
+     * @return Alerts[]
+     */
+    public function findBySubjects(array $subjects): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.users', 'u')
+            ->addSelect('u')
+            ->leftJoin('u.sections', 's')
+            ->addSelect('s')
+            ->leftJoin('a.subject', 'sub')
+            ->addSelect('sub')
+            ->andWhere('a.subject IN (:subjects)')
+            ->setParameter('subjects', $subjects)
+            ->orderBy('a.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function existsByTypeSubjectAndStudent(string $type, Subjects $subject, Users $student): bool
     {
         $alerts = $this->findBy(['subject' => $subject, 'users' => $student]);
