@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Repository\GradeTypesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: GradeTypesRepository::class)]
+#[UniqueEntity(fields: ['skill', 'type'], message: 'Un type d\'épreuve ne peut être défini qu\'une seule fois par compétence.')]
 class GradeTypes
 {
     #[ORM\Id]
@@ -63,5 +65,10 @@ class GradeTypes
         $this->weight = $weight;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) ($this->type?->getName() ?? 'Type d\'épreuve');
     }
 }
