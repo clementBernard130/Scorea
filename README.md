@@ -96,59 +96,66 @@ cd Scorea
 ```
 
 ### 1. Environnement de Développement
-**Nettoyage complet (Effacement physique)**
-Supprime tout : conteneurs, images, volumes (base de données), et réseaux.
+**Nettoyage complet (effacement physique)**  
+Supprime tout : conteneurs, images, volumes (base de données) et réseaux.
 ```bash
 docker compose -f compose.yaml down -v --rmi all --remove-orphans
 ```
-Creation de l'environnement 
+Création de l'environnement
 ```bash
- cp .env.dist .env
+cp .env.dist .env
 ```
 
-Construction et Lancement
+Construction et lancement
 
 ```bash
 docker compose -f compose.yaml --env-file .env up --build -d
 ```
-Initialisation de la Base de Données
+Initialisation de la base de données
 ```bash
 docker compose -f compose.yaml exec web php bin/console doctrine:migrations:migrate --no-interaction
 # Charger les fixtures
 docker compose -f compose.yaml exec web php bin/console doctrine:fixtures:load --no-interaction
 ```
 
+Accès à l'application :
+- Application : http://localhost:8000
+- Mailpit (dev) : http://localhost:8025
+
 ### 2. Environnement de Production (Prod)
-Nettoyage complet (Effacement physique)
+Nettoyage complet (effacement physique)  
 Supprime tout pour repartir sur une base saine avant un nouveau déploiement.
 
 ```bash
 docker compose -f compose.prod.yaml --env-file .env.prod.local down -v --rmi all --remove-orphans
 ```
 
-Création de l'environnement 
+Création de l'environnement
 
 ```bash
 cp .env.dist .env.prod.local
 ```
 
-Changer APP_SECRET et POSTGRES_PASSWORD
+Configurer les variables sensibles dans `.env.prod.local` :
+- `APP_SECRET`
+- `POSTGRES_PASSWORD`
+- `DATABASE_URL` (obligatoire, cf. `compose.prod.yaml`)
 
-Construction et Lancement
+Construction et lancement
 ```bash
 docker compose -f compose.prod.yaml --env-file .env.prod.local up --build -d
 ```
 
-Initialisation de la Base de Données
+Initialisation de la base de données
 ```bash
 # Appliquer les migrations uniquement
-docker compose -f compose.prod.yaml --env-file .env.prod.local exec web php ...bin/console doctrine:migrations:migrate --no-interaction
+docker compose -f compose.prod.yaml --env-file .env.prod.local exec web php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
 Arrêt avec les données
 ```bash
 docker compose -f compose.prod.yaml --env-file .env.prod.local down
-#Relancement
+# Relancement
 docker compose -f compose.prod.yaml --env-file .env.prod.local up -d
 ```
 
