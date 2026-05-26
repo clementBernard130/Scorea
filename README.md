@@ -9,7 +9,7 @@
 <!-- issues -->
 <p align="center"><a href="https://github.com/clementBernard130/Scorea/issues"><img src="https://badgen.net/github/issues/clementBernard130/Scorea" alt="issues"/></a>&nbsp;&nbsp;<a href="https://github.com/clementBernard130/Scorea/issues?q=is%3Aissue%20state%3Aopen"><img src="https://badgen.net/github/open-issues/clementBernard130/Scorea" alt="open issues"/></a>&nbsp;&nbsp;<a href="https://github.com/clementBernard130/Scorea/issues?q=is%3Aissue%20state%3Aclosed"><img src="https://badgen.net/github/closed-issues/clementBernard130/Scorea" alt="closed issues"/></a></p>
 <!-- labels issues -->
-<p align="center"><a href="https://github.com/clementBernard130/Scorea/issues?q=is%3Aissue%20label%3Afeature"><img src="https://img.shields.io/github/issues-search/clementBernard130/Scorea?query=is%3Aissue%20label%3Afeature&label=feature&color=blue" alt="feature issues"/></a>&nbsp;&nbsp;<a href="https://github.com/clementBernard130/Scorea/issues?q=is%3Aissue%20label%3Abug"><img src="https://img.shields.io/github/issues-search/clementBernard130/Scorea?query=is%3Aissue%20label%3Abug&label=fix&color=red" alt="bug issues"/></a></p>
+<p align="center"><a href="https://github.com/clementBernard130/Scorea/issues?q=is%3Aissue%20label%3Afeature"><img src="https://badgen.net/github/label-issues/clementBernard130/Scorea/feature" alt="feature issues"/></a>&nbsp;&nbsp;<a href="https://github.com/clementBernard130/Scorea/issues?q=is%3Aissue%20label%3Atask"><img src="https://badgen.net/github/label-issues/clementBernard130/Scorea/task" alt="task issues"/></a>&nbsp;&nbsp;<a href="https://github.com/clementBernard130/Scorea/issues?q=is%3Aissue%20label%3Abug"><img src="https://badgen.net/github/label-issues/clementBernard130/Scorea/bug" alt="bug issues"/></a></p>
 <!-- prs -->
 <p align="center"><a href="https://github.com/clementBernard130/Scorea/pulls"><img src="https://badgen.net/github/prs/clementBernard130/Scorea" alt="prs"/></a>&nbsp;&nbsp;<a href="https://github.com/clementBernard130/Scorea/pulls?q=is%3Aopen+is%3Apr"><img src="https://badgen.net/github/open-prs/clementBernard130/Scorea" alt="open prs"/></a>&nbsp;&nbsp;<a href="https://github.com/clementBernard130/Scorea/pulls?q=is%3Apr+is%3Aclosed"><img src="https://badgen.net/github/closed-prs/clementBernard130/Scorea" alt="closed prs"/></a>&nbsp;&nbsp;<a href="https://github.com/clementBernard130/Scorea/pulls?q=is%3Apr+is%3Amerged"><img src="https://badgen.net/github/merged-prs/clementBernard130/Scorea" alt="merged prs"/></a></p>
 
@@ -20,8 +20,6 @@
   - [Stack technique](#stack-technique)
   - [Recette](#recette)
   - [Lancer le projet](#lancer-le-projet)
-    - [Prérequis](#prérequis)
-    - [Démarrage avec Docker Compose](#démarrage-avec-docker-compose)
   - [Utilisation](#utilisation)
     - [Portail enseignant](#portail-enseignant)
     - [Portail étudiant](#portail-étudiant)
@@ -97,30 +95,61 @@ git clone https://github.com/clementBernard130/Scorea.git
 cd Scorea
 ```
 
-### Démarrage avec Docker Compose
+### 1. Environnement de Développement
+**Nettoyage complet (Effacement physique)**
+Supprime tout : conteneurs, images, volumes (base de données), et réseaux.
+```bash
+docker compose -f compose.yaml down -v --rmi all --remove-orphans
+```
+Creation de l'environnement 
+```bash
+ cp .env.dist .env
+```
 
-**1. Construire et démarrer les conteneurs :**
+Construction et Lancement
 
 ```bash
-docker compose up --build
+docker compose -f compose.yaml --env-file .env up --build -d
+```
+Initialisation de la Base de Données
+```bash
+docker compose -f compose.yaml exec web php bin/console doctrine:migrations:migrate --no-interaction
+# Charger les fixtures
+docker compose -f compose.yaml exec web php bin/console doctrine:fixtures:load --no-interaction
 ```
 
-**2. Vérifier que les conteneurs sont actifs :**
+### 2. Environnement de Production (Prod)
+Nettoyage complet (Effacement physique)
+Supprime tout pour repartir sur une base saine avant un nouveau déploiement.
 
 ```bash
-docker compose ps
+docker compose -f compose.prod.yaml --env-file .env.prod.local down -v --rmi all --remove-orphans
 ```
 
-**3. Accéder à l'application :**
-
-```
-http://localhost
-```
-
-**4. Arrêter les conteneurs :**
+Création de l'environnement 
 
 ```bash
-docker compose down
+cp .env.dist .env.prod.local
+```
+
+Changer APP_SECRET et POSTGRES_PASSWORD
+
+Construction et Lancement
+```bash
+docker compose -f compose.prod.yaml --env-file .env.prod.local up --build -d
+```
+
+Initialisation de la Base de Données
+```bash
+# Appliquer les migrations uniquement
+docker compose -f compose.prod.yaml --env-file .env.prod.local exec web php ...bin/console doctrine:migrations:migrate --no-interaction
+```
+
+Arrêt avec les données
+```bash
+docker compose -f compose.prod.yaml --env-file .env.prod.local down
+#Relancement
+docker compose -f compose.prod.yaml --env-file .env.prod.local up -d
 ```
 
 ## Utilisation
