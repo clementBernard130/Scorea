@@ -19,7 +19,7 @@ class SessionStabilityTest extends WebTestCase
     {
         // Get a teacher user from fixtures
         $userRepository = static::getContainer()->get(UsersRepository::class);
-        $teacher = $userRepository->findOneBy(['username' => 'teacher1']);
+        $teacher = $userRepository->findOneBy(['username' => 'mathias.teacher']);
         
         $this->assertNotNull($teacher, 'Teacher user should exist from fixtures');
 
