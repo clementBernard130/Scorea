@@ -1,0 +1,233 @@
+{% extends '@EasyAdmin/crud/new.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --new-bg-start: #f7f4ee;
+            --new-bg-end: #ecf6f4;
+            --new-primary: #0e8a7d;
+            --new-secondary: #0a5e60;
+            --new-accent: #ec6f2f;
+            --new-text: #15323a;
+            --new-muted: #5f7680;
+            --new-surface: #ffffff;
+            --new-border: #d9ebe7;
+            --new-shadow: rgba(12, 64, 67, 0.14);
+        }
+
+        .skill-create-page {
+            position: relative;
+            max-width: 1040px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .skill-create-toolbar,
+        .skill-create-hero,
+        .skill-create-form-card {
+            position: relative;
+            z-index: 1;
+        }
+
+        .skill-create-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .skill-create-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--new-text);
+            background: color-mix(in srgb, var(--new-bg-end) 60%, #ffffff);
+            border: 1px solid var(--new-border);
+            border-radius: 12px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .skill-create-back:hover,
+        .skill-create-back:focus,
+        .skill-create-back:active,
+        .skill-create-back:focus-visible {
+            color: var(--new-text) !important;
+            background: #ffffff !important;
+            border-color: color-mix(in srgb, var(--new-primary) 32%, var(--new-border)) !important;
+        }
+
+        .skill-create-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--new-accent) 20%, #ffffff);
+            color: color-mix(in srgb, var(--new-accent) 72%, #8a3f19);
+            font-size: 0.79rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .skill-create-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--new-primary) 25%, var(--new-border));
+            background: linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)), linear-gradient(130deg, var(--new-bg-start), var(--new-bg-end));
+            box-shadow: 0 20px 40px var(--new-shadow);
+            padding: 1.3rem;
+        }
+
+        .skill-create-title {
+            margin: 0;
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+            line-height: 1.12;
+            color: var(--new-text);
+            letter-spacing: -0.02em;
+        }
+
+        .skill-create-subtitle {
+            margin: 0.55rem 0 0;
+            color: var(--new-muted);
+            font-size: 0.95rem;
+            max-width: 54ch;
+        }
+
+        .skill-create-form-card {
+            border-radius: 18px;
+            padding: 1.1rem;
+            border: 1px solid color-mix(in srgb, var(--new-primary) 18%, var(--new-border));
+            background: var(--new-surface);
+            box-shadow: 0 16px 32px rgba(14, 76, 84, 0.1);
+        }
+
+        .skill-create-section {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--new-primary) 16%, var(--new-border));
+            background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--new-bg-end) 22%, #ffffff));
+            padding: 0.95rem;
+        }
+
+        .skill-create-section + .skill-create-section {
+            margin-top: 0.85rem;
+        }
+
+        .skill-create-section-title {
+            margin: 0 0 0.72rem;
+            color: var(--new-text);
+            font-size: 0.94rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .skill-create-section-title::before {
+            content: '';
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--new-primary), var(--new-accent));
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--new-primary) 22%, transparent);
+        }
+
+        .skill-create-form-card .form-label,
+        .skill-create-form-card label {
+            color: color-mix(in srgb, var(--new-text) 88%, #102026);
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .skill-create-form-card .form-control,
+        .skill-create-form-card .form-select {
+            border-radius: 10px;
+            border: 1px solid color-mix(in srgb, var(--new-primary) 18%, var(--new-border));
+            min-height: 42px;
+            background: #ffffff;
+        }
+
+        .skill-create-form-card .form-control:focus,
+        .skill-create-form-card .form-select:focus {
+            border-color: color-mix(in srgb, var(--new-primary) 70%, #0a5e60);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--new-primary) 22%, transparent);
+        }
+
+        .skill-create-form-card .ea-form-actions,
+        .skill-create-form-card .form-actions {
+            border-top: 1px dashed color-mix(in srgb, var(--new-primary) 26%, var(--new-border));
+            margin-top: 0.9rem;
+            padding-top: 0.9rem;
+        }
+
+        .btn-primary {
+            border: none !important;
+            color: #fff !important;
+            border-radius: 11px !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--new-primary), var(--new-secondary)) !important;
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+            padding: 0.55rem 1rem !important;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:focus-visible {
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px rgba(9, 94, 96, 0.28);
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="skill-create-page">
+        <div class="skill-create-toolbar">
+            <a href="{{ app.request.query.get('trainingId') ? ea_url().setAction('index').set('trainingId', app.request.query.get('trainingId')) : ea_url().setAction('index') }}" class="skill-create-back">
+                <i class="fa fa-arrow-left"></i> Retour
+            </a>
+            <span class="skill-create-pill"><i class="fa fa-cube"></i> Nouveau bloc</span>
+        </div>
+
+        <section class="skill-create-hero">
+            <h2 class="skill-create-title">Créer un bloc de compétences</h2>
+            <p class="skill-create-subtitle">Renseignez les informations du bloc puis ajoutez ses compétences.</p>
+        </section>
+
+        <section class="skill-create-form-card">
+            {{ form_start(new_form) }}
+
+            <div class="skill-create-section">
+                <h3 class="skill-create-section-title">Informations generales</h3>
+                {% if new_form.name is defined %}
+                    {{ form_row(new_form.name) }}
+                {% endif %}
+                {% if new_form.trainings is defined %}
+                    {{ form_row(new_form.trainings) }}
+                {% endif %}
+                {% if new_form.description is defined %}
+                    {{ form_row(new_form.description) }}
+                {% endif %}
+            </div>
+
+            <div class="skill-create-section">
+                <h3 class="skill-create-section-title">Compétences</h3>
+                {% if new_form.skills is defined %}
+                    {{ form_row(new_form.skills) }}
+                {% endif %}
+            </div>
+
+            {{ form_rest(new_form) }}
+            {{ form_end(new_form, { render_rest: false }) }}
+        </section>
+    </div>
+{% endblock %}

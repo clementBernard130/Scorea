@@ -1,0 +1,299 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Import des données{% endblock %}
+
+{% block main %}
+    <div class="import-export-page">
+        <header class="ie-hero">
+            <div class="ie-hero-content">
+                <span class="ie-pill"><i class="fa fa-arrows-rotate"></i> Synchronisation données</span>
+                <h1>Import des données</h1>
+                <p>Importez les données des étudiants et des formations au format CSV.</p>
+            </div>
+        </header>
+
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="flash flash-{{ type }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="ie-grid">
+            <section class="ie-card">
+                <div class="ie-card-head">
+                    <h2><i class="fa fa-user-graduate"></i> Étudiants</h2>
+                    <span class="ie-tag">CSV</span>
+                </div>
+
+                <p class="ie-hint">Colonnes attendues: <strong>first_name;last_name;email</strong></p>
+
+                <form action="{{ path('admin_import_students') }}" method="post" enctype="multipart/form-data" class="ie-form">
+                    <label for="students_file">Fichier CSV étudiants</label>
+                    <input id="students_file" name="students_file" type="file" accept=".csv,text/csv" required>
+                    <button type="submit" class="ie-btn ie-btn-primary">
+                        <i class="fa fa-file-import"></i> Importer les étudiants
+                    </button>
+                </form>
+
+            </section>
+
+            <section class="ie-card">
+                <div class="ie-card-head">
+                    <h2><i class="fa fa-graduation-cap"></i> Formations</h2>
+                    <span class="ie-tag">CSV</span>
+                </div>
+
+                <p class="ie-hint">Colonnes attendues: <strong>name</strong></p>
+
+                <form action="{{ path('admin_import_trainings') }}" method="post" enctype="multipart/form-data" class="ie-form">
+                    <label for="trainings_file">Fichier CSV formations</label>
+                    <input id="trainings_file" name="trainings_file" type="file" accept=".csv,text/csv" required>
+                    <button type="submit" class="ie-btn ie-btn-primary">
+                        <i class="fa fa-file-import"></i> Importer les formations
+                    </button>
+                </form>
+
+            </section>
+        </div>
+    </div>
+
+    <style>
+        :root {
+            --ie-bg-start: #f7f4ee;
+            --ie-bg-end: #ecf6f4;
+            --ie-primary: #0e8a7d;
+            --ie-secondary: #0a5e60;
+            --ie-accent: #ec6f2f;
+            --ie-text: #15323a;
+            --ie-muted: #5f7680;
+            --ie-surface: #ffffff;
+            --ie-border: #d9ebe7;
+            --ie-shadow: rgba(12, 64, 67, 0.14);
+        }
+
+        .import-export-page {
+            position: relative;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 12px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .import-export-page::before,
+        .import-export-page::after {
+            content: '';
+            position: absolute;
+            border-radius: 999px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .import-export-page::before {
+            width: 260px;
+            height: 260px;
+            top: -42px;
+            right: -42px;
+            background: radial-gradient(circle at 30% 30%, rgba(236, 111, 47, 0.34), rgba(236, 111, 47, 0));
+        }
+
+        .import-export-page::after {
+            width: 300px;
+            height: 300px;
+            bottom: -80px;
+            left: -70px;
+            background: radial-gradient(circle at 50% 50%, rgba(14, 138, 125, 0.24), rgba(14, 138, 125, 0));
+        }
+
+        .ie-hero,
+        .flash,
+        .ie-grid {
+            position: relative;
+            z-index: 1;
+        }
+
+        .ie-hero {
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--ie-primary) 25%, var(--ie-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.42)),
+                linear-gradient(130deg, var(--ie-bg-start), var(--ie-bg-end));
+            box-shadow: 0 20px 40px var(--ie-shadow);
+            padding: 18px;
+        }
+
+        .ie-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.72rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--ie-accent) 20%, #ffffff);
+            color: color-mix(in srgb, var(--ie-accent) 72%, #8a3f19);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .ie-hero h1 {
+            margin: 10px 0 6px;
+            color: var(--ie-text);
+            font-size: clamp(1.4rem, 2.4vw, 2rem);
+            letter-spacing: -0.02em;
+        }
+
+        .ie-hero p {
+            margin: 0;
+            color: var(--ie-muted);
+            max-width: 66ch;
+        }
+
+        .ie-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+
+        .ie-card {
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--ie-primary) 16%, var(--ie-border));
+            background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--ie-bg-end) 24%, #ffffff));
+            box-shadow: 0 16px 32px rgba(14, 76, 84, 0.1);
+            padding: 16px;
+            display: grid;
+            gap: 12px;
+            transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+        }
+
+        .ie-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 34px rgba(14, 76, 84, 0.16);
+            border-color: color-mix(in srgb, var(--ie-primary) 38%, var(--ie-border));
+        }
+
+        .ie-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .ie-card-head h2 {
+            margin: 0;
+            color: var(--ie-text);
+            font-size: 1.06rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.44rem;
+        }
+
+        .ie-tag {
+            border-radius: 999px;
+            border: 1px solid color-mix(in srgb, var(--ie-primary) 24%, var(--ie-border));
+            background: #ffffff;
+            color: var(--ie-secondary);
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 0.22rem 0.62rem;
+            letter-spacing: 0.04em;
+        }
+
+        .ie-hint {
+            margin: 0;
+            color: var(--ie-muted);
+            font-size: 0.92rem;
+        }
+
+        .ie-form {
+            display: grid;
+            gap: 8px;
+        }
+
+        .ie-form label {
+            color: color-mix(in srgb, var(--ie-text) 88%, #102026);
+            font-weight: 700;
+        }
+
+        .ie-form input[type='file'] {
+            border: 1px solid color-mix(in srgb, var(--ie-primary) 18%, var(--ie-border));
+            border-radius: 10px;
+            padding: 10px;
+            background: #ffffff;
+        }
+
+        .ie-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            text-decoration: none;
+            border-radius: 11px;
+            padding: 0.58rem 1rem;
+            font-weight: 700;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .ie-btn-primary {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--ie-primary), var(--ie-secondary));
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+        }
+
+        .ie-btn-primary:hover,
+        .ie-btn-primary:focus,
+        .ie-btn-primary:active,
+        .ie-btn-primary:focus-visible {
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 14px 22px rgba(9, 94, 96, 0.3);
+        }
+
+        .ie-btn-outline {
+            color: var(--ie-secondary);
+            border-color: color-mix(in srgb, var(--ie-primary) 28%, var(--ie-border));
+            background: rgba(255, 255, 255, 0.84);
+        }
+
+        .ie-btn-outline:hover,
+        .ie-btn-outline:focus,
+        .ie-btn-outline:active,
+        .ie-btn-outline:focus-visible {
+            color: var(--ie-secondary);
+            transform: translateY(-1px);
+            border-color: color-mix(in srgb, var(--ie-accent) 46%, var(--ie-border));
+            box-shadow: 0 10px 18px rgba(236, 111, 47, 0.16);
+        }
+
+        .flash {
+            border-radius: 10px;
+            padding: 10px 12px;
+            border: 1px solid transparent;
+            font-weight: 600;
+        }
+
+        .flash-success {
+            background: #eaf8ef;
+            color: #12663c;
+            border-color: #b9e6cc;
+        }
+
+        .flash-danger {
+            background: #fdecec;
+            color: #8c1e1e;
+            border-color: #f3c3c3;
+        }
+
+        @media (max-width: 780px) {
+            .import-export-page {
+                padding: 8px;
+            }
+
+            .ie-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}

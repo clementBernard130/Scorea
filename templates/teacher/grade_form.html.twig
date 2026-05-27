@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle }} - Scorea{% endblock %}
+
+{% block body %}
+{% set hasStudents = form.student.vars.choices|length > 0 %}
+<div class="min-h-screen bg-gray-100 text-gray-900">
+    <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md bg-white px-6 py-4 shadow-md">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-gray-500">Espace enseignant</p>
+                <h1 class="text-2xl font-semibold text-gray-900">{{ pageTitle }}</h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    {{ test.subject.name }} - {{ test.testDate|date('d/m/Y') }}
+                </p>
+            </div>
+            <a href="{{ section ? path('app_class_show', { id: section.id }) : path('app_home') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
+                Retour
+            </a>
+        </header>
+
+        <section class="rounded-md bg-white p-6 shadow-md sm:p-8">
+            {{ form_start(form, { action: formAction, method: 'POST' }) }}
+                <div class="grid gap-5">
+                    <div>
+                        {{ form_label(form.student, null, {'label_attr': {'class': 'mb-2 block text-sm font-semibold text-gray-800'}}) }}
+                        {{ form_widget(form.student, {'attr': {'class': 'w-full rounded-md border border-gray-300 bg-white px-3 py-2'}}) }}
+                        {{ form_errors(form.student) }}
+                        {% if not hasStudents %}
+                            <p class="mt-2 text-sm text-red-600">Aucun étudiant disponible: soit la classe est vide, soit tous les étudiants sont déjà notés pour ce test.</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form_label(form.grade, null, {'label_attr': {'class': 'mb-2 block text-sm font-semibold text-gray-800'}}) }}
+                        {{ form_widget(form.grade, {'attr': {'class': 'w-full rounded-md border border-gray-300 bg-white px-3 py-2', 'inputmode': 'decimal', 'min': 0, 'max': 20, 'step': '0.01', 'data-grade-input': 'true'}}) }}
+                        {{ form_errors(form.grade) }}
+                    </div>
+                    <div>
+                        {{ form_label(form.comment, null, {'label_attr': {'class': 'mb-2 block text-sm font-semibold text-gray-800'}}) }}
+                        {{ form_widget(form.comment, {'attr': {'class': 'min-h-32 w-full rounded-md border border-gray-300 bg-white px-3 py-2'}}) }}
+                        {{ form_errors(form.comment) }}
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-wrap items-center gap-3">
+                    <button id="grade-submit-button" type="submit" {{ not hasStudents ? 'disabled' : '' }} class="rounded-md px-5 py-3 font-medium text-white transition {{ hasStudents ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-400' }}">
+                        {{ submitLabel }}
+                    </button>
+                    <a href="{{ section ? path('app_class_show', { id: section.id }) : path('app_home') }}" class="rounded-md border border-gray-300 bg-white px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-50">
+                        Annuler
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const studentSelect = document.getElementById('form_student');
+            const submitButton = document.getElementById('grade-submit-button');
+            const gradeInput = document.querySelector('[data-grade-input="true"]');
+
+            if (!studentSelect || !submitButton) {
+                return;
+            }
+
+            const hasStudentOptions = Array.from(studentSelect.options).some(function (option) {
+                return option.value !== '';
+            });
+
+            submitButton.disabled = !hasStudentOptions;
+            if (!hasStudentOptions) {
+                submitButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                submitButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+            }
+
+            if (gradeInput) {
+                const rangeMessage = 'La note doit être comprise entre 0 et 20.';
+
+                const sanitizeGrade = function () {
+                    let value = gradeInput.value.replace(/,/g, '.');
+                    value = value.replace(/[^0-9.]/g, '');
+
+                    const parts = value.split('.');
+                    if (parts.length > 2) {
+                        value = parts.shift() + '.' + parts.join('');
+                    }
+
+                    gradeInput.value = value;
+                };
+
+                const validateGrade = function () {
+                    const value = gradeInput.value.trim();
+                    if (value === '') {
+                        gradeInput.setCustomValidity('');
+                        return;
+                    }
+
+                    const numericValue = Number(value);
+                    if (Number.isNaN(numericValue) || numericValue < 0 || numericValue > 20) {
+                        gradeInput.setCustomValidity(rangeMessage);
+                        return;
+                    }
+
+                    gradeInput.setCustomValidity('');
+                };
+
+                gradeInput.addEventListener('beforeinput', function (event) {
+                    if (event.data && /[^0-9.,]/.test(event.data)) {
+                        event.preventDefault();
+                    }
+                });
+
+                gradeInput.addEventListener('input', function () {
+                    sanitizeGrade();
+                    validateGrade();
+                });
+                gradeInput.addEventListener('blur', validateGrade);
+                gradeInput.addEventListener('paste', function () {
+                    window.setTimeout(function () {
+                        sanitizeGrade();
+                        validateGrade();
+                    }, 0);
+                });
+            }
+        });
+    </script>
+{% endblock %}

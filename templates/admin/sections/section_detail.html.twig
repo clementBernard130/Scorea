@@ -1,0 +1,390 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --detail-bg-start: #f7f4ee;
+            --detail-bg-end: #ecf6f4;
+            --detail-primary: #0e8a7d;
+            --detail-secondary: #0a5e60;
+            --detail-accent: #ec6f2f;
+            --detail-text: #15323a;
+            --detail-muted: #5f7680;
+            --detail-surface: #ffffff;
+            --detail-border: #d9ebe7;
+            --detail-shadow: rgba(12, 64, 67, 0.14);
+        }
+
+        .section-detail-page {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .section-detail-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+        }
+
+        .section-detail-toolbar .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 12px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn-section-back {
+            color: var(--detail-text);
+            background: color-mix(in srgb, var(--detail-bg-end) 60%, #ffffff);
+            border: 1px solid var(--detail-border);
+        }
+
+        .btn-section-back:hover,
+        .btn-section-back:focus,
+        .btn-section-back:active,
+        .btn-section-back:focus-visible {
+            color: var(--detail-text) !important;
+            background: #ffffff !important;
+            border-color: color-mix(in srgb, var(--detail-primary) 32%, var(--detail-border)) !important;
+        }
+
+        .btn-section-edit {
+            border: none;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--detail-primary), var(--detail-secondary));
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+        }
+
+        .btn-section-edit:hover,
+        .btn-section-edit:focus,
+        .btn-section-edit:active,
+        .btn-section-edit:focus-visible {
+            color: #ffffff !important;
+            background: linear-gradient(135deg, var(--detail-primary), var(--detail-secondary)) !important;
+        }
+
+        .section-detail-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--detail-primary) 25%, var(--detail-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+                linear-gradient(130deg, var(--detail-bg-start), var(--detail-bg-end));
+            box-shadow: 0 20px 40px var(--detail-shadow);
+            padding: 1.3rem;
+        }
+
+        .section-detail-title {
+            margin: 0;
+            color: var(--detail-text);
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+        }
+
+        .section-detail-subtitle {
+            margin: 0.5rem 0 0;
+            color: var(--detail-muted);
+        }
+
+        .section-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.85rem;
+        }
+
+        .section-detail-card {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--detail-primary) 16%, var(--detail-border));
+            background: var(--detail-surface);
+            box-shadow: 0 10px 20px rgba(9, 93, 93, 0.08);
+            padding: 1rem;
+        }
+
+        .section-detail-card h3 {
+            margin: 0 0 0.7rem;
+            font-size: 0.96rem;
+            color: var(--detail-text);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .section-chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+
+        .section-user-group + .section-user-group {
+            margin-top: 0.9rem;
+        }
+
+        .section-user-group-title {
+            margin: 0 0 0.55rem;
+            color: var(--detail-text);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--detail-accent) 16%, #ffffff);
+            border: 1px solid color-mix(in srgb, var(--detail-accent) 26%, var(--detail-border));
+            color: color-mix(in srgb, var(--detail-accent) 75%, #7e3a17);
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .section-user-link {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+
+        .section-user-link:hover,
+        .section-user-link:focus,
+        .section-user-link:active,
+        .section-user-link:focus-visible {
+            color: inherit !important;
+            transform: translateY(-1px);
+            border-color: color-mix(in srgb, var(--detail-primary) 34%, var(--detail-border));
+            box-shadow: 0 8px 16px rgba(9, 93, 93, 0.12);
+        }
+
+        .section-muted {
+            margin: 0;
+            color: var(--detail-muted);
+            font-style: italic;
+        }
+
+        .danger-zone {
+            border: 1px solid #f2c3c3;
+            background: linear-gradient(180deg, #fff7f7, #fff0f0);
+        }
+
+        .danger-zone-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .danger-zone-title {
+            margin: 0;
+            font-size: 1rem;
+            color: #8d1f1f;
+            font-weight: 700;
+        }
+
+        .btn-danger-zone {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border: none;
+            border-radius: 10px;
+            padding: 0.55rem 0.9rem;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, #d73a49, #9e1f2d);
+            box-shadow: 0 10px 20px rgba(153, 28, 39, 0.2);
+        }
+
+        .btn-danger-zone:hover,
+        .btn-danger-zone:focus,
+        .btn-danger-zone:active,
+        .btn-danger-zone:focus-visible {
+            color: #fff !important;
+            background: linear-gradient(135deg, #bf2f3c, #851926) !important;
+        }
+
+        .danger-zone .ea-delete-form {
+            margin: 0;
+        }
+
+        .danger-zone .ea-delete-form .action-delete,
+        .danger-zone .ea-delete-form button[type='submit'] {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 0.55rem 0.9rem !important;
+            color: #fff !important;
+            text-decoration: none;
+            background: linear-gradient(135deg, #d73a49, #9e1f2d) !important;
+            box-shadow: 0 10px 20px rgba(153, 28, 39, 0.2);
+        }
+
+        .danger-zone .ea-delete-form .action-delete:hover,
+        .danger-zone .ea-delete-form .action-delete:focus,
+        .danger-zone .ea-delete-form .action-delete:active,
+        .danger-zone .ea-delete-form button[type='submit']:hover,
+        .danger-zone .ea-delete-form button[type='submit']:focus,
+        .danger-zone .ea-delete-form button[type='submit']:active {
+            color: #fff !important;
+            background: linear-gradient(135deg, #bf2f3c, #851926) !important;
+        }
+
+        @media (max-width: 780px) {
+            .section-detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}Fiche section{% endblock %}
+
+{% block main %}
+    <div class="section-detail-page">
+        <div class="section-detail-toolbar">
+            <a href="{{ app.request.headers.get('referer')|default(ea_url().setAction('index')) }}" class="btn btn-section-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                <i class="fa fa-arrow-left"></i> Retour
+            </a>
+            <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-section-edit">
+                <i class="fa fa-pen"></i> Modifier
+            </a>
+        </div>
+
+        <section class="section-detail-hero">
+            <h2 class="section-detail-title">{{ entity.instance.name|default('Section sans nom') }}</h2>
+            <p class="section-detail-subtitle">Vue detaillée de la section et de ses rattachements.</p>
+        </section>
+
+        <div class="section-detail-grid">
+            <section class="section-detail-card">
+                <h3>Periode</h3>
+                <p>
+                    Du {{ entity.instance.startDate ? entity.instance.startDate|date('d/m/Y') : '-' }}
+                    au {{ entity.instance.endDate ? entity.instance.endDate|date('d/m/Y') : '-' }}
+                </p>
+            </section>
+
+            <section class="section-detail-card">
+                <h3>Formation rattachée</h3>
+                {% if entity.instance.training is not null %}
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\TrainingCrudController').setAction('detail').setEntityId(entity.instance.training.id) }}" class="section-chip section-user-link">
+                        <i class="fa fa-graduation-cap"></i> {{ entity.instance.training }}
+                    </a>
+                {% else %}
+                    <p class="section-muted">Aucune formation rattachée.</p>
+                {% endif %}
+            </section>
+        </div>
+
+        <section class="section-detail-card">
+            <h3>Utilisateurs rattachés</h3>
+            {% if entity.instance.users|length > 0 %}
+                {% set teacherUsers = [] %}
+                {% set studentUsers = [] %}
+                {% set otherUsers = [] %}
+
+                {% for user in entity.instance.users %}
+                    {% set roles = user.roles|default([]) %}
+                    {% if 'ROLE_ADMIN' in roles or 'ROLE_TEACHER' in roles %}
+                        {% set teacherUsers = teacherUsers|merge([user]) %}
+                    {% elseif 'ROLE_STUDENT' in roles %}
+                        {% set studentUsers = studentUsers|merge([user]) %}
+                    {% else %}
+                        {% set otherUsers = otherUsers|merge([user]) %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if teacherUsers is not empty %}
+                    <div class="section-user-group">
+                        <h4 class="section-user-group-title">Professeurs</h4>
+                        <div class="section-chip-wrap">
+                            {% for user in teacherUsers %}
+                                {% set userController = 'App\\Controller\\Admin\\TeacherCrudController' %}
+                                {% if 'ROLE_ADMIN' in user.roles|default([]) %}
+                                    {% set userController = 'App\\Controller\\Admin\\AdminCrudController' %}
+                                {% endif %}
+
+                                <a href="{{ ea_url().setController(userController).setAction('detail').setEntityId(user.id) }}" class="section-chip section-user-link">
+                                    <i class="fa fa-chalkboard-teacher"></i>
+                                    {{ user.lastName|default('') }} {{ user.firstName|default(user.username|default(user)) }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if studentUsers is not empty %}
+                    <div class="section-user-group">
+                        <h4 class="section-user-group-title">Étudiants</h4>
+                        <div class="section-chip-wrap">
+                            {% for user in studentUsers %}
+                                <a href="{{ ea_url().setController('App\\Controller\\Admin\\StudentCrudController').setAction('detail').setEntityId(user.id) }}" class="section-chip section-user-link">
+                                    <i class="fa fa-user-graduate"></i>
+                                    {{ user.lastName|default('') }} {{ user.firstName|default(user.username|default(user)) }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if otherUsers is not empty %}
+                    <div class="section-user-group">
+                        <h4 class="section-user-group-title">Autres</h4>
+                        <div class="section-chip-wrap">
+                            {% for user in otherUsers %}
+                                <a href="{{ ea_url().setController('App\\Controller\\Admin\\UserCrudController').setAction('detail').setEntityId(user.id) }}" class="section-chip section-user-link">
+                                    <i class="fa fa-user"></i>
+                                    {{ user.lastName|default('') }} {{ user.firstName|default(user.username|default(user)) }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <p class="section-muted">Aucun utilisateur rattaché.</p>
+            {% endif %}
+        </section>
+
+        <section class="section-detail-card">
+            <h3>Evaluations effectuées</h3>
+            {% if entity.instance.tests|length > 0 %}
+                <div class="section-chip-wrap">
+                    {% for test in entity.instance.tests|sort((a, b) => b.testDate <=> a.testDate) %}
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\TestsCrudController').setAction('detail').setEntityId(test.id) }}" class="section-chip section-user-link">
+                            <i class="fa fa-file-alt"></i> {{ test }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="section-muted">Aucun test rattaché.</p>
+            {% endif %}
+        </section>
+
+        <section class="section-detail-card danger-zone">
+            <div class="danger-zone-header">
+                <h3 class="danger-zone-title">Zone de danger</h3>
+                {% set deleteUrl = ea_url().setAction('delete').setEntityId(entity.primaryKeyValue) %}
+                <button
+                    type="button"
+                    class="btn-danger-zone"
+                    data-action-name="delete"
+                    formaction="{{ deleteUrl }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modal-delete"
+                >
+                    <i class="fa fa-trash"></i>
+                    <span>Supprimer la section</span>
+                </button>
+                {{ include('@EasyAdmin/crud/includes/_delete_form.html.twig', { entity_id: entity.primaryKeyValue }, with_context: false) }}
+            </div>
+        </section>
+    </div>
+{% endblock %}

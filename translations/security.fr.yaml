@@ -1,0 +1,8 @@
+# French translations for security messages
+'Invalid credentials.': 'Identifiants invalides.'
+'Username could not be found.': "Nom d'utilisateur introuvable."
+'Account is disabled.': 'Le compte est désactivé.'
+'Account is locked.': 'Le compte est verrouillé.'
+'Too many failed login attempts, please try again later.': 'Trop de tentatives de connexion échouées, veuillez réessayer plus tard.'
+'Invalid CSRF token.': 'Jeton CSRF invalide.'
+'Authentication request could not be processed due to a system problem.': "La demande d'authentification n'a pas pu être traitée en raison d'un problème système."

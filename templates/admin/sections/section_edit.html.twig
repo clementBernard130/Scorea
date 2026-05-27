@@ -1,0 +1,252 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --edit-bg-start: #f7f4ee;
+            --edit-bg-end: #ecf6f4;
+            --edit-primary: #0e8a7d;
+            --edit-secondary: #0a5e60;
+            --edit-accent: #ec6f2f;
+            --edit-text: #15323a;
+            --edit-muted: #5f7680;
+            --edit-surface: #ffffff;
+            --edit-border: #d9ebe7;
+            --edit-shadow: rgba(12, 64, 67, 0.14);
+        }
+
+        .section-edit-page {
+            position: relative;
+            max-width: 1040px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .section-edit-toolbar,
+        .section-edit-hero,
+        .section-edit-form-card {
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-edit-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .section-edit-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--edit-text);
+            background: color-mix(in srgb, var(--edit-bg-end) 60%, #ffffff);
+            border: 1px solid var(--edit-border);
+            border-radius: 12px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .section-edit-back:hover,
+        .section-edit-back:focus,
+        .section-edit-back:active,
+        .section-edit-back:focus-visible {
+            color: var(--edit-text) !important;
+            background: #ffffff !important;
+            border-color: color-mix(in srgb, var(--edit-primary) 32%, var(--edit-border)) !important;
+        }
+
+        .section-edit-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--edit-accent) 20%, #ffffff);
+            color: color-mix(in srgb, var(--edit-accent) 72%, #8a3f19);
+            font-size: 0.79rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .section-edit-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--edit-primary) 25%, var(--edit-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+                linear-gradient(130deg, var(--edit-bg-start), var(--edit-bg-end));
+            box-shadow: 0 20px 40px var(--edit-shadow);
+            padding: 1.3rem;
+        }
+
+        .section-edit-title {
+            margin: 0;
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+            line-height: 1.12;
+            color: var(--edit-text);
+            letter-spacing: -0.02em;
+        }
+
+        .section-edit-subtitle {
+            margin: 0.55rem 0 0;
+            color: var(--edit-muted);
+            font-size: 0.95rem;
+            max-width: 54ch;
+        }
+
+        .section-edit-form-card {
+            border-radius: 18px;
+            padding: 1.1rem;
+            border: 1px solid color-mix(in srgb, var(--edit-primary) 18%, var(--edit-border));
+            background: var(--edit-surface);
+            box-shadow: 0 16px 32px rgba(14, 76, 84, 0.1);
+        }
+
+        .section-edit-section {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--edit-primary) 16%, var(--edit-border));
+            background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--edit-bg-end) 22%, #ffffff));
+            padding: 0.95rem;
+        }
+
+        .section-edit-section + .section-edit-section {
+            margin-top: 0.85rem;
+        }
+
+        .section-edit-section-title {
+            margin: 0 0 0.72rem;
+            color: var(--edit-text);
+            font-size: 0.94rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .section-edit-section-title::before {
+            content: '';
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--edit-primary), var(--edit-accent));
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--edit-primary) 22%, transparent);
+        }
+
+        .section-edit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.8rem;
+        }
+
+        .section-edit-form-card .form-label,
+        .section-edit-form-card label {
+            color: color-mix(in srgb, var(--edit-text) 88%, #102026);
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .section-edit-form-card .form-control,
+        .section-edit-form-card .form-select {
+            border-radius: 10px;
+            border: 1px solid color-mix(in srgb, var(--edit-primary) 18%, var(--edit-border));
+            min-height: 42px;
+            background: #ffffff;
+        }
+
+        .section-edit-form-card .form-control:focus,
+        .section-edit-form-card .form-select:focus {
+            border-color: color-mix(in srgb, var(--edit-primary) 70%, #0a5e60);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--edit-primary) 22%, transparent);
+        }
+
+        .section-edit-form-card .ea-form-actions,
+        .section-edit-form-card .form-actions {
+            border-top: 1px dashed color-mix(in srgb, var(--edit-primary) 26%, var(--edit-border));
+            margin-top: 0.9rem;
+            padding-top: 0.9rem;
+        }
+
+        .btn-primary {
+            border: none !important;
+            color: #fff !important;
+            border-radius: 11px !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--edit-primary), var(--edit-secondary)) !important;
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+            padding: 0.55rem 1rem !important;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:focus-visible {
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px rgba(9, 94, 96, 0.28);
+        }
+
+        @media (max-width: 780px) {
+            .section-edit-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="section-edit-page">
+        <div class="section-edit-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="section-edit-back">
+                    <i class="fa fa-arrow-left"></i> Retour
+            </a>
+            <span class="section-edit-pill"><i class="fa fa-pen"></i> Edition</span>
+        </div>
+
+        <section class="section-edit-hero">
+            <h2 class="section-edit-title">Modifier la section</h2>
+            <p class="section-edit-subtitle">Mettez a jour les informations, la formation et les utilisateurs associes.</p>
+        </section>
+
+        <section class="section-edit-form-card">
+            {{ form_start(edit_form) }}
+
+            <div class="section-edit-section">
+                <h3 class="section-edit-section-title">Informations generales</h3>
+                {% if edit_form.name is defined %}
+                    {{ form_row(edit_form.name) }}
+                {% endif %}
+                <div class="section-edit-grid">
+                    {% if edit_form.start_date is defined %}
+                        {{ form_row(edit_form.start_date) }}
+                    {% endif %}
+                    {% if edit_form.end_date is defined %}
+                        {{ form_row(edit_form.end_date) }}
+                    {% endif %}
+                </div>
+                {% if edit_form.training is defined %}
+                    {{ form_row(edit_form.training) }}
+                {% endif %}
+            </div>
+
+            <div class="section-edit-section">
+                <h3 class="section-edit-section-title">Utilisateurs</h3>
+                {% if edit_form.users is defined %}
+                    {{ form_row(edit_form.users) }}
+                {% endif %}
+            </div>
+
+            {{ form_rest(edit_form) }}
+            {{ form_end(edit_form, { render_rest: false }) }}
+        </section>
+    </div>
+{% endblock %}

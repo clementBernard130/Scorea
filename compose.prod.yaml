@@ -1,0 +1,41 @@
+# Usage :
+#   1. Copier .env.dist en .env.prod.local et remplir APP_SECRET + POSTGRES_PASSWORD
+#   2. docker compose -f compose.prod.yaml --env-file .env.prod.local up --build
+
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD requis}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+
+  web:
+    build:
+      context: .
+      args:
+        APP_ENV: prod
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: ${APP_SECRET:?APP_SECRET requis}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL requis}
+      MAILER_DSN: ${MAILER_DSN:-null://null}
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  database_data:

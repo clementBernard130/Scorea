@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle }} - Scorea{% endblock %}
+
+{% block body %}
+{% set hasStudents = students|length > 0 %}
+<div class="min-h-screen bg-gray-100 text-gray-900">
+    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md bg-white px-6 py-4 shadow-md">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-gray-500">Espace enseignant</p>
+                <h1 class="text-2xl font-semibold text-gray-900">{{ pageTitle }}</h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    {{ test.subject.name }} - {{ test.testDate|date('d/m/Y') }}
+                </p>
+            </div>
+            <a href="{{ section ? path('app_class_show', { id: section.id }) : path('app_home') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
+                Retour
+            </a>
+        </header>
+
+        {% if not hasStudents %}
+            <section class="rounded-md bg-white p-6 shadow-md sm:p-8">
+                <p class="text-center text-sm text-red-600">Aucun étudiant disponible: soit la classe est vide, soit tous les étudiants sont déjà notés pour ce test.</p>
+            </section>
+        {% else %}
+            <section class="rounded-md bg-white shadow-md overflow-hidden">
+                <form method="POST" class="p-0">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Élève</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Note (/20)</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Commentaire</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for student in students %}
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                                            {% set fullName = (student.firstName|trim ~ ' ' ~ student.lastName|trim)|trim %}
+                                            {{ fullName ?: student.username }}
+                                            <input type="hidden" name="grade_{{ loop.index }}[student_id]" value="{{ student.id }}">
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-700">
+                                            <input type="number" 
+                                                name="grade_{{ loop.index }}[grade]" 
+                                                min="0" 
+                                                max="20" 
+                                                step="0.01" 
+                                                placeholder="0.00"
+                                                inputmode="decimal"
+                                                class="w-20 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-700">
+                                            <input type="text" 
+                                                name="grade_{{ loop.index }}[comment]" 
+                                                placeholder="Optionnel..."
+                                                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="border-t border-gray-200 px-6 py-4 flex flex-wrap items-center gap-3 bg-gray-50">
+                        <button type="submit" class="rounded-md bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700">
+                            Enregistrer les notes
+                        </button>
+                        <a href="{{ section ? path('app_class_show', { id: section.id }) : path('app_home') }}" class="rounded-md border border-gray-300 bg-white px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-50">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+            </section>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const form = document.querySelector('form');
+                    const inputs = form.querySelectorAll('input[type="number"]');
+
+                    // Add real-time validation
+                    inputs.forEach(input => {
+                        input.addEventListener('input', validateRow);
+                        input.addEventListener('change', validateRow);
+                    });
+
+                    function validateRow() {
+                        const rows = form.querySelectorAll('tbody tr');
+                        rows.forEach(row => {
+                            const gradeInput = row.querySelector('input[type="number"]');
+
+                            if (gradeInput.value && (Number(gradeInput.value) < 0 || Number(gradeInput.value) > 20)) {
+                                gradeInput.classList.add('border-red-500', 'bg-red-50');
+                            } else {
+                                gradeInput.classList.remove('border-red-500', 'bg-red-50');
+                            }
+                        });
+                    }
+
+                    // Validate on submit
+                    form.addEventListener('submit', function (e) {
+                        const rows = form.querySelectorAll('tbody tr');
+                        let hasValidEntry = false;
+                        let hasInvalidEntry = false;
+
+                        rows.forEach(row => {
+                            const gradeInput = row.querySelector('input[type="number"]');
+                            const hasGrade = gradeInput.value.trim() !== '';
+                            const numericGrade = Number(gradeInput.value);
+
+                            if (hasGrade && !Number.isNaN(numericGrade) && numericGrade >= 0 && numericGrade <= 20) {
+                                hasValidEntry = true;
+                            } else if (hasGrade) {
+                                hasInvalidEntry = true;
+                                gradeInput.classList.add('border-red-500', 'bg-red-50');
+                            }
+                        });
+
+                        if (hasInvalidEntry) {
+                            e.preventDefault();
+                            alert('Veuillez saisir des notes valides entre 0 et 20.');
+                            return false;
+                        }
+
+                        if (!hasValidEntry) {
+                            e.preventDefault();
+                            alert('Veuillez saisir au moins une note.');
+                            return false;
+                        }
+                    });
+                });
+            </script>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

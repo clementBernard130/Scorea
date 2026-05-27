@@ -1,0 +1,234 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --edit-bg-start: #f7f4ee;
+            --edit-bg-end: #ecf6f4;
+            --edit-primary: #0e8a7d;
+            --edit-secondary: #0a5e60;
+            --edit-accent: #ec6f2f;
+            --edit-text: #15323a;
+            --edit-muted: #5f7680;
+            --edit-surface: #ffffff;
+            --edit-border: #d9ebe7;
+            --edit-shadow: rgba(12, 64, 67, 0.14);
+        }
+
+        .training-edit-page {
+            position: relative;
+            max-width: 1040px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .training-edit-toolbar,
+        .training-edit-hero,
+        .training-edit-form-card {
+            position: relative;
+            z-index: 1;
+        }
+
+        .training-edit-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .training-edit-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--edit-text);
+            background: color-mix(in srgb, var(--edit-bg-end) 60%, #ffffff);
+            border: 1px solid var(--edit-border);
+            border-radius: 12px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .training-edit-back:hover,
+        .training-edit-back:focus,
+        .training-edit-back:active,
+        .training-edit-back:focus-visible {
+            color: var(--edit-text) !important;
+            background: #ffffff !important;
+            border-color: color-mix(in srgb, var(--edit-primary) 32%, var(--edit-border)) !important;
+        }
+
+        .training-edit-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--edit-accent) 20%, #ffffff);
+            color: color-mix(in srgb, var(--edit-accent) 72%, #8a3f19);
+            font-size: 0.79rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .training-edit-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--edit-primary) 25%, var(--edit-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+                linear-gradient(130deg, var(--edit-bg-start), var(--edit-bg-end));
+            box-shadow: 0 20px 40px var(--edit-shadow);
+            padding: 1.3rem;
+        }
+
+        .training-edit-title {
+            margin: 0;
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+            line-height: 1.12;
+            color: var(--edit-text);
+            letter-spacing: -0.02em;
+        }
+
+        .training-edit-subtitle {
+            margin: 0.55rem 0 0;
+            color: var(--edit-muted);
+            font-size: 0.95rem;
+            max-width: 54ch;
+        }
+
+        .training-edit-form-card {
+            border-radius: 18px;
+            padding: 1.1rem;
+            border: 1px solid color-mix(in srgb, var(--edit-primary) 18%, var(--edit-border));
+            background: var(--edit-surface);
+            box-shadow: 0 16px 32px rgba(14, 76, 84, 0.1);
+        }
+
+        .training-edit-section {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--edit-primary) 16%, var(--edit-border));
+            background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--edit-bg-end) 22%, #ffffff));
+            padding: 0.95rem;
+        }
+
+        .training-edit-section + .training-edit-section {
+            margin-top: 0.85rem;
+        }
+
+        .training-edit-section-title {
+            margin: 0 0 0.72rem;
+            color: var(--edit-text);
+            font-size: 0.94rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .training-edit-section-title::before {
+            content: '';
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--edit-primary), var(--edit-accent));
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--edit-primary) 22%, transparent);
+        }
+
+        .training-edit-form-card .form-label,
+        .training-edit-form-card label {
+            color: color-mix(in srgb, var(--edit-text) 88%, #102026);
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .training-edit-form-card .form-control,
+        .training-edit-form-card .form-select {
+            border-radius: 10px;
+            border: 1px solid color-mix(in srgb, var(--edit-primary) 18%, var(--edit-border));
+            min-height: 42px;
+            background: #ffffff;
+        }
+
+        .training-edit-form-card .form-control:focus,
+        .training-edit-form-card .form-select:focus {
+            border-color: color-mix(in srgb, var(--edit-primary) 70%, #0a5e60);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--edit-primary) 22%, transparent);
+        }
+
+        .training-edit-form-card .ea-form-actions,
+        .training-edit-form-card .form-actions {
+            border-top: 1px dashed color-mix(in srgb, var(--edit-primary) 26%, var(--edit-border));
+            margin-top: 0.9rem;
+            padding-top: 0.9rem;
+        }
+
+        .btn-primary {
+            border: none !important;
+            color: #fff !important;
+            border-radius: 11px !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--edit-primary), var(--edit-secondary)) !important;
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+            padding: 0.55rem 1rem !important;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:focus-visible {
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px rgba(9, 94, 96, 0.28);
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="training-edit-page">
+        <div class="training-edit-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="training-edit-back">
+                <i class="fa fa-arrow-left"></i> Retour
+            </a>
+            <span class="training-edit-pill"><i class="fa fa-pen"></i> Edition</span>
+        </div>
+
+        <section class="training-edit-hero">
+            <h2 class="training-edit-title">Modifier la formation</h2>
+            <p class="training-edit-subtitle">
+                Mettez à jour les informations et les blocs de compétences associés.
+            </p>
+        </section>
+
+        <section class="training-edit-form-card">
+            {{ form_start(edit_form) }}
+
+            <div class="training-edit-section">
+                <h3 class="training-edit-section-title">Informations générales</h3>
+                {% if edit_form.name is defined %}
+                    {{ form_row(edit_form.name) }}
+                {% endif %}
+                {% if edit_form.description is defined %}
+                    {{ form_row(edit_form.description) }}
+                {% endif %}
+            </div>
+
+            <div class="training-edit-section">
+                <h3 class="training-edit-section-title">Blocs de compétences</h3>
+                {% if edit_form.skillUnits is defined %}
+                    {{ form_row(edit_form.skillUnits) }}
+                {% endif %}
+            </div>
+
+            {{ form_rest(edit_form) }}
+            {{ form_end(edit_form, { render_rest: false }) }}
+        </section>
+    </div>
+{% endblock %}

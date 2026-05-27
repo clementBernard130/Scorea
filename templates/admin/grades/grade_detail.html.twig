@@ -1,0 +1,344 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --grade-detail-bg-start: #f7f4ee;
+            --grade-detail-bg-end: #ecf6f4;
+            --grade-detail-primary: #0e8a7d;
+            --grade-detail-secondary: #0a5e60;
+            --grade-detail-accent: #ec6f2f;
+            --grade-detail-text: #15323a;
+            --grade-detail-muted: #5f7680;
+            --grade-detail-surface: #ffffff;
+            --grade-detail-border: #d9ebe7;
+            --grade-detail-shadow: rgba(12, 64, 67, 0.14);
+        }
+
+        .grade-detail-page {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .grade-detail-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+        }
+
+        .grade-detail-toolbar .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 12px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn-grade-back {
+            color: var(--grade-detail-text);
+            background: color-mix(in srgb, var(--grade-detail-bg-end) 60%, #ffffff);
+            border: 1px solid var(--grade-detail-border);
+        }
+
+        .btn-grade-back:hover,
+        .btn-grade-back:focus,
+        .btn-grade-back:active,
+        .btn-grade-back:focus-visible {
+            color: var(--grade-detail-text) !important;
+            background: #ffffff !important;
+            border-color: color-mix(in srgb, var(--grade-detail-primary) 32%, var(--grade-detail-border)) !important;
+        }
+
+        .btn-grade-edit {
+            border: none;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--grade-detail-primary), var(--grade-detail-secondary));
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+        }
+
+        .btn-grade-edit:hover,
+        .btn-grade-edit:focus,
+        .btn-grade-edit:active,
+        .btn-grade-edit:focus-visible {
+            color: #ffffff !important;
+            background: linear-gradient(135deg, var(--grade-detail-primary), var(--grade-detail-secondary)) !important;
+        }
+
+        .grade-detail-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--grade-detail-primary) 25%, var(--grade-detail-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+                linear-gradient(130deg, var(--grade-detail-bg-start), var(--grade-detail-bg-end));
+            box-shadow: 0 20px 40px var(--grade-detail-shadow);
+            padding: 1.3rem;
+        }
+
+        .grade-detail-title {
+            margin: 0;
+            color: var(--grade-detail-text);
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+        }
+
+        .grade-detail-subtitle {
+            margin: 0.5rem 0 0;
+            color: var(--grade-detail-muted);
+        }
+
+        .grade-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.85rem;
+        }
+
+        .grade-detail-card {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--grade-detail-primary) 16%, var(--grade-detail-border));
+            background: var(--grade-detail-surface);
+            box-shadow: 0 10px 20px rgba(9, 93, 93, 0.08);
+            padding: 1rem;
+        }
+
+        .grade-detail-card h3 {
+            margin: 0 0 0.7rem;
+            font-size: 0.96rem;
+            color: var(--grade-detail-text);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .grade-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--grade-detail-accent) 16%, #ffffff);
+            border: 1px solid color-mix(in srgb, var(--grade-detail-accent) 26%, var(--grade-detail-border));
+            color: color-mix(in srgb, var(--grade-detail-accent) 75%, #7e3a17);
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .grade-user-link {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+
+        .grade-user-link:hover,
+        .grade-user-link:focus,
+        .grade-user-link:active,
+        .grade-user-link:focus-visible {
+            color: inherit !important;
+            transform: translateY(-1px);
+            border-color: color-mix(in srgb, var(--grade-detail-primary) 34%, var(--grade-detail-border));
+            box-shadow: 0 8px 16px rgba(9, 93, 93, 0.12);
+        }
+
+        .grade-muted {
+            margin: 0;
+            color: var(--grade-detail-muted);
+            font-style: italic;
+        }
+
+        .grade-value {
+            margin: 0;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--grade-detail-secondary);
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .grade-comment {
+            margin: 0;
+            white-space: pre-line;
+        }
+
+        .danger-zone {
+            border: 1px solid #f2c3c3;
+            background: linear-gradient(180deg, #fff7f7, #fff0f0);
+        }
+
+        .danger-zone-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .danger-zone-title {
+            margin: 0;
+            font-size: 1rem;
+            color: #8d1f1f;
+            font-weight: 700;
+        }
+
+        .btn-danger-zone {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border: none;
+            border-radius: 10px;
+            padding: 0.55rem 0.9rem;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, #d73a49, #9e1f2d);
+            box-shadow: 0 10px 20px rgba(153, 28, 39, 0.2);
+        }
+
+        .btn-danger-zone:hover,
+        .btn-danger-zone:focus,
+        .btn-danger-zone:active,
+        .btn-danger-zone:focus-visible {
+            color: #fff !important;
+            background: linear-gradient(135deg, #bf2f3c, #851926) !important;
+        }
+
+        .danger-zone .ea-delete-form {
+            margin: 0;
+        }
+
+        .danger-zone .ea-delete-form .action-delete,
+        .danger-zone .ea-delete-form button[type='submit'] {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 0.55rem 0.9rem !important;
+            color: #fff !important;
+            text-decoration: none;
+            background: linear-gradient(135deg, #d73a49, #9e1f2d) !important;
+            box-shadow: 0 10px 20px rgba(153, 28, 39, 0.2);
+        }
+
+        .danger-zone .ea-delete-form .action-delete:hover,
+        .danger-zone .ea-delete-form .action-delete:focus,
+        .danger-zone .ea-delete-form .action-delete:active,
+        .danger-zone .ea-delete-form button[type='submit']:hover,
+        .danger-zone .ea-delete-form button[type='submit']:focus,
+        .danger-zone .ea-delete-form button[type='submit']:active {
+            color: #fff !important;
+            background: linear-gradient(135deg, #bf2f3c, #851926) !important;
+        }
+
+        @media (max-width: 780px) {
+            .grade-detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}Fiche note{% endblock %}
+
+{% block main %}
+    <div class="grade-detail-page">
+        <div class="grade-detail-toolbar">
+            <a href="{{ app.request.headers.get('referer')|default(ea_url().setAction('index')) }}" class="btn btn-grade-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                <i class="fa fa-arrow-left"></i> Retour
+            </a>
+            <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-grade-edit">
+                <i class="fa fa-pen"></i> Modifier
+            </a>
+        </div>
+
+        <section class="grade-detail-hero">
+            <h2 class="grade-detail-title">
+                {{ entity.instance.student ? (entity.instance.student.lastName|default('') ~ ' ' ~ entity.instance.student.firstName|default(entity.instance.student.username|default('Élève'))) | trim : 'Élève inconnu' }}
+                -
+                {{ entity.instance.grade is not null ? entity.instance.grade : '-' }}
+            </h2>
+            <p class="grade-detail-subtitle">Vue détaillée de la note et de son contexte d'évaluation.</p>
+        </section>
+
+        <div class="grade-detail-grid">
+            <section class="grade-detail-card">
+                <h3>Valeur</h3>
+                <p class="grade-value">{{ entity.instance.grade is not null ? entity.instance.grade : '-' }}</p>
+            </section>
+
+            <section class="grade-detail-card">
+                <h3>Type de note</h3>
+                {% if entity.instance.test is not null and entity.instance.test.gradeType is not null %}
+                    <span class="grade-chip">
+                        <i class="fa fa-tag"></i> {{ entity.instance.test.gradeType.name|default(entity.instance.test.gradeType) }}
+                    </span>
+                {% else %}
+                    <p class="grade-muted">Aucun type de note renseigné.</p>
+                {% endif %}
+            </section>
+
+            <section class="grade-detail-card">
+                <h3>Élève</h3>
+                {% if entity.instance.student is not null %}
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\StudentCrudController').setAction('detail').setEntityId(entity.instance.student.id) }}" class="grade-chip grade-user-link">
+                        <i class="fa fa-user-graduate"></i>
+                        {{ entity.instance.student.lastName|default('') }} {{ entity.instance.student.firstName|default(entity.instance.student.username|default(entity.instance.student)) }}
+                    </a>
+                {% else %}
+                    <p class="grade-muted">Aucun élève rattaché.</p>
+                {% endif %}
+            </section>
+
+            <section class="grade-detail-card">
+                <h3>Test associé</h3>
+                {% if entity.instance.test is not null %}
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\TestsCrudController').setAction('detail').setEntityId(entity.instance.test.id) }}" class="grade-chip grade-user-link">
+                        <i class="fa fa-file-alt"></i> {{ entity.instance.test }}
+                    </a>
+                {% else %}
+                    <p class="grade-muted">Aucun test associé.</p>
+                {% endif %}
+            </section>
+        </div>
+
+        <section class="grade-detail-card">
+            <h3>Commentaire</h3>
+            {% if entity.instance.comment is not empty %}
+                <p class="grade-comment">{{ entity.instance.comment }}</p>
+            {% else %}
+                <p class="grade-muted">Aucun commentaire.</p>
+            {% endif %}
+        </section>
+
+        <section class="grade-detail-grid">
+            <div class="grade-detail-card">
+                <h3>Créée le</h3>
+                <p>{{ entity.instance.createdAt ? entity.instance.createdAt|date('d/m/Y H:i') : '-' }}</p>
+            </div>
+            <div class="grade-detail-card">
+                <h3>Mise à jour le</h3>
+                <p>{{ entity.instance.updatedAt ? entity.instance.updatedAt|date('d/m/Y H:i') : '-' }}</p>
+            </div>
+        </section>
+
+        <section class="grade-detail-card danger-zone">
+            <div class="danger-zone-header">
+                <h3 class="danger-zone-title">Zone de danger</h3>
+                {% set deleteUrl = ea_url().setAction('delete').setEntityId(entity.primaryKeyValue) %}
+                <button
+                    type="button"
+                    class="btn-danger-zone"
+                    data-action-name="delete"
+                    formaction="{{ deleteUrl }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modal-delete"
+                >
+                    <i class="fa fa-trash"></i>
+                    <span>Supprimer la note</span>
+                </button>
+                {{ include('@EasyAdmin/crud/includes/_delete_form.html.twig', { entity_id: entity.primaryKeyValue }, with_context: false) }}
+            </div>
+        </section>
+    </div>
+{% endblock %}

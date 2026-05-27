@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@source "../../templates";
+@source not "../../public";
+
+
+body {
+    background-color: lightgray;
+}

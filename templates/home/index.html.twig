@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Scorea{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-100 text-gray-900">
+    <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+        <header class="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-md bg-white px-6 py-4 shadow-md">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-gray-500">Scorea</p>
+                <h1 class="text-2xl font-semibold text-gray-900">Accueil</h1>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                {% if user %}
+                    <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-2">
+                        <p class="text-gray-900">Connecté en tant que <span class="font-medium">{{ user.firstName }} {{ user.lastName }}</span></p>
+                    </div>
+                    {% if is_granted('ROLE_TEACHER') %}
+                        <a href="{{ path('teacher_profile') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
+                            Mon profil
+                        </a>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
+                            Administration
+                        </a>
+                    {% endif %}
+                    <a href="{{ path('app_logout') }}" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                        Déconnexion
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                        Connexion
+                    </a>
+                {% endif %}
+            </div>
+        </header>
+
+        <main>
+            {% if user and is_granted('ROLE_TEACHER') %}
+                <section class="mb-4 rounded-md bg-white p-4 shadow-md sm:p-6">
+                    <div class="flex flex-wrap items-end justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-semibold text-gray-900">Mes classes</h2>
+                            <p class="mt-2 max-w-2xl text-gray-600">
+                                Retrouvez vos classes, ouvrez une section, puis accédez aux étudiants, aux tests et à la saisie des notes.
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-center">
+                                <p class="text-2xl font-semibold text-gray-900">{{ teacherSections|length }} <span class="text-xs uppercase tracking-wide text-gray-500">Classes</span></p>
+                            </div>
+                            <div class="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-center">
+                                <a href="{{ path('teacher_portal_tests_index') }}" class="block text-2xl font-semibold text-gray-900 transition hover:text-blue-700">
+                                    {{ teacherTestsCount }} <span class="text-xs uppercase tracking-wide text-gray-500">Évaluations</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-4 rounded-md bg-white p-4 shadow-md sm:p-6">
+                    <div class="mb-3 flex items-center justify-between">
+                        <h2 class="text-3xl font-semibold text-gray-900">Alertes</h2>
+                        <span class="text-sm text-gray-500">{{ teacherAlerts|length }} élément(s)</span>
+                    </div>
+
+                    {% if teacherAlerts is not empty %}
+                        <ul class="space-y-2">
+                            {% for item in teacherAlerts %}
+                                <li>
+                                    <a href="{{ 'lower_average' in item.alert.type
+                                            ? path('app_test_show', { id: item.testId, section: item.sectionId })
+                                            : path('teacher_portal_grade_new', { id: item.testId, section: item.sectionId, student: item.studentId }) }}"
+                                       class="flex items-start gap-3 rounded-md border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-gray-800 transition hover:bg-orange-100">
+                                        <span class="mt-0.5 shrink-0 text-orange-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </span>
+                                        <span>{{ item.alert.description }}</span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-sm text-gray-500">Aucune alerte récente.</p>
+                    {% endif %}
+                </section>
+
+                {% if teacherSections is not empty %}
+                    <section class="space-y-4">
+                        {% for classItem in teacherSections %}
+                            {% set section = classItem.section %}
+                            <a href="{{ path('app_class_show', { id: section.id }) }}" class="group flex flex-col gap-4 rounded-md border border-gray-200 bg-white p-6 text-gray-900 shadow-sm transition hover:shadow-md sm:flex-row sm:items-center sm:justify-between">
+                                <div class="flex min-w-0 items-start gap-4">
+                                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-md bg-blue-600 text-lg font-semibold text-white">
+                                        {{ section.name|slice(0, 2)|upper }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="truncate text-2xl font-semibold text-gray-900">{{ section.name }}</h3>
+                                        <p class="mt-1 text-sm text-gray-600">{{ section.training.name }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-3 sm:justify-end">
+                                    {% if classItem.ungradedStudentCount > 0 %}
+                                        <div class="inline-flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+                                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">{{ classItem.ungradedStudentCount }}</span>
+                                        </div>
+                                    {% endif %}
+                                    <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">
+                                        {{ classItem.studentCount }} étudiant{% if classItem.studentCount > 1 %}s{% endif %}
+                                    </div>
+                                    <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">
+                                        {{ section.startDate|date('d/m/Y') }} - {{ section.endDate|date('d/m/Y') }}
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-500 group-hover:text-gray-900">Ouvrir la classe →</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </section>
+                {% else %}
+                    <section class="rounded-md border border-dashed border-gray-300 bg-white p-8 text-center text-gray-600 shadow-sm">
+                        <p class="text-lg font-medium text-gray-900">Aucune classe n'est liée à votre compte.</p>
+                        <p class="mt-2">Si c'est une erreur, vérifiez l'association enseignant / section dans l'administration.</p>
+                    </section>
+                {% endif %}
+            {% else %}
+                <div class="rounded-md bg-white px-8 py-16 text-center text-gray-900 shadow-md">
+                    <p class="text-sm uppercase tracking-wide text-gray-500">Bienvenue sur Scorea</p>
+                    <h2 class="mt-3 text-4xl font-semibold text-gray-900">Connectez-vous pour accéder à votre espace</h2>
+                    <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600">Une fois connecté, votre tableau de bord s'adapte à votre rôle.</p>
+                    <a href="{{ path('app_login') }}" class="mt-8 inline-flex rounded-md bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700">
+                        Se connecter
+                    </a>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}

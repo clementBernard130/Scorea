@@ -1,0 +1,241 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --subject-bg-start: #f7f2ea;
+            --subject-bg-end: #e7f3f1;
+            --subject-primary: #0f7e73;
+            --subject-primary-deep: #0b5b56;
+            --subject-accent: #cc6d26;
+            --subject-text: #17353d;
+            --subject-muted: #5f757e;
+            --subject-surface: #ffffff;
+            --subject-border: #d7e8e3;
+            --subject-shadow: rgba(11, 84, 90, 0.12);
+        }
+
+        .subject-detail-page {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1.1rem;
+            padding-bottom: 0.6rem;
+        }
+
+        .subject-detail-page::before {
+            content: '';
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            right: -80px;
+            top: -70px;
+            border-radius: 999px;
+            background: radial-gradient(circle at center, rgba(204, 109, 38, 0.2), rgba(204, 109, 38, 0));
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .subject-detail-toolbar,
+        .subject-detail-hero,
+        .subject-detail-grid,
+        .subject-detail-card {
+            position: relative;
+            z-index: 1;
+        }
+
+        .subject-detail-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .subject-detail-toolbar .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 11px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .btn-subject-back {
+            color: var(--subject-text);
+            background: color-mix(in srgb, var(--subject-bg-end) 65%, #ffffff);
+            border: 1px solid var(--subject-border);
+        }
+
+        .btn-subject-edit {
+            border: none;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--subject-primary), var(--subject-primary-deep));
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+        }
+
+        .btn-subject-back:hover,
+        .btn-subject-back:focus,
+        .btn-subject-back:active,
+        .btn-subject-back:focus-visible {
+            color: var(--subject-text) !important;
+            background: #ffffff !important;
+            border-color: color-mix(in srgb, var(--subject-primary) 35%, var(--subject-border)) !important;
+        }
+
+        .btn-subject-edit:hover,
+        .btn-subject-edit:focus,
+        .btn-subject-edit:active,
+        .btn-subject-edit:focus-visible {
+            color: #ffffff !important;
+            background: linear-gradient(135deg, var(--subject-primary), var(--subject-primary-deep)) !important;
+            transform: translateY(-1px);
+        }
+
+        .subject-detail-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--subject-primary) 25%, var(--subject-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+                linear-gradient(130deg, var(--subject-bg-start), var(--subject-bg-end));
+            box-shadow: 0 20px 40px var(--subject-shadow);
+            padding: 1.35rem;
+        }
+
+        .subject-detail-title {
+            margin: 0;
+            color: var(--subject-text);
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+            line-height: 1.12;
+        }
+
+        .subject-detail-subtitle {
+            margin: 0.5rem 0 0;
+            color: var(--subject-muted);
+        }
+
+        .subject-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .subject-detail-card {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--subject-primary) 16%, var(--subject-border));
+            background: var(--subject-surface);
+            box-shadow: 0 12px 22px rgba(9, 93, 93, 0.08);
+            padding: 1.05rem;
+        }
+
+        .subject-detail-card h3 {
+            margin: 0 0 0.7rem;
+            font-size: 0.96rem;
+            color: var(--subject-text);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .subject-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            border-radius: 999px;
+            padding: 0.4rem 0.8rem;
+            background: color-mix(in srgb, var(--subject-accent) 14%, #ffffff);
+            border: 1px solid color-mix(in srgb, var(--subject-accent) 24%, var(--subject-border));
+            color: color-mix(in srgb, var(--subject-accent) 75%, #7e3a17);
+            font-weight: 700;
+        }
+
+        .subject-description {
+            margin: 0;
+            color: var(--subject-text);
+            line-height: 1.55;
+            white-space: pre-line;
+        }
+
+        .subject-muted {
+            margin: 0;
+            color: var(--subject-muted);
+            font-style: italic;
+        }
+
+        @media (max-width: 640px) {
+            .subject-detail-page {
+                gap: 0.85rem;
+            }
+
+            .subject-detail-hero,
+            .subject-detail-card {
+                padding: 0.9rem;
+            }
+
+            .subject-detail-toolbar {
+                align-items: stretch;
+            }
+
+            .subject-detail-toolbar .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .subject-detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}Fiche matiere{% endblock %}
+
+{% block main %}
+    <div class="subject-detail-page">
+        <div class="subject-detail-toolbar">
+            <a href="{{ app.request.headers.get('referer')|default(ea_url().setAction('index')) }}" class="btn btn-subject-back" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                <i class="fa fa-arrow-left"></i> Retour
+            </a>
+            <a href="{{ ea_url().setAction('edit').setEntityId(entity.primaryKeyValue) }}" class="btn btn-subject-edit">
+                <i class="fa fa-pen"></i> Modifier
+            </a>
+        </div>
+
+        <section class="subject-detail-hero">
+            <h2 class="subject-detail-title">{{ entity.instance.name|default('Matiere sans nom') }}</h2>
+            <p class="subject-detail-subtitle">Vue détaillée de la matière.</p>
+        </section>
+
+        <div class="subject-detail-grid">
+            <section class="subject-detail-card">
+                <h3>Coefficient</h3>
+                <p class="subject-stat">
+                    <i class="fa fa-balance-scale"></i>
+                    {{ entity.instance.coefficient is not null ? entity.instance.coefficient : '-' }}
+                </p>
+            </section>
+
+            <section class="subject-detail-card">
+                <h3>Identifiant</h3>
+                <p class="subject-stat">
+                    <i class="fa fa-hashtag"></i>
+                    {{ entity.primaryKeyValue }}
+                </p>
+            </section>
+        </div>
+
+        <section class="subject-detail-card">
+            <h3>Description</h3>
+            {% if entity.instance.description is not empty %}
+                <p class="subject-description">{{ entity.instance.description }}</p>
+            {% else %}
+                <p class="subject-muted">Aucune description.</p>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

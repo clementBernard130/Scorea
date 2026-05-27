@@ -1,0 +1,193 @@
+{% extends '@EasyAdmin/crud/new.html.twig' %}
+
+{% block configured_head_contents %}
+    {{ parent() }}
+    <style>
+        :root {
+            --subject-new-bg-start: #f6f1e8;
+            --subject-new-bg-end: #e8f4f1;
+            --subject-new-primary: #0f7e73;
+            --subject-new-secondary: #0a5d58;
+            --subject-new-accent: #d67827;
+            --subject-new-text: #16343c;
+            --subject-new-muted: #5d727b;
+            --subject-new-surface: #ffffff;
+            --subject-new-border: #d8e8e3;
+        }
+
+        .subject-new-page {
+            max-width: 980px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .subject-new-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+        }
+
+        .subject-new-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--subject-new-text);
+            background: color-mix(in srgb, var(--subject-new-bg-end) 60%, #ffffff);
+            border: 1px solid var(--subject-new-border);
+            border-radius: 12px;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .subject-new-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--subject-new-accent) 20%, #ffffff);
+            color: color-mix(in srgb, var(--subject-new-accent) 72%, #8a3f19);
+            font-size: 0.79rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .subject-new-hero {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid color-mix(in srgb, var(--subject-new-primary) 25%, var(--subject-new-border));
+            background:
+                linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+                linear-gradient(130deg, var(--subject-new-bg-start), var(--subject-new-bg-end));
+            box-shadow: 0 20px 40px rgba(12, 64, 67, 0.14);
+            padding: 1.3rem;
+        }
+
+        .subject-new-title {
+            margin: 0;
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+            line-height: 1.12;
+            color: var(--subject-new-text);
+        }
+
+        .subject-new-subtitle {
+            margin: 0.55rem 0 0;
+            color: var(--subject-new-muted);
+            font-size: 0.95rem;
+            max-width: 58ch;
+        }
+
+        .subject-new-form-card {
+            border-radius: 18px;
+            padding: 1.1rem;
+            border: 1px solid color-mix(in srgb, var(--subject-new-primary) 18%, var(--subject-new-border));
+            background: var(--subject-new-surface);
+            box-shadow: 0 16px 32px rgba(14, 76, 84, 0.1);
+        }
+
+        .subject-new-section {
+            border-radius: 14px;
+            border: 1px solid color-mix(in srgb, var(--subject-new-primary) 16%, var(--subject-new-border));
+            background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--subject-new-bg-end) 22%, #ffffff));
+            padding: 0.95rem;
+        }
+
+        .subject-new-section-title {
+            margin: 0 0 0.72rem;
+            color: var(--subject-new-text);
+            font-size: 0.94rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .subject-new-section-title::before {
+            content: '';
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--subject-new-primary), var(--subject-new-accent));
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--subject-new-primary) 22%, transparent);
+        }
+
+        .subject-new-form-card .form-label,
+        .subject-new-form-card label {
+            color: color-mix(in srgb, var(--subject-new-text) 88%, #102026);
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .subject-new-form-card .form-control,
+        .subject-new-form-card .form-select {
+            border-radius: 10px;
+            border: 1px solid color-mix(in srgb, var(--subject-new-primary) 18%, var(--subject-new-border));
+            min-height: 42px;
+            background: #ffffff;
+        }
+
+        .subject-new-form-card textarea.form-control {
+            min-height: 120px;
+        }
+
+        .subject-new-form-card .ea-form-actions,
+        .subject-new-form-card .form-actions {
+            border-top: 1px dashed color-mix(in srgb, var(--subject-new-primary) 26%, var(--subject-new-border));
+            margin-top: 0.9rem;
+            padding-top: 0.9rem;
+        }
+
+        .btn-primary {
+            border: none !important;
+            color: #fff !important;
+            border-radius: 11px !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--subject-new-primary), var(--subject-new-secondary)) !important;
+            box-shadow: 0 10px 18px rgba(9, 94, 96, 0.24);
+            padding: 0.55rem 1rem !important;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="subject-new-page">
+        <div class="subject-new-toolbar">
+            <a href="{{ ea_url().setAction('index') }}" class="subject-new-back">
+                <i class="fa fa-arrow-left"></i> Retour
+            </a>
+            <span class="subject-new-pill"><i class="fa fa-book"></i> Nouvelle matiere</span>
+        </div>
+
+        <section class="subject-new-hero">
+            <h2 class="subject-new-title">Creer une matiere</h2>
+            <p class="subject-new-subtitle">Renseignez le nom, la description et le coefficient de la matiere.</p>
+        </section>
+
+        <section class="subject-new-form-card">
+            {{ form_start(new_form) }}
+
+            <div class="subject-new-section">
+                <h3 class="subject-new-section-title">Informations generales</h3>
+                {% if new_form.name is defined %}
+                    {{ form_row(new_form.name) }}
+                {% endif %}
+                {% if new_form.description is defined %}
+                    {{ form_row(new_form.description) }}
+                {% endif %}
+                {% if new_form.coefficient is defined %}
+                    {{ form_row(new_form.coefficient) }}
+                {% endif %}
+            </div>
+
+            {{ form_rest(new_form) }}
+            {{ form_end(new_form, { render_rest: false }) }}
+        </section>
+    </div>
+{% endblock %}

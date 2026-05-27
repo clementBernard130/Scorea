@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail du test - Scorea{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-100 text-gray-900">
+    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-md bg-white px-6 py-4 shadow-md">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-gray-500">Espace enseignant</p>
+                <h1 class="text-2xl font-semibold text-gray-900">{{ test.subject.name }} - {{ test.testDate|date('d/m/Y') }}</h1>
+                <p class="mt-1 text-sm text-gray-600">{{ test.comment ?: 'Aucun commentaire' }}</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{{ section ? path('app_class_show', { id: section.id }) : path('app_home') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50">
+                    Retour
+                </a>
+                {% if canAddGrade %}
+                    <a href="{{ section ? path('teacher_portal_grade_new', { id: test.id, section: section.id }) : path('teacher_portal_grade_new', { id: test.id }) }}" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700">
+                        Saisir une note
+                    </a>
+                {% else %}
+                    <span class="cursor-not-allowed rounded-md bg-gray-400 px-4 py-2 font-medium text-white" title="Tous les étudiants ont déjà une note pour ce test">
+                        Saisir une note
+                    </span>
+                {% endif %}
+            </div>
+        </header>
+
+        <section class="rounded-md bg-white p-6 shadow-md sm:p-8">
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <h2 class="text-2xl font-semibold text-gray-900">Notes des étudiants</h2>
+            </div>
+
+            <div class="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Nombre de notes</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900">{{ gradeCount }}</p>
+                </div>
+                <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Moyenne</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900">
+                        {{ averageGrade is not null ? averageGrade|number_format(2, ',', ' ') : '-' }}
+                    </p>
+                </div>
+                <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Note minimale</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900">
+                        {{ minGrade is not null ? minGrade|number_format(2, ',', ' ') : '-' }}
+                    </p>
+                </div>
+                <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Note maximale</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900">
+                        {{ maxGrade is not null ? maxGrade|number_format(2, ',', ' ') : '-' }}
+                    </p>
+                </div>
+            </div>
+
+            {% if grades is not empty %}
+                <div class="overflow-x-auto rounded-md border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Étudiant</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Type</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Note</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Commentaire</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-600">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            {% for grade in grades %}
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-900">{{ grade.student.firstName }} {{ grade.student.lastName }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ grade.test and grade.test.gradeType ? grade.test.gradeType.name : 'Type non défini' }}</td>
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900">{{ grade.grade|number_format(2, ',', ' ') }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ grade.comment ?: 'Aucun commentaire' }}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="flex justify-end gap-2">
+                                            <a href="{{ section ? path('teacher_portal_grade_edit', { id: grade.id, section: section.id }) : path('teacher_portal_grade_edit', { id: grade.id }) }}" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50">
+                                                Modifier
+                                            </a>
+                                            <form method="post" action="{{ section ? path('teacher_portal_grade_delete', { id: grade.id, section: section.id }) : path('teacher_portal_grade_delete', { id: grade.id }) }}" onsubmit="return confirm('Supprimer cette note ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_grade_' ~ grade.id) }}">
+                                                <button type="submit" class="rounded-md bg-red-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-red-700">
+                                                    Supprimer
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-gray-600">
+                    Aucune note n'a encore été saisie pour ce test.
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

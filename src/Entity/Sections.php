@@ -1,0 +1,163 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\SectionsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: SectionsRepository::class)]
+class Sections
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTime $start_date = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTime $end_date = null;
+
+    #[ORM\ManyToOne(inversedBy: 'sections')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Trainings $training = null;
+
+    /**
+     * @var Collection<int, Tests>
+     */
+    #[ORM\OneToMany(targetEntity: Tests::class, mappedBy: 'section')]
+    private Collection $tests;
+
+    /**
+     * @var Collection<int, Users>
+     */
+    #[ORM\ManyToMany(targetEntity: Users::class, mappedBy: 'sections')]
+    private Collection $users;
+
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+        $this->tests = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getStartDate(): ?\DateTime
+    {
+        return $this->start_date;
+    }
+
+    public function setStartDate(\DateTime $start_date): static
+    {
+        $this->start_date = $start_date;
+
+        return $this;
+    }
+
+    public function getEndDate(): ?\DateTime
+    {
+        return $this->end_date;
+    }
+
+    public function setEndDate(\DateTime $end_date): static
+    {
+        $this->end_date = $end_date;
+
+        return $this;
+    }
+
+    public function getTraining(): ?Trainings
+    {
+        return $this->training;
+    }
+
+    public function setTraining(?Trainings $training): static
+    {
+        $this->training = $training;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tests>
+     */
+    public function getTests(): Collection
+    {
+        return $this->tests;
+    }
+
+    public function addTest(Tests $test): static
+    {
+        if (!$this->tests->contains($test)) {
+            $this->tests->add($test);
+            $test->setSection($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTest(Tests $test): static
+    {
+        if ($this->tests->removeElement($test)) {
+            if ($test->getSection() === $this) {
+                $test->setSection(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Users>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(Users $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->addSection($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(Users $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeSection($this);
+        }
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->name;
+    }
+}
