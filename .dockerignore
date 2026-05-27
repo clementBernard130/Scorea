@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+vendor/
+var/
+node_modules/
+public/build/
+compose*.yaml
+*.md
+tests/
