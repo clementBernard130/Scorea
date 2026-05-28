@@ -334,7 +334,7 @@ class AppFixtures extends Fixture
 
         // === Grade type names ===
         $gradeTypeNamesByName = [];
-        foreach (['Contrôle continu', 'Oral', 'Examen'] as $gradeTypeName) {
+        foreach (['Contrôle Continu', 'Oral Projet', 'DS'] as $gradeTypeName) {
             $gradeTypeEntity = $manager->getRepository(GradeTypeNames::class)->findOneBy(['name' => $gradeTypeName]);
             if ($gradeTypeEntity === null) {
                 $gradeTypeEntity = new GradeTypeNames();
@@ -350,44 +350,44 @@ class AppFixtures extends Fixture
         // === Grade types and weights by skill ===
         $skillGradeTypes = [
             'Analyser les besoins métiers' => [
-                'Contrôle continu' => 30,
-                'Oral' => 20,
-                'Examen' => 50,
+                'Contrôle Continu' => 30,
+                'Oral Projet' => 20,
+                'DS' => 50,
             ],
             'Concevoir une architecture applicative' => [
-                'Contrôle continu' => 40,
-                'Oral' => 20,
-                'Examen' => 40,
+                'Contrôle Continu' => 40,
+                'Oral Projet' => 20,
+                'DS' => 40,
             ],
             'Sécuriser une application' => [
-                'Contrôle continu' => 35,
-                'Oral' => 15,
-                'Examen' => 50,
+                'Contrôle Continu' => 35,
+                'Oral Projet' => 15,
+                'DS' => 50,
             ],
             'Développer des composants métier' => [
-                'Contrôle continu' => 45,
-                'Oral' => 15,
-                'Examen' => 40,
+                'Contrôle Continu' => 45,
+                'Oral Projet' => 15,
+                'DS' => 40,
             ],
             'Mettre en production une application' => [
-                'Contrôle continu' => 30,
-                'Oral' => 20,
-                'Examen' => 50,
+                'Contrôle Continu' => 30,
+                'Oral Projet' => 20,
+                'DS' => 50,
             ],
             'Maintenir une application' => [
-                'Contrôle continu' => 40,
-                'Oral' => 20,
-                'Examen' => 40,
+                'Contrôle Continu' => 40,
+                'Oral Projet' => 20,
+                'DS' => 40,
             ],
             'Gérer un projet de modernisation' => [
-                'Contrôle continu' => 25,
-                'Oral' => 25,
-                'Examen' => 50,
+                'Contrôle Continu' => 25,
+                'Oral Projet' => 25,
+                'DS' => 50,
             ],
             'Refactoriser du code legacy' => [
-                'Contrôle continu' => 35,
-                'Oral' => 25,
-                'Examen' => 40,
+                'Contrôle Continu' => 35,
+                'Oral Projet' => 25,
+                'DS' => 40,
             ],
         ];
 
@@ -446,7 +446,7 @@ class AppFixtures extends Fixture
                 'teacher' => 'mathias.teacher', 
                 'comment' => 'Controle Python - structures de donnees', 
                 'testDate' => new DateTime('2026-01-15'), 
-                'gradeType' => 'Contrôle continu',
+                'gradeType' => 'Contrôle Continu',
                 'gradingMode' => 'full', 
                 'coverage' => 1.0
             ],
@@ -457,7 +457,7 @@ class AppFixtures extends Fixture
                 'teacher' => 'mathias.teacher', 
                 'comment' => 'Quiz Python - algorithmie', 
                 'testDate' => new DateTime('2026-02-12'), 
-                'gradeType' => 'Oral',
+                'gradeType' => 'Oral Projet',
                 'gradingMode' => 'none', 
                 'coverage' => 0.75
             ],
@@ -468,7 +468,7 @@ class AppFixtures extends Fixture
                 'teacher' => 'mathias.teacher', 
                 'comment' => 'Controle Framework PHP - Symfony', 
                 'testDate' => new DateTime('2026-02-20'), 
-                'gradeType' => 'Contrôle continu',
+                'gradeType' => 'Contrôle Continu',
                 'gradingMode' => 'none', 
                 'coverage' => 0.0
             ],
@@ -479,7 +479,7 @@ class AppFixtures extends Fixture
                 'teacher' => 'mathias.teacher', 
                 'comment' => 'TP Framework - validation de formulaire', 
                 'testDate' => new DateTime('2026-04-06'), 
-                'gradeType' => 'Oral',
+                'gradeType' => 'Oral Projet',
                 'gradingMode' => 'partial', 
                 'coverage' => 0.5
             ],
@@ -490,7 +490,7 @@ class AppFixtures extends Fixture
                 'teacher' => 'mathias.teacher',
                 'comment' => 'Evaluation finale de gestion de projet',
                 'testDate' => new DateTime('2026-06-10'),
-                'gradeType' => 'Examen',
+                'gradeType' => 'DS',
                 'gradingMode' => 'full',
                 'coverage' => 1.0
             ]
