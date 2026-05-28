@@ -253,18 +253,6 @@ class AppFixtures extends Fixture
         // === SkillsUnit ===
         $skillUnits = [
             [
-                'name' => 'SIO-BLOC-1 : Maintenir les infrastructures et services',
-                'training' => 'BTS SIO',
-            ],
-            [
-                'name' => 'SIO-BLOC-2 : Développer des applications et gérer les données',
-                'training' => 'BTS SIO',
-            ],
-            [
-                'name' => 'SIO-BLOC-3 : Piloter un projet et accompagner les utilisateurs',
-                'training' => 'BTS SIO',
-            ],
-            [
                 'name' => 'DSNS-BLOC-1 : Analyser, conceptualiser, maquetter et sécuriser une solution',
                 'training' => 'Bachelor DSNS',
             ],
