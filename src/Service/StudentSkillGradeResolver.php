@@ -200,12 +200,13 @@ final class StudentSkillGradeResolver
     }
 
     /**
-     * Moyenne globale = moyenne des moyennes de matières pondérée par coefficient,
-     * chaque moyenne de matière étant elle-même pondérée par type d'éval
-     * (pondération issue de l'union des GradeTypes de toutes les compétences liées à la matière).
+     * Moyenne globale = moyenne des moyennes de matières pondérée par coefficient.
+     * Chaque moyenne de matière = moyenne arithmétique des moyennes de compétences liées,
+     * chaque moyenne de compétence étant pondérée par type d'éval.
      */
     public function resolveGlobalAverage(Users $student): ?float
     {
+        // 1. Collecte des notes par matière → compétence → type d'éval
         $subjectData = [];
 
         foreach ($student->getGrades() as $grade) {
@@ -221,42 +222,55 @@ final class StudentSkillGradeResolver
             }
 
             if (!isset($subjectData[$subjectId])) {
-                // Fusionne les pondérations de tous les types d'éval de toutes les compétences liées
-                $typeWeights = [];
-                foreach ($subject->getSkills() as $skill) {
-                    foreach ($this->buildTypeWeightMap($skill) as $typeId => $weight) {
-                        if (isset($typeWeights[$typeId]) && $typeWeights[$typeId] !== $weight) {
-                            throw new \LogicException(sprintf(
-                                'Conflit de pondération pour le type d\'éval id=%d sur la matière "%s" (id=%d) : poids %d sur une compétence, %d sur une autre.',
-                                $typeId,
-                                $subject->getName() ?? 'inconnue',
-                                $subjectId,
-                                $typeWeights[$typeId],
-                                $weight
-                            ));
-                        }
-                        $typeWeights[$typeId] = $weight;
-                    }
-                }
                 $subjectData[$subjectId] = [
-                    'coefficient'  => $coefficient,
-                    'typeWeights'  => $typeWeights,
-                    'gradesByType' => [],
+                    'coefficient' => $coefficient,
+                    'skills'      => [],
                 ];
+
+                foreach ($subject->getSkills() as $skill) {
+                    $skillId = $skill->getId();
+                    if ($skillId === null) {
+                        continue;
+                    }
+                    $subjectData[$subjectId]['skills'][$skillId] = [
+                        'typeWeights'  => $this->buildTypeWeightMap($skill),
+                        'gradesByType' => [],
+                    ];
+                }
             }
 
             $key = $gradeTypeId ?? 'none';
-            $subjectData[$subjectId]['gradesByType'][$key][] = $gradeValue;
+
+            // Distribue la note dans chaque compétence liée à la matière
+            foreach ($subjectData[$subjectId]['skills'] as &$skillEntry) {
+                $skillEntry['gradesByType'][$key][] = $gradeValue;
+            }
+            unset($skillEntry);
         }
 
+        // 2. Calcul de la moyenne globale
         $weightedSum    = 0.0;
         $coefficientSum = 0.0;
 
         foreach ($subjectData as $data) {
-            if ($data['gradesByType'] === []) {
+            $skillAverages = [];
+
+            foreach ($data['skills'] as $skillEntry) {
+                if ($skillEntry['gradesByType'] === []) {
+                    continue;
+                }
+                $skillAverages[] = $this->computeTypeWeightedAverage(
+                    $skillEntry['gradesByType'],
+                    $skillEntry['typeWeights']
+                );
+            }
+
+            if ($skillAverages === []) {
                 continue;
             }
-            $subjectAvg      = $this->computeTypeWeightedAverage($data['gradesByType'], $data['typeWeights']);
+
+            // Moyenne de la matière = moyenne arithmétique des moyennes de compétences
+            $subjectAvg      = array_sum($skillAverages) / count($skillAverages);
             $weightedSum    += $subjectAvg * $data['coefficient'];
             $coefficientSum += $data['coefficient'];
         }
